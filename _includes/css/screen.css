@@ -133,7 +133,7 @@ nav h1, nav h2 {
 
 #post pre {
   border: 1px solid #ddd;
-  background-color: #eff9e8;
+  background-color: #f4f4f4;
   padding: 0 .4em;
   margin-bottom: 18px !important;
 }
@@ -145,7 +145,7 @@ nav h1, nav h2 {
 
 #post code {
   border: 1px solid #ddd;
-  background-color: #eff9e8;
+  background-color: #f4f4f4;
   font-size: 80%;
   padding: 0 .2em;
 }
