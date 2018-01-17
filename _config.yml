@@ -1,1 +1,5 @@
-theme: jekyll-theme-slate
+# General Jekyll Config
+highlighter: pygments
+url: https://highdb.com
+lsi: false
+exclude: [LICENSE, CNAME, README.md, .gitignore, Gemfile, Gemfile.lock]
