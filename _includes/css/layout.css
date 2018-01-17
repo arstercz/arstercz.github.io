@@ -21,17 +21,17 @@
 	nav {
 		width: 160px; }
 	.sidebar h2 {
-		font-size: 18px;
+		font-size: 15px;
 	}
 
 	#bio {
-		font-size: 14px;
+		font-size: 12px;
 	}
 }
 
 /* All Mobile Sizes (devices and browser) */
 @media only screen and (max-width: 767px) {
-	header h1 { font-size: 34px; line-height: 37px; }
+	header h1 { font-size: 30px; line-height: 35px; }
 	nav { position: relative; }
 	nav ul,
 	#logo { text-align: left; }
@@ -51,8 +51,8 @@
 	}
 
 	h1 {
-		font-size: 26px;
-		line-height: 35px;
+		font-size: 20px;
+		line-height: 30px;
 	}
 }
 
@@ -63,12 +63,12 @@
 	}
 
 	h1 {
-		font-size: 22px;
-		line-height: 30px;
+		font-size: 19px;
+		line-height: 28px;
 	}
 
 	h2 {
-		font-size: 20px;
-		line-height: 21px;
+		font-size: 17px;
+		line-height: 20px;
 	}
 }
