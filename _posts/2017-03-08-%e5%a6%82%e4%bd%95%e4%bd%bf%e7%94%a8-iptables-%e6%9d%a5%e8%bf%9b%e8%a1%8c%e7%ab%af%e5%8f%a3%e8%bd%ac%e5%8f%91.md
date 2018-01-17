@@ -19,7 +19,7 @@ tags:
 ---
 <h2>1. 介绍</h2>
 
-传统的端口转发工具<a href="https://github.com/chenzhe07/portproxy">portproxy</a> 、<a href="https://boutell.com/rinetd/">rinetd</a> 等， 这些应用工具都通过接收并转发 tcp 数据报文实现转发端口的目的, 但是都存在或多或少的缺陷, 比如不能 tcp/udp 同时支持, 难以修改数据报文的一些路由规则等. 庆幸的是我们可以通过 linux 的 iptables 的数据包过滤规则在 kernel 层面实现端口的转发.
+传统的端口转发工具<a href="https://github.com/arstercz/portproxy">portproxy</a> 、<a href="https://boutell.com/rinetd/">rinetd</a> 等， 这些应用工具都通过接收并转发 tcp 数据报文实现转发端口的目的, 但是都存在或多或少的缺陷, 比如不能 tcp/udp 同时支持, 难以修改数据报文的一些路由规则等. 庆幸的是我们可以通过 linux 的 iptables 的数据包过滤规则在 kernel 层面实现端口的转发.
 
 在 iptables 的层面, 端口转发也可以称为端口映射, 是通过NAT(地址转发)的方式来修改数据包目的地址或端口, 再将报文转发到最终的主机(通常在没有公网地址的私有网络中). 通过这种方式用户既可以访问到远端的私有网络的机器(比如运行着 http 服务的主机).
 
