@@ -46,6 +46,8 @@
 		content: none; }
 	table {
 		border-collapse: collapse;
+        border-width: 1px 0 0 1px;
+        margin-bottom: 20px;
 		border-spacing: 0; }
 
 
