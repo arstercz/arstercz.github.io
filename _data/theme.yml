@@ -13,7 +13,7 @@ email: arstercz@gmail.com
 tagline: "weak opinions, strongly held"
 
 # Google Analytics key, leave blank to ignore
-google_analytics_key: UA-xxxx-x
+google_analytics_key:
 
 # Toggle "Postings are my own" disclaimer in footer
 show_disclaimer: true
