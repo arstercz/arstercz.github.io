@@ -56,7 +56,7 @@
 	body {
 		background: #fff;
 		font: 12px/20px "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
-		color: #272727;
+		color: #f4f4f4;
 		-webkit-font-smoothing: antialiased; /* Fix for webkit rendering */
 		-webkit-text-size-adjust: 100%;
  }
