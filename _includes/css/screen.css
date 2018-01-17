@@ -63,6 +63,8 @@ a:visited {
 
 table {
   font-size: inherit;
+  border-width: 1px 0 0 1px;
+  margin-bottom: 20px;
   font: 100%;
 }
 
@@ -88,7 +90,7 @@ ul.posts span {
   font-family: 'Lucida Console', 'Andale Mono', monospace;
   color: #aaa;
   padding-right: 5px;
-  font-size:12px;
+  font-size:13px;
 }
 
 .meta {
