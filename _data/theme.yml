@@ -2,7 +2,7 @@
 
 # Color for top bar, links, etc
 #highlight_color: '#38abd8'
-highlight_color: '#006d24'
+highlight_color: '#2da8d8'
 
 # Profile links on the left sidebar, leave blank to ignore
 social:
