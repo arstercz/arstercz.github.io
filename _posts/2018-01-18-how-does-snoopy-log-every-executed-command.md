@@ -13,7 +13,7 @@ tags:
 ---
 ## snoopy 介绍
 
-[snoopy](https://github.com/a2o/snoopy) 是一个轻量级的lib库, 用来记录系统中所有执行过的命令(以及参数). 我们在实际环境的使用过程中, 结合 snoopy 和 rsyslog 可以很方便的搜集所有主机的历史执行命令, 这种方式给安全审计和故障排错带来了很大的便利. 不同于以往的 `shell + history` 方式, snoopy 是以预加载 (`preload`) 的方式实现历史命令的记录, 整个会话环境的信息都可以记录下来, 而前者则仅仅记录执行的命令, 且容易绕过记录, 难以满足我们的需求. 安装部署可参考 [install](https://github.com/a2o/snoopy/blob/master/doc/INSTALL.md), [rpm-install](https://github.com/a2o/snoopy#installation). 下文则详细介绍 snoopy 如何实现以及使用事项.
+[snoopy](https://github.com/a2o/snoopy) 是一个轻量级的lib库, 用来记录系统中所有执行过的命令(以及参数). 我们在实际环境的使用过程中, 结合 snoopy 和 rsyslog 可以很方便的搜集所有主机的历史执行命令, 这种方式给安全审计和故障排错带来了很大的便利. 不同于以往的 `shell + history` 方式, snoopy 是以预加载 (`preload`) 的方式实现历史命令的记录, 整个会话环境的信息都可以记录下来, 而前者则仅仅记录执行的命令, 且容易绕过记录, 难以满足我们的需求. 安装部署可参考 [install](https://github.com/a2o/snoopy/blob/master/doc/INSTALL.md), [rpm-install](https://github.com/arstercz/sys-rpm). 下文则详细介绍 snoopy 如何实现以及使用事项.
 
 ## snoopy 如何工作
 
