@@ -100,8 +100,8 @@ open("/usr/local/lib/libsnoopy.so", O_RDONLY) = 3
 ```
 系统直接以 `execve` 函数开始执行 `uptime` 程序, 第 4 行开始访问 `/etc/ld.so.preload`, 进而加载 `/usr/local/lib/libsnoopy.so`, 后续内容则为具体的执行信息. 而 snoopy 的输出则包含以下:
 ```
-Jan 18 16:19:52 z119 snoopy[16530]: [uid:0 sid:24493 tty:/dev/pts/3 cwd:/root filename:/usr/bin/strace]: strace uptime
-Jan 18 16:19:52 z119 snoopy[16533]: [uid:0 sid:24493 tty:/dev/pts/3 cwd:/root filename:/usr/bin/uptime]: uptime
+Jan 18 16:19:52 cz-test1 snoopy[16530]: [uid:0 sid:24493 tty:/dev/pts/3 cwd:/root filename:/usr/bin/strace]: strace uptime
+Jan 18 16:19:52 cz-test1 snoopy[16533]: [uid:0 sid:24493 tty:/dev/pts/3 cwd:/root filename:/usr/bin/uptime]: uptime
 ```
 snoopy 搜集了很全的信息, 包括 uid, sid, cwd 等. 更多输出选项可通过 `snoopy.ini` 配置文件查看.
 
