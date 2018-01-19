@@ -32,7 +32,7 @@ prxoysql 切换;
 ## 配置说明
 
 自定义脚本读取 `masterha-script.cnf` 文件获取主从实例和 proxysql 的配置信息, 如下所示:
-```
+```bash
 10.0.21.7:3308 10.0.21.17:3308
    vip 10.0.21.97   
    block_user ^percona$|^proxysqlmon$
