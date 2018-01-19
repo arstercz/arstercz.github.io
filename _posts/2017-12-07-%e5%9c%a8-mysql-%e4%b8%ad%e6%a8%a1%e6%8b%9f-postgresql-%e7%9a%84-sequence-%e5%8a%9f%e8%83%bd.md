@@ -26,7 +26,7 @@ tags:
 
 在 PostgreSQL 中, 我们需要先创建一个 sequence, 然后才能使用 `nextval()` 等函数, 如下所示:
 
-```
+```SQL
 cztest_2=> create sequence seq1;
 CREATE SEQUENCE
 cztest_2=> select setval('seq1', 20); 
@@ -61,7 +61,7 @@ cztest_2=> select nextval('seq1');
 ```
 
 在本文中我们只实现 PostgreSQL 的下面几个函数:
-```
+```SQL
 nextval(regclass)                 bigint   递增序列并返回新值
 currval(regclass)                 bigint   返回最近一次用 nextval 获取的指定序列的数值
 setval(regclass, bigint)          bigint   设置序列的当前数值
@@ -75,7 +75,7 @@ setval(regclass, bigint)          bigint   设置序列的当前数值
 
 
 可以在对应的库中创建表:
-```
+```SQL
 CREATE TABLE `sequence_data` (
   `sequence_name` varchar(100) NOT NULL,
   `sequence_increment` int(11) unsigned NOT NULL DEFAULT '1',
@@ -91,7 +91,7 @@ CREATE TABLE `sequence_data` (
 在该表中, `sequence_cur_value` 为无符号整形, 并没有考虑负数的情况.
 
 更新数据:
-```
+```SQL
 -- This code will create sequence with default values.
 INSERT INTO sequence.sequence_data
     (sequence_name)
@@ -108,7 +108,7 @@ VALUE  ('sq_sequence_2', 10, 100);
 #### nextval 函数:
 
 创建 nextval 函数, 与上述的参考链接相比, 我们先进行了更新, 再进行查询, 所以上述的表结构 `sequence_cur_value` 的默认值改为了 0. 另外没有 `sequence_name` 的话则返回 NULL. 如下所示:
-```
+```SQL
 DROP FUNCTION IF EXISTS `nextval`;
 DELIMITER $$
  
@@ -154,7 +154,7 @@ END$$
 #### currval 函数:
 
 currval 函数则仅返回当前时刻 `sequence_cur_value` 的值, 如果当前值为 0 的话则返回 NULL.
-```
+```SQL
 DROP FUNCTION IF EXISTS `currval`;
 DELIMITER $$
  
@@ -179,11 +179,11 @@ END$$
 #### setval 函数
 
 setval 函数则更新 `sequence_cur_value` 的值, 如果要设置起始值可以通过该函数完成. 另外我们并没有实现 PostgreSQL 中setval 函数的下面的语法， cycle 选项可以在往 `sequence_data` 表插入数据的时候就指定好:
-```
+```SQL
 setval(regclass, bigint, boolean)
 ```
 我们去掉了 cycle 选项:
-```
+```SQL
 DROP FUNCTION IF EXISTS `setval`;
 DELIMITER $$
  
@@ -233,7 +233,7 @@ END$$
 #### 如何使用
 
 可以同上述的 PostgreSQL 进行比较:
-```
+```SQL
 mysql root@[localhost:s3301 sequence] > select setval('sq_my_sequence', 20) as setval; 
 +--------+
 | setval |
@@ -276,7 +276,7 @@ mysql root@[localhost:s3301 sequence] > select nextval('sq_my_sequence') as next
 ```
 
 另外这些函数也支持事务, 在默认隔离级别为 `REPEATABLE-READ` 下操作:
-```
+```SQL
 mysql root@[localhost:s3301 sequence] > begin;
 Query OK, 0 rows affected (0.00 sec)
 
@@ -309,7 +309,7 @@ mysql root@[localhost:s3301 sequence] > select currval('sq_my_sequence');
 #### 复制
 
 在主从环境中, 可以参考官方文档 [stored-programs-logging](https://dev.mysql.com/doc/refman/5.6/en/stored-programs-logging.html) 查看存储过程及函数对 binlog 的影响. 在上述的 setval 和 nextval 函数中, 由于函数更新了数据, 每次的返回值也不同, 所以我们声明了 `NOT DETERMINISTIC`, 这些声明需要开启参数 `log_bin_trust_function_creators `, 另外其中并没有使用一些不安全函数, 所以在复制格式为 `statement` 和 `mixed` 的时候, binlog 都以正常的语句显示, 如下:
-```
+```SQL
 #171207 11:28:49 server id 396517  end_log_pos 974 CRC32 0x1e5076e1     Query   thread_id=8818  exec_time=0     error_code=0
 SET TIMESTAMP=1512530929/*!*/;
 BEGIN
@@ -354,7 +354,7 @@ COMMIT/*!*/;
 
 ### nextval 函数方式压测
 直接使用 mysqlslap 进行压测, 使用 10 个线程执行 5w 条查询:
-```
+```SQL
 # mysqlslap -P 3301 -u root \
 --number-of-queries 50000 -c 10 
 --create-schema sequence 
@@ -368,7 +368,7 @@ Benchmark
 
 ```
 执行后查看 currval 信息:
-```
+```SQL
 
 mysql root@[localhost:s3301 sequence] > select currval('sq_my_sequence') as currval;
 +---------+
@@ -380,7 +380,7 @@ mysql root@[localhost:s3301 sequence] > select currval('sq_my_sequence') as curr
 ```
 
 平均每秒执行2200多, 在执行的过程查看 `innodb status` 信息, 可以看到只有 index-record 锁占用, 没有 gap 锁:
-```
+```SQL
 ------- TRX HAS BEEN WAITING 0 SEC FOR THIS LOCK TO BE GRANTED:
 RECORD LOCKS space id 327 page no 3 n bits 72 index `PRIMARY` of table `sequence`.`sequence_data` trx id 1960370 lock_mode X locks rec but not gap waiting
 ```
@@ -396,7 +396,7 @@ RECORD LOCKS space id 327 page no 3 n bits 72 index `PRIMARY` of table `sequence
 #### replace 和 select 分开
 
 在 `guid` 为 InnoDB 引擎的情况下很快就出现死锁, 事务级别为默认的 `REPEATABLE-READ`:
-```
+```SQL
 mysqlslap -P 3301 -u root \
 --number-of-queries 50000 -c 10 \
 --create-schema sequence \
@@ -407,7 +407,7 @@ mysqlslap: Cannot run query replace into guid (stub) values ('a'); select last_i
 mysqlslap: Cannot run query replace into guid (stub) values ('a'); select last_insert_id() ERROR : Deadlock found when trying to get lock; try restarting transaction
 ```
 `innodb status` 的死锁信息提示的则比较明显, 存在 gap 锁:
-```
+```SQL
 *** (2) HOLDS THE LOCK(S):
 RECORD LOCKS space id 328 page no 4 n bits 72 index `stub` of table `sequence`.`guid` trx id 2170941 lock_mode X
 *** (2) WAITING FOR THIS LOCK TO BE GRANTED:
@@ -415,7 +415,7 @@ RECORD LOCKS space id 328 page no 4 n bits 72 index `stub` of table `sequence`.`
 *** WE ROLL BACK TRANSACTION (1)
 ```
 表结构如下, 从 id 值来看插入的记录不多:
-```
+```SQL
 mysql root@[localhost:s3301 sequence] > show create table guid\G   
 *************************** 1. row ***************************
        Table: guid
@@ -439,7 +439,7 @@ mysql root@[localhost:s3301 sequence] > select * from guid;
 #### replace 和 select 在一个事务中
 
 放到一个事务中, 使用默认隔离级别 `REPEATABLE-READ` 则相对正常, 平均每秒达到了 4400 多:
-```
+```SQL
 mysqlslap -P 3301 -u root \
 --number-of-queries 50000 -c 10 \
 --create-schema sequence \
@@ -454,7 +454,7 @@ Benchmark
 ```
 
 `innodb status` 死锁的概率比上面的低了很多, 在我们持续压测中, 死锁的现象依旧出现, 同样存在 gap 锁, 不过吞吐量还是蛮高的:
-```
+```SQL
 *** (2) TRANSACTION:
 TRANSACTION 4538744, ACTIVE 0 sec updating or deleting
 mysql tables in use 1, locked 1
@@ -471,7 +471,7 @@ RECORD LOCKS space id 328 page no 4 n bits 88 index `stub` of table `sequence`.`
 ### MyISAM 表测试
 
 在 guid 表为 MyISAM 引擎的情况下, 因为每次操作都是表锁, 所以死锁的概率很难发生, 性能方面也会较好, 平均每秒达到了 3200 多:
-```
+```SQL
 mysqlslap -u root \
 --number-of-queries 50000 -c 10 \
 --create-schema sequence \
@@ -485,7 +485,7 @@ Benchmark
         Average number of queries per client: 5000
 ```
 表结构如下, 5w 条都正常插入:
-```
+```SQL
 mysql root@[localhost:s3301 sequence] > show create table guid2\G
 *************************** 1. row ***************************
        Table: guid2

@@ -67,7 +67,7 @@ cp /usr/lib64/libboost_regex-mt.so.5 /usr/lib64/libboost_regex-mt-d.so.5
 如果安装了boost-debuginfo.x86_64，做以下改动,跳过debuh库的依赖检测:
 
 注释 vi /usr/lib64/boost/Boost.cmake以下信息:
-<pre>
+```c
 534 #  foreach(file ${_IMPORT_CHECK_FILES_FOR_${target}} )
 535 #    if(NOT EXISTS "${file}" )
 536 #      message(FATAL_ERROR "The imported target \"${target}\" references the file
@@ -81,10 +81,10 @@ cp /usr/lib64/libboost_regex-mt.so.5 /usr/lib64/libboost_regex-mt-d.so.5
 544 #")
 545 #    endif()
 546 #  endforeach()
-</pre>
+```
 
 CMakeLists.txt增加以下信息：
-<pre>
+```c
 --- ../../replication-booster-for-mysql/CMakeLists.txt	2014-11-06 16:32:01.466160057 +0800
 +++ CMakeLists.txt	2014-11-06 17:19:06.346764919 +0800
 @@ -5,9 +5,9 @@
@@ -99,7 +99,7 @@ CMakeLists.txt增加以下信息：
  include_directories(${MySQL_INCLUDE_DIR})
  
  # Find MySQL replication listener and header files
-</pre>
+
 cmake . -DCMAKE_PREFIX_PATH=/home/mysql/mysql-replication-listener/   #指定replication listener的路径
 make编译增加共享库
 ln -s /usr/lib64/libicuuc.so.42 /usr/lib64/libicuuc.so
@@ -108,10 +108,10 @@ ln -s /usr/lib64/libicui18n.so.42 /usr/lib64/libicui18n.so
 运行replication_booster执行以下依赖
 cp /home/scripts/mysql-replication-listener/lib/libreplication.so.1 /usr/lib64/
 cp /opt/5.6.15/lib/libmysqlclient.so.18 /usr/lib64/
-
+```
 
 指定s选项以执行prefetch转换,如下的processlist:
-# replication_booster --user=root --password=xxxxxx --admin_user=root --admin_password=xxxxxx --socket=/srv/mysql/date3301/data/s8301 -s 10
+`# replication_booster --user=root --password=xxxxxx --admin_user=root --admin_password=xxxxxx --socket=/srv/mysql/date3301/data/s8301 -s 10`
 
 <pre>
 2014-11-06 18:20:36: Reading relay log file: /srv/mysql/data3301/data/relay-bin.000877 from relay log pos: 173556941

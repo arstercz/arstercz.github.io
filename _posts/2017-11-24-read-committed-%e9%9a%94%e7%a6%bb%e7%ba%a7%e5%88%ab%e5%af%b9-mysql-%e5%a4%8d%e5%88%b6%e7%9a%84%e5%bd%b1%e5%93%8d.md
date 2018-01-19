@@ -29,7 +29,7 @@ MySQL:  Percona-Server-5.5.33-rel31.1-566.Linux.x86_64
 #### 主从环境
 
 使用 [repl_discovery](https://github.com/arstercz/mysql_repl_discovery)检查如下:
-```
+```bash
 # repl_discovery -h 10.0.21.7 -P 3308 -u monitor --askpass
 Enter password : 
 +-10.0.21.7:3308

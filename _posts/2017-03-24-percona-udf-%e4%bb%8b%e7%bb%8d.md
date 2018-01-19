@@ -129,7 +129,7 @@ efficiently with BIT_XOR().
 
 举例如下, 单独运行被转为有符号整型负数, 不过代码注释中同样给了解决的方法, 使用 CAST 函数转为无符号整型即可.
 
-<pre><code> mysql&gt; SELECT MURMUR_HASH(12346);
+<pre><code class="SQL"> mysql&gt; SELECT MURMUR_HASH(12346);
 +----------------------+
 | MURMUR_HASH(12346)   |
 +----------------------+
