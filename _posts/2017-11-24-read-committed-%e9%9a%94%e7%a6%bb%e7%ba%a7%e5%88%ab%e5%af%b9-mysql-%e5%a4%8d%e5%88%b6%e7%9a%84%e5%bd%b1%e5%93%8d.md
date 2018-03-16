@@ -20,7 +20,7 @@ tags:
 
 #### 环境配置
 
-```
+```bash
 OS:     CentOS release 6.7 (Final)
 Kernel: 2.6.32-573.18.1.el6.x86_64
 MySQL:  Percona-Server-5.5.33-rel31.1-566.Linux.x86_64
