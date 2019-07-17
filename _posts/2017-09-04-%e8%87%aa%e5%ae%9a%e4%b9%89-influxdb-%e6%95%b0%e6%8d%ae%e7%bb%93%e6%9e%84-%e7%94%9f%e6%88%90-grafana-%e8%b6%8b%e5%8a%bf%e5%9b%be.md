@@ -57,7 +57,7 @@ curl -i -XPOST 'http://localhost:8086/write?db=mydb' --data-binary 'cpu_load_sho
 
 #### 示例
 以获取一个 user 表的最大自增 id 为例, 从数据库获取到表的最大自增id 后即可通过 curl 的 POST 方法向 influxdb 插入数据:
-```Perl
+```perl
 sub insert_data {
     my ($server, $ua, $data) = @_;
     $data .= "i";

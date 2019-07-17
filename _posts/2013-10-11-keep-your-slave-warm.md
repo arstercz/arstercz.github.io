@@ -33,7 +33,6 @@ workflow:
               filter select sql                 replay sql on slave
    | master |------------------->| text file |---------------------->| slave |
 ```
-<!--more-->
 steps:
 1. capture select statement on master server, and save result into text file. 
 
@@ -56,10 +55,9 @@ pt-query-digest --charset=utf8 --processlist h=172.33.0.3,u=book_user,p='xxxxxx'
  '$event->{arg} =~ m/^select/i' --execute h=172.33.0.8,P=3306,D=dbname,u=book_user,p='xxxxxx' --execute-throttle 70,30,5 --no-report
 ```
 
-interval: How frequently to poll the processlist, default is .1 (means 100ms), and .01 means 10ms, .001 means 1ms.
+`interval: How frequently to poll the processlist, default is .1 (means 100ms), and .01 means 10ms, .001 means 1ms.`
 
-<b>Compare to percona playback.</b>
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;playback is usefull for warm your server, but don’t run it on the production server,because playback will run both SELECT and DML queries.
- read more:
+### Compare to percona playback
+playback is usefull for warm your server, but don’t run it on the production server,because playback will run both SELECT and DML queries. read more:
    <a href="http://www.percona.com/doc/percona-playback/index.html">http://www.percona.com/doc/percona-playback/index.html</a>
-   <a href="https://archive.fosdem.org/2013/schedule/event/bp_hot_slave/attachments/slides/271/export/events/attachments/bp_hot_slave/slides/271/slides.pdf">https://archive.fosdem.org/2013/schedule/event/bp_hot_slave/attachments/slides/271/export/events/attachments/bp_hot_slave/slides/271/slides.pdf</a>
+   <a href="https://archive.fosdem.org/2013/schedule/event/bp_hot_slave/attachments/slides/271/export/events/attachments/bp_hot_slave/slides/271/slides.pdf">bp_hot_slave-slide</a>

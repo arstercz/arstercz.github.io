@@ -27,14 +27,13 @@ tags:
 
 我们以如下结构来讲解如何在 public A 主机中进行端口转发, 使得用户可以访问到后端的 private B 主机的 memcached 端口:
 
-<pre><code>note: 所有主机均为 Centos 系统, 1.1.1.1 为任意的公网地址.
-
+```
    +------+           +----------+             +-----------+
-   | user |  -------&gt; | public A | ----------&gt; | private B | 
+   | user |  -------> | public A | ----------> | private B | 
    +------+           +----------+             +-----------+
    pub: 2.2.2.2     em1: 10.0.21.5             em1: 10.0.21.7
                     em2: 1.1.1.1
-</code></pre>
+```
 
 图中 public A 主机的 em2 网卡为公网地址, 最终 user 可以通过访问 1.1.1.1:20011 来访问 private B 的 11211 端口. user 用户的主机可能存在于私有网络中, 也可能有独立的公网地址, 后续会介绍两者的不同.
 
@@ -42,37 +41,39 @@ tags:
 
 linux 用户可以通过 iptables 及其一系列的规则来高度控制数据报文的传输. 而 iptables 中的表则是其构件块, 描述了功能的大类, iptables 一共有4个表, 分别如下:
 
-<pre><code>filter
+```
+filter
 nat
 mangle
 raw
-</code></pre>
+```
 
 每个表都有自己的一组内置链, 用户基于这些链可以建立一组规则, 常用的有 filter 表中的 INPUT、OUTPUT、和 FORWARD 链等.
 
 下图描述了数据包进入一台主机的 iptables 的工作流程:
 
-<pre><code>                               XXXXXXXXXXXXXXXXXX
+```
+                               XXXXXXXXXXXXXXXXXX
                              XXX     Network    XXX
                                XXXXXXXXXXXXXXXXXX
                                        +
                                        |
                                        v
  +-------------+              +------------------+
- |table: filter| &lt;---+        | table: nat       |
+ |table: filter| <---+        | table: nat       |
  |chain: INPUT |     |        | chain: PREROUTING|
  +-----+-------+     |        +--------+---------+
        |             |                 |
        v             |                 v
  [local process]     |           ****************          +--------------+
-       |             +---------+ Routing decision +------&gt; |table: filter |
+       |             +---------+ Routing decision +------> |table: filter |
        v                         ****************          |chain: FORWARD|
 ****************                                           +------+-------+
 Routing decision                                                  |
 ****************                                                  |
        |                                                          |
        v                        ****************                  |
-+-------------+       +------&gt;  Routing decision  &lt;---------------+
++-------------+       +------>  Routing decision  <---------------+
 |table: nat   |       |         ****************
 |chain: OUTPUT|       |               +
 +-----+-------+       |               |
@@ -86,7 +87,8 @@ Routing decision                                                  |
                                XXXXXXXXXXXXXXXXXX
                              XXX    Network     XXX
                                XXXXXXXXXXXXXXXXXX
-</code></pre>
+```
+
 
 本文要介绍的端口转发就是基于 nat 表的 PREROUTING 和 POSTROUTING 链, 所有的数据报文都要先经过 nat 的 PREROUTING 链进行处理, 再根据路由规则选择是进入 filter 的 INPUT 链还是 filter 的 FORWARD 链, 不管进入哪个链, 之后都会进去 nat 表的 POSTROUTING 链, 最后数据报文再转发出去.
 
@@ -105,13 +107,15 @@ redhat/centos 系列系统默认为 0, 或者在 /etc/sysctl.conf 文件进行�
 
 用户访问 1.1.1.1:20011 的时候, 通过 DNAT 的方式将数据报文中的目的 ip 信息改为后端的 private B 地址 10.0.21.7:11211.
 
-<pre><code>iptables -t nat -A PREROUTING -d 1.1.1.1/32 -p tcp -m tcp --dport 20011 -j DNAT --to-destination 10.0.21.7:11211
-</code></pre>
+```
+iptables -t nat -A PREROUTING -d 1.1.1.1/32 -p tcp -m tcp --dport 20011 -j DNAT --to-destination 10.0.21.7:11211
+```
 
 如果 public A 主机的公网地址是固定的静态 ip, 则不用设置下面的参数:
 
-<pre><code>iptables -t nat -A POSTROUTING -o em2 -j MASQUERADE 
-</code></pre>
+```
+iptables -t nat -A POSTROUTING -o em2 -j MASQUERADE 
+```
 
 <h4>3) 增加 filter 表的 FORWARD 规则</h4>
 
@@ -137,33 +141,36 @@ redhat/centos 系列系统默认为 0, 或者在 /etc/sysctl.conf 文件进行�
 
 <h4>1) user 在本地的私网环境中 telnet public A 主机:</h4>
 
-<pre><code>telnet 1.1.1.1 20011
+```
+telnet 1.1.1.1 20011
 Trying 1.1.1.1...
 ^C
-</code></pre>
+```
 
 user 本地端抓包:
 
-<pre><code># tcpdump -S -s0 -nn -i any port 20011
+```
+# tcpdump -S -s0 -nn -i any port 20011
 10:09:20.018174 IP 192.168.1.101.51782 &gt; 1.1.1.1.20011: Flags [S], seq 3245571896, win 14600, options [mss 1460,sackOK,TS val 57645414 ecr 0,nop,wscale 7], length 0
 10:09:21.017320 IP 192.168.1.101.51782 &gt; 1.1.1.1.20011: Flags [S], seq 3245571896, win 14600, options [mss 1460,sackOK,TS val 57646414 ecr 0,nop,wscale 7], length 0
-</code></pre>
+```
 
 public A 主机抓包:
 
-<pre><code># tcpdump -S -nn -i any port 11211 or port 20011
+```
+# tcpdump -S -nn -i any port 11211 or port 20011
 10:09:22.777271 IP 2.2.2.2.57158 &gt; 1.1.1.1.20011: Flags [S], seq 3937785824, win 14600, options [mss 1380,sackOK,TS val 57645414 ecr 0,nop,wscale 7], length 0
 10:09:22.777335 IP 10.0.21.5.57158 &gt; 10.0.21.7.11211: Flags [S], seq 3937785824, win 14600, options [mss 1380,sackOK,TS val 57645414 ecr 0,nop,wscale 7], length 0
 10:09:23.776389 IP 2.2.2.2.57158 &gt; 1.1.1.1.20011: Flags [S], seq 3937785824, win 14600, options [mss 1380,sackOK,TS val 57646414 ecr 0,nop,wscale 7], length 0
 10:09:23.776420 IP 10.0.21.5.57158 &gt; 10.0.21.7.11211: Flags [S], seq 3937785824, win 14600, options [mss 1380,sackOK,TS val 57646414 ecr 0,nop,wscale 7], length 0
-</code></pre>
+```
 
 private B 主机抓包:
-
-<pre><code># tcpdump -S -nn -i any port 11211
+```
+# tcpdump -S -nn -i any port 11211
 10:09:23.773626 IP 10.0.21.5.57158 &gt; 10.0.21.7.11211: Flags [S], seq 3937785824, win 14600, options [mss 1380,sackOK,TS val 57646414 ecr 0,nop,wscale 7], length 0
 10:09:25.773608 IP 10.0.21.5.57158 &gt; 10.0.21.7.11211: Flags [S], seq 3937785824, win 14600, options [mss 1380,sackOK,TS val 57648414 ecr 0,nop,wscale 7], length 0
-</code></pre>
+```
 
 从两个 tcpdump 结果可以看出, 数据报文已经正常到了 private B 主机, 也就说已经通过了 public A 主机的 POSTROUTING 处理, 将包转发到了后端的 B 主机, 但是 B 主机没有响应, 正常的三次握手也没有建立完成, 也就是 B 主机直接丢弃了 A 发送过来的报文.
 
@@ -181,7 +188,7 @@ linux 系统的 TIME_WAIT 状态用来保障连接的正常关系, 实际上并�
 
 当 tcp_tw_recycle 和 tcp_timestamps 参数同时开启的时候, 同一源 ip 的连接, 在 TIME_WAIT 状态下, 系统内核会追踪其最近的时间戳信息, 如果时间戳正常增长就允许重用(re-use)该连接的 socket, 如果时间戳异常变更, 该主机就会丢弃接收到 SYN 报文, 这就会引起上面令人迷惑的问题. 同样再来看看我们的环境, user 如果存在于 NAT 环境, 在连接 public server 的时候, 用户侧的 NAT 只会更改 IP 的源地址信息, 而不会改变时间戳(tcp 报文的时间戳基于系统启动的时间, tcp 报文的 timestamps 选项), <a href="https://www.ietf.org/rfc/rfc1323.txt">rfc</a>文档规定时间戳值必须为单调递增，否则接受到的包可能会被丢掉, 如下所示:
 
-<pre><code>
+```
            An additional mechanism could be added to the TCP, a per-host
            cache of the last timestamp received from any connection.
            This value could then be used in the PAWS mechanism to reject
@@ -191,9 +198,9 @@ linux 系统的 TIME_WAIT 状态用来保障连接的正常关系, 实际上并�
            would require that the TIME-WAIT delay plus the RTT together
            must be at least one tick of the sender's timestamp clock.
            Such an extension is not part of the proposal of this RFC.
-</code></pre>
+```
 在 linux 内核源文件中 <code>linux/v2.6.39.4/source/net/ipv4/tcp_ipv4.c</code> 中的 <code>tcp_v4_conn_request</code> 函数中
-<pre><code>
+```
 		/* VJ's idea. We save last timestamp seen
 		 * from the destination in peer table, when entering
 		 * state TIME-WAIT, and check against it before
@@ -216,9 +223,9 @@ linux 系统的 TIME_WAIT 状态用来保障连接的正常关系, 实际上并�
 				goto drop_and_release;
 			}
 		}
-</code></pre>
+```
 <code>tmp_opt.saw_tstamp</code> 即表示该socket支持<code>tcp_timestamp</code>, <code>sysctl_tw_recycle</code> 则是 <code>tcp_tw_recycle</code> 对应的选项; <code>TCP_PAWS_MSL</code> 的值为 60, <code>TCP_PAWS_WINDOW</code> 的值则为 1, <code>linux/v2.6.39.4/source/include/net/tcp.h</code> 包含以下代码
-<pre><code>
+```
 #define TCP_PAWS_MSL	60		/* Per-host timestamps are invalidated
 					 * after this time. It should be equal
 					 * (or greater than) TCP_TIMEWAIT_LEN
@@ -229,22 +236,24 @@ linux 系统的 TIME_WAIT 状态用来保障连接的正常关系, 实际上并�
 					 * timestamps. It must be less than
 					 * minimal timewait lifetime.
 					 */
-</code></pre>
+```
 
 所以对于后端的 private B 主机而言, 其保存着 public A 主机转发时候的连接信息, 这个连接的时间戳也是最新的值, 而 user 本地端的时间戳信息则远远小于该值, 这就会引起 B 主机直接丢弃 user 发送过来的请求, 相反如果 user 本地端的时间戳大于 public A 保存的时间戳则可以正常访问 B 主机. 这种问题实际上在 LVS 环境中也是比较普遍的, 很多人都建议线上的机器只开启 tcp_tw_reuse 选项, 让 tcp_tw_recycle 保持默认, 不要开启.
 
 另外 tcp_timestamps 参数控制时间戳信息, 而在内核代码中 <code>#define tcp_time_stamp ((__u32)(jiffies))</code> 内核每秒中将 jiffies 变量增加 HZ 次, 对于 HZ 值为 100 的系统, 1 个 jiffy 就等于 1000/100 = 10ms, 对于 1000 的系统, 1 个 jiffy 就是 1ms, 本文中测试的机器的系统的 HZ 为 1000, 如下:
 
-<pre><code>cat /boot/config-2.6.32-573.18.1.el6.x86_64| grep HZ
+```
+cat /boot/config-2.6.32-573.18.1.el6.x86_64| grep HZ
 CONFIG_NO_HZ=y
 CONFIG_HZ_1000=y
 CONFIG_HZ=1000
 CONFIG_MACHZ_WDT=m
-</code></pre>
+```
 
 我们来看看正常的 telnet 请求的情况:
 
-<pre><code>12:26:41.599122 IP 2.2.2.2.26597 &gt; 1.1.1.1.20011: Flags [S], seq 1403291286, win 14600, options [mss 1380,sackOK,TS val 65884228 ecr 0,nop,wscale 7], length 0
+```
+12:26:41.599122 IP 2.2.2.2.26597 &gt; 1.1.1.1.20011: Flags [S], seq 1403291286, win 14600, options [mss 1380,sackOK,TS val 65884228 ecr 0,nop,wscale 7], length 0
 12:26:41.599155 IP 10.0.21.5.26597 &gt; 10.0.21.7.11211: Flags [S], seq 1403291286, win 14600, options [mss 1380,sackOK,TS val 65884228 ecr 0,nop,wscale 7], length 0
 12:26:41.599219 IP 10.0.21.7.11211 &gt; 10.0.21.5.26597: Flags [S.], seq 159148930, ack 1403291287, win 14480, options [mss 1460,sackOK,TS val 1681744061 ecr 65884228,nop,wscale 7], length 0
 12:26:41.599226 IP 1.1.1.1.20011 &gt; 2.2.2.2.26597: Flags [S.], seq 159148930, ack 1403291287, win 14480, options [mss 1460,sackOK,TS val 1681744061 ecr 65884228,nop,wscale 7], length 0
@@ -254,7 +263,7 @@ CONFIG_MACHZ_WDT=m
 ...
 12:26:44.119060 IP 10.0.21.7.11211 &gt; 10.0.21.5.26597: Flags [.], ack 1403291294, win 114, options [nop,nop,TS val 1681746581 ecr 65886749], length 0
 12:26:44.119068 IP 1.1.1.1.20011 &gt; 2.2.2.2.26597: Flags [.], ack 1403291294, win 114, options [nop,nop,TS val 1681746581 ecr 65886749], length 0
-</code></pre>
+```
 
 这是正常的三次握手的过程, 第三个包为 private B 主机的响应, 倒数第三个包的 TS val 为 65884232, 倒数第二个报的 ecr 为 65886749, 相减为 2.517个 HZ, 即经过了 2517 ms, 刚好对应每行的时间信息. 而最后一个包的 TS val 值 1681746581 会被 private B 主机保存为连接的最新时间戳(如果 tcp_tw_recycle 和 tcp_timestamps 同时开启的话).
 

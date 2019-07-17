@@ -212,7 +212,7 @@ nohup masterha_manager --global_conf=/web/tmha/global.conf --conf=/web/tmha/tcas
 
 1. 
 
-```MHA::ServerManager::validate_slaves() slave检测;  MHA::ServerManager::get_current_alive_master()  当前master;```
+`MHA::ServerManager::validate_slaves() slave检测;  MHA::ServerManager::get_current_alive_master()  当前master;`
 
 2.
 
@@ -224,11 +224,11 @@ MHA::HealthCheck::wait_until_unreachable()  -- master 健康检查;
 
 3.
 
-```MHA::HealthCheck::wait_until_unreachable()  MHA::SSHCheck::do_ssh_connection_check() ssh 检测;```
+`MHA::HealthCheck::wait_until_unreachable()  MHA::SSHCheck::do_ssh_connection_check() ssh 检测;`
 
 4.
 
-```MHA::MasterMonitor::wait_until_master_is_dead()  master失效后的操作； ```
+`MHA::MasterMonitor::wait_until_master_is_dead()  master失效后的操作； `
 
 5.
 
