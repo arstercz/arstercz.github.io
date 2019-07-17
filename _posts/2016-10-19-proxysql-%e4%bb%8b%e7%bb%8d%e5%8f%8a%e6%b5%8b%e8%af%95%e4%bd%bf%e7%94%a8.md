@@ -18,34 +18,37 @@ tags:
   - proxy
   - proxysql
 ---
-<a href="http://www.proxysql.com/">proxysql</a> 是一个 MySQL 中间层的代理, 其源代码 <a href="https://github.com/sysown/proxysql">proxysql</a>在github 上托管, 兼容 MySQL 协议, 所以同样支持 Percona 和 MariaDB 分之版本. 同类的产品有 <a href="https://github.com/Qihoo360/Atlas">Atlas</a> 和 <a href="https://github.com/flike/kingshard">kingshard</a>, 三者相比较起来, Atlas 和 kingshard 的功能类似, 仅能代理指定的库, 同样都支持表分区处理; proxysql 则可以代理整个实例, 配置方便则是 cnf 文件 + sqlite3 + runtime 的方式实现, 特别灵活, 不过目前还没有实现表分区功能, 其它功能可以在官网介绍中查找.
+[proxysql](http://www.proxysql.com/) 是一个 MySQL 中间层的代理, 其源代码 [github-proxysql](https://github.com/sysown/proxysql) 在github 上托管, 兼容 MySQL 协议, 所以同样支持 Percona 和 MariaDB 分之版本. 同类的产品有 [Atlas](https://github.com/Qihoo360/Atlas) 和 [kingshard](https://github.com/flike/kingshard), 三者相比较起来, Atlas 和 kingshard 的功能类似, 仅能代理指定的库, 同样都支持表分区处理; proxysql 则可以代理整个实例, 配置方便则是 `cnf 文件 + sqlite3 + runtime` 的方式实现, 特别灵活, 不过目前还没有实现表分区功能, 其它功能可以在官网介绍中查找.
 
-proxysql 的简单配置使用可以参考 <a href="https://www.percona.com/blog/2016/09/16/consul-proxysql-mysql-ha/">consul-proxysql-mysql-ha</a>
-管理接口参见 <a href="https://github.com/sysown/proxysql/wiki/Tables-in-Admin-interface">proxysql wiki</a>
+proxysql 的简单配置使用可以参考 [consul-proxysql-mysql-ha](https://www.percona.com/blog/2016/09/16/consul-proxysql-mysql-ha/)
+管理接口参见 [admin-interface](https://github.com/sysown/proxysql/wiki/Tables-in-Admin-interface)
 
 下面部分主要介绍笔者在测试环境中的运行情况, 侧重于 proxysql 连接和直连之间的数据对比, 编码方面也会简单说明.
 
-<h2>以下为测试环境的配置</h2>
+## 以下为测试环境的配置
 
 系统环境:
 
-```<code>Centos 6.5 final, Linux cz-test1 2.6.32-431.3.1.el6.x86_64
+```
+Centos 6.5 final, Linux cz-test1 2.6.32-431.3.1.el6.x86_64
 proxysql-1.4.3-1.x86_64.rpm
-</code></pre>
+```
 
 MySQL 主从配置:
 
-```<code>version: Percona-Server-5.5.36
+```
+version: Percona-Server-5.5.36
 repl :
     10.0.21.5:3303(current master: read_only = 0)
        +-- 10.0.21.7:3303(current slave: read_only = 1)
-</code></pre>
+```
 
 proxysql 配置:
 
 /etc/proxysql.cnf 中的主要配置:
 
-```<code>admin_variables=
+```
+admin_variables=
 {
         admin_credentials="admin:admin"
         mysql_ifaces="0.0.0.0:6032"
@@ -126,14 +129,15 @@ mysql_replication_hostgroups=
                 reader_hostgroup=20
                 comment="percona repl 1"
         }
-）
-</code></pre>
+)
+```
 
-/etc/init.d/proxysql start 启动后进行相关的测试.
+`/etc/init.d/proxysql start` 启动后进行相关的测试.
 
-<h4>先来看看 proxysql 的整个实例代理, 连接 proxysql 等同连接 mysql server:</h4>
+#### 先来看看 proxysql 的整个实例代理, 连接 proxysql 等同连接 mysql server:
 
-```<code>mysql -h 10.0.21.5 -P 6033 -u percona per2 -e "select database()"
+```
+mysql -h 10.0.21.5 -P 6033 -u percona per2 -e "select database()"
 +------------+
 | database() |
 +------------+
@@ -145,13 +149,14 @@ mysql -h 10.0.21.5 -P 6033 -u percona percona -e "select database()"
 +------------+
 | percona    |
 +------------+
-</code></pre>
+```
 
-<h4>centos7 系统中使用 mysql 自带的 sql_bench 工具 test-insert 进行测试</h4>
+#### centos7 系统中使用 mysql 自带的 sql_bench 工具 test-insert 进行测试
 
 下面结果为连接 proxysql 接口的信息:
 
-```<code>[root@cz-centos7 sql-bench]# ./test-insert --host 10.0.21.5:6033 --user=percona --database=percona 
+```
+[root@cz-centos7 sql-bench]# ./test-insert --host 10.0.21.5:6033 --user=percona --database=percona 
 Testing server 'MySQL 5.5.36 34.1 rel34.1 log' at 2016-10-18 22:33:55
 
 Testing the speed of inserting data into 1 table and do some selects on it.
@@ -258,11 +263,12 @@ Time for multiple_value_insert (100000):  2 wallclock secs ( 0.20 usr  0.00 sys 
 Time for drop table(1):  0 wallclock secs ( 0.00 usr  0.00 sys +  0.00 cusr  0.00 csys =  0.00 CPU)
 
 Total time: 3385 wallclock secs (263.76 usr 175.71 sys +  0.00 cusr  0.00 csys = 439.47 CPU)
-</code></pre>
+```
 
 下面的结果为直连 MySQL 的信息:
 
-```<code>[root@cz-centos7 sql-bench]# ./test-insert --host 10.0.21.5:3303 --user=percona --database=percona 
+```
+[root@cz-centos7 sql-bench]# ./test-insert --host 10.0.21.5:3303 --user=percona --database=percona 
 Testing server 'MySQL 5.5.36 34.1 rel34.1 log' at 2016-10-18 23:36:54
 
 Testing the speed of inserting data into 1 table and do some selects on it.
@@ -369,41 +375,44 @@ Time for multiple_value_insert (100000):  1 wallclock secs ( 0.20 usr  0.00 sys 
 Time for drop table(1):  0 wallclock secs ( 0.00 usr  0.00 sys +  0.00 cusr  0.00 csys =  0.00 CPU)
 
 Total time: 2658 wallclock secs (240.54 usr 175.23 sys +  0.00 cusr  0.00 csys = 415.77 CPU)
-</code></pre>
+```
 
 从上面结果看, 所有的更新操作所耗的时间差别不太大, proxysql 额外增加了大约 10% 左右的开销, select 差别较大, 不同的 select 类型, 开销也各不相同, 简单按key 查询的话开销也在 10% 左右, range 查询则开销很大, 有些 sql 达到了 50% 的额外开销.
 
-<h4>下面使用 mysqlslap 进行简单的测试</h4>
+#### 下面使用 mysqlslap 进行简单的测试
 
 下面为连接 proxysql 的结果:
 
-```<code>[root@cz-centos7 sql-bench]# /opt/Percona-Server-5.5.33-rel31.1-566.Linux.x86_64/bin/mysqlslap -h 10.0.21.5 -P 6033 -upercona percona -a --auto-generate-sql-execute-number=3000 --auto-generate-sql-load-type=read --auto-generate-sql-secondary-indexes=3 --auto-generate-sql-unique-query-number=1 --auto-generate-sql-write-number=1000 -c 10
+```
+[root@cz-centos7 sql-bench]# /opt/Percona-Server-5.5.33-rel31.1-566.Linux.x86_64/bin/mysqlslap -h 10.0.21.5 -P 6033 -upercona percona -a --auto-generate-sql-execute-number=3000 --auto-generate-sql-load-type=read --auto-generate-sql-secondary-indexes=3 --auto-generate-sql-unique-query-number=1 --auto-generate-sql-write-number=1000 -c 10
 Benchmark
     Average number of seconds to run all queries: 38.865 seconds
     Minimum number of seconds to run all queries: 38.865 seconds
     Maximum number of seconds to run all queries: 38.865 seconds
     Number of clients running queries: 10
     Average number of queries per client: 3000
-</code></pre>
+```
 
 下面为直连 MySQL 结果:
 
-```<code>[root@cz-centos7 sql-bench]# /opt/Percona-Server-5.5.33-rel31.1-566.Linux.x86_64/bin/mysqlslap -h 10.0.21.5 -P 3303 -upercona percona -a --auto-generate-sql-execute-number=3000 --auto-generate-sql-load-type=read --auto-generate-sql-secondary-indexes=3 --auto-generate-sql-unique-query-number=1 --auto-generate-sql-write-number=1000 -c 10
+```
+[root@cz-centos7 sql-bench]# /opt/Percona-Server-5.5.33-rel31.1-566.Linux.x86_64/bin/mysqlslap -h 10.0.21.5 -P 3303 -upercona percona -a --auto-generate-sql-execute-number=3000 --auto-generate-sql-load-type=read --auto-generate-sql-secondary-indexes=3 --auto-generate-sql-unique-query-number=1 --auto-generate-sql-write-number=1000 -c 10
 Benchmark
     Average number of seconds to run all queries: 37.446 seconds
     Minimum number of seconds to run all queries: 37.446 seconds
     Maximum number of seconds to run all queries: 37.446 seconds
     Number of clients running queries: 10
     Average number of queries per client: 3000
-</code></pre>
+```
 
 从这点看混合读写的结果相差不大, 多余一点开销可能是由于 proxysql 查询规则的匹配引起的.
 
-<h4>编码方面</h4>
+#### 编码方面
 
 可以查询管理接口的 mysql_collations 表查看 proxysql 支持的字符集:
 
-```<code>mysql&gt; select * from mysql_collations where charset like '%utf8%';
+```
+mysql> select * from mysql_collations where charset like '%utf8%';
 +-----+-----------------------+---------+---------+
 | Id  | Collation             | Charset | Default |
 +-----+-----------------------+---------+---------+
@@ -416,11 +425,12 @@ Benchmark
 | 193 | utf8_icelandic_ci     | utf8    |         |
 ......
 ......
-</code></pre>
+```
 
 使用 utf8 编码简单测试:
 
-```<code>$ export LANG="en_US.UTF-8"
+```
+$ export LANG="en_US.UTF-8"
 $ mysql -h 10.0.21.5 -P 6033 -u percona -p -Bse "create table tags(id int(10) auto_increment primary key, name varchar(50), msg text)"
 $ mysql -h 10.0.21.5 -P 6033 -u percona -p -Bse "insert into tags(name, msg) values(\"测试啊\", \"hello 每个人都有的bbbb\")"
 $ mysql -h 10.0.21.5 -P 6033 -u percona -p percona -e "select * from tags"
@@ -432,34 +442,32 @@ $ mysql -h 10.0.21.5 -P 6033 -u percona -p percona -e "select * from tags"
 |  3 | 测试啊    | hello 每个人都有的aaaaa       |
 |  4 | 测试啊    | hello 每个人都有的bbbb        |
 +----+-----------+-------------------------------+
-</code></pre>
+```
 
 相比 360 的 atlas, 编码方面更全面, 另外 proxysql 的 replication_lag_action 接口对主从情况进行监控, 主从出现问题后会自行下线操作, 主从回复后也会自行上线, 监控的频率可以在 proxysql.cnf 中进行配置, 详见 <a href="https://github.com/sysown/proxysql/wiki/Tables-in-Admin-interface">wiki admin</a>
 
-<h4>FAQ</h4>
+#### FAQ
 
-<ol>
-<li>proxysql 部署问题
-为防止单点故障, 需要多机部署 proxysql, 可以用 keepalive 做冗余, 也可以参考文章开始处的 consul + dnsmasq + proxysql 方式构建高可用架构.</p></li>
-<li><p>主从故障后 proxysql 如何处理
-可以在配置文件中的 mysql_variables 部分配置 <a href="https://github.com/sysown/proxysql/blob/v1.2.4/doc/monitor.md">monitor</a> 和 ping 相关的参数, 尽管控制的不是很精细但比起手工和脚本操作来好了不少.</p></li>
-<li><p>多少人使用?
-最近一年多可以在<a href="https://www.percona.com">percona</a>中看到 percona 对 proxysql 做了很多的推广, 国外公司用的人较多, 国内用的人较少</p></li>
-</ol>
+*proxysql 部署问题*
+为防止单点故障, 需要多机部署 proxysql, 可以用 `keepalive` 做冗余, 也可以参考文章开始处的 `consul + dnsmasq + proxysql` 方式构建高可用架构.
 
-<h4>其它问题</h4>
+*主从故障后 proxysql 如何处理*
+可以在配置文件中的 mysql_variables 部分配置 [proxysql-monitor](https://github.com/sysown/proxysql/blob/v1.2.4/doc/monitor.md)  和 ping 相关的参数, 尽管控制的不是很精细但比起手工和脚本操作来好了不少.
 
-<ol>
-<li> 管理端口远程连接问题: proxysql 中强制管理接口的 <code>admin</code> 用户名只能本地登录, 即通过 <code>127.0.0.1</code> 或 <code>localhost</code> 等方式连接, 如果要远程登录可以指定管理的用户名不是 <code>admin</code> 即可, 详见 <a href="https://github.com/sysown/proxysql/issues/1212">issue1212</a></li><p>
+*多少人使用?*
+最近一年多可以在 [percona](https://www.percona.com) 中看到 percona 对 proxysql 做了很多的推广, 国外公司用的人较多, 国内用的人较少.
 
-<li> 1.4.1版本后 <code>query rule</code> 的正则实现从 <code>re2</code> 变为 <code>pcre</code>,  规则的大小写可以指定 <code>CASELESS</code> 选项进行忽略设置.</li><p>
+#### 其它问题
 
-<li> 新增了集群和 <a href="https://clickhouse.yandex/">clickhouse</a> 的支持.</li><p>
+	管理端口远程连接问题: proxysql 中强制管理接口的 `admin` 用户名只能本地登录, 即通过 `127.0.0.1` 或 `localhost` 等方式连接, 如果要远程登录可以指定管理的用户名不是 `admin` 即可, 详见 [issue1212](https://github.com/sysown/proxysql/issues/1212)
 
-<li>事务处理问题. 应用程序最好使用 <code>begin</code> 或 <code>start transaction</code> 显示开启一个事务, 这样事务中的sql 都会发送到写组中. 很多 Spring 框架的 java 程序都使用 <code>set autocommit = 0; xxxx; commit</code> 这种方式操作事务, proxysql 认为 <code>set autocommit = 0</code> 不是开启事务, 所以会出现 <a href="https://github.com/sysown/proxysql/issues/1256">issue1256</a> 的问题. 可以等待 1.4.4 版本解决该类问题</li>
-</ol>
+	1.4.1版本后 `query rule` 的正则实现从 `re2` 变为 `pcre`,  规则的大小写可以指定 `CASELESS` 选项进行忽略设置
 
-<h4>FYI</h4>
+	新增了集群和 [clickhouse](https://clickhouse.yandex/)
+
+	事务处理问题. 应用程序最好使用 `begin` 或 `start transaction` 显示开启一个事务, 这样事务中的sql 都会发送到写组中. 很多 Spring 框架的 java 程序都使用 `set autocommit = 0; xxxx; commit` 这种方式操作事务, `proxysql` 认为 `set autocommit = 0` 不是开启事务, 所以会出现 [issue1256](https://github.com/sysown/proxysql/issues/1256) 的问题. 可以等待 1.4.4 版本解决该类问题
+
+#### FYI
 
 <p><a href="https://github.com/sysown/proxysql/">github</a>
 <p><a href="https://www.percona.com/live/plam16/sessions/proxysql-tutorial">percona live</a>
