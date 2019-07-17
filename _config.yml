@@ -1,5 +1,0 @@
-# General Jekyll Config
-highlighter: rouge
-url: https://arstercz.com
-lsi: false
-exclude: [LICENSE, CNAME, README.md, .gitignore, Gemfile, Gemfile.lock]
