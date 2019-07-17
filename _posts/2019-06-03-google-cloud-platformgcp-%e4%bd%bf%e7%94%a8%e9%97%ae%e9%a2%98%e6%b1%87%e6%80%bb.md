@@ -14,22 +14,24 @@ tags:
 ---
 使用了 GCP 服务一段时间后, 碰到了一些问题, 本文仅对这些问题进行简单的汇总说明, 下述的问题均以 Centos7 系统为准, 部分问题适用于所有 Linux 系统, 本文也会持续更新碰到的问题:
 
-<pre><code>1. yum-cron 自动更新问题
+```
+1. yum-cron 自动更新问题
 2. 实例创建 ip 及系统分区丢失问题
 3. console 登录问题
 4. 公钥覆盖问题
 5. gmail 用户创建问题
 6. google 服务问题
 7. 磁盘修改问题
-</code></pre>
+```
 
-<h2>详细说明</h2>
+## 详细说明
 
-<h3>1. yum-cron 自动更新问题</h3>
+### 1. yum-cron 自动更新问题
 
-默认安装了 yum-cron 会每小时自动更新 yum 包, 最好禁止以免更新 <code>kernel</code>, <code>systemd</code> 等软件. 可以使用如下两种方式之一处理:
+默认安装了 yum-cron 会每小时自动更新 yum 包, 最好禁止以免更新 `kernel`, `systemd` 等软件. 可以使用如下两种方式之一处理:
 
-<pre><code>   1) 修改配置:
+```
+   1) 修改配置:
     # /etc/yum/yum-cron.conf
       update_messages = no
       download_updates = no
@@ -37,30 +39,30 @@ tags:
 
    2) 停止服务:
      systemctl stop yum-cron.service; systemctl disable yum-cron.service
-</code></pre>
+```
 
-<h3>2. 实例创建 ip 及系统分区丢失问题</h3>
+### 2. 实例创建 ip 及系统分区丢失问题
 
 创建的云主机不要通过实例组创建, 系统盘会被托管, 在关机的时候会重置系统盘. 另外需要绑定弹性 ip, 避免重启的时候 ip 变更;
 
-<h3>3. console 登录问题</h3>
+### 3. console 登录问题
 
 必须开启 sshd 服务才能使用 console 等方式连接云主机, 系统崩溃等问题可试着从 gcp 后台查看日志信息(后台 web 点击云主机后, 在 logs 选项查看对应的日志信息);
 
-<h3>4. 公钥覆盖问题</h3>
+### 4. 公钥覆盖问题
 
-实例开启 <code>os_login</code> 功能会覆盖 <code>/root/.ssh/authorized_keys</code> 中的公钥信息;
+实例开启 `os_login` 功能会覆盖 `/root/.ssh/authorized_keys` 中的公钥信息;
 
-<h3>5. gmail 用户创建问题</h3>
+### 5. gmail 用户创建问题
 
 后台 web 中点击云主机 ssh 的时候, google 服务会将后台用户对应的 gmail 用户创建到对应的云主机中;
 
-<h3>6. google 服务问题</h3>
+### 6. google 服务问题
 
-不要关闭 <code>google-accounts-daemon.service</code>, <code>google-clock-skew-daemon</code>, <code>google-network-daemon</code> 三个服务, GCP 重要的一些服务都依赖这几个运行的服务; 从目前碰到的问题来看, 关闭服务会导致云主机失联, 只能通过后台 web 重启主机才能恢复连接.
+不要关闭 `google-accounts-daemon.service`, `google-clock-skew-daemon`, `google-network-daemon` 三个服务, GCP 重要的一些服务都依赖这几个运行的服务; 从目前碰到的问题来看, 关闭服务会导致云主机失联, 只能通过后台 web 重启主机才能恢复连接.
 
-<h3>7. 磁盘修改问题</h3>
+### 7. 磁盘修改问题
 
-google 云主机磁盘性能的限制随磁盘大小变化, 一定范围内, 磁盘越大性能越好;可以直接加大磁盘大小而不影响数据, 在后台 web 中 <code>resize</code> 数据盘大小, 保存后在云主机中执行 <code>xfs_growfs /dev/sdb</code> 即可, 其它文件系统可参考 growpart 命令, 更多见 <a href="https://cloud.google.com/compute/docs/disks/add-persistent-disk">gcp-disk</a>; 减小磁盘会影响已有数据, 可以附加新磁盘设备来替换数据.
+google 云主机磁盘性能的限制随磁盘大小变化, 一定范围内, 磁盘越大性能越好;可以直接加大磁盘大小而不影响数据, 在后台 web 中 `resize` 数据盘大小, 保存后在云主机中执行 `xfs_growfs /dev/sdb` 即可, 其它文件系统可参考 growpart 命令, 更多见 <a href="https://cloud.google.com/compute/docs/disks/add-persistent-disk">gcp-disk</a>; 减小磁盘会影响已有数据, 可以附加新磁盘设备来替换数据.
 
 另外 google 云主机磁盘(本地ssd,标准盘等)的性能都受磁盘大小的影响, 一定范围内磁盘越大, 随机 io 和吞吐量越大, 所以在准备缩减磁盘的时候需要考虑到磁盘的性能问题.
