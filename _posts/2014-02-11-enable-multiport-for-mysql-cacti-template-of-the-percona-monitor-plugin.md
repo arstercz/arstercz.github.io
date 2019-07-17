@@ -21,9 +21,9 @@ tags:
   - muti port
 ---
 Modified cacti.tables records to archive the goal that percona plugin for mysql can monitor more than one instance with diffrenet port.All changes are based on 'Data Input Methods' and 'Data template'. The flow we also used to create custom template is :
-<pre>
+```
  'sctipts'  --> 'Data Input Methods' --> 'Data Template' --> 'Graph Template'
-</pre>
+```
 
 Vaiables connect to mysql are writed on 'ss_get_mysql_stats.php' file, which can be find in '<cacti_path>/scripts/', the port will be fixed if 'Data Input Methods' enable allow nulls, for instance:
  <font color=red>https://your_monit_site/cacti/data_input.php?action=field_edit&id=266&data_input_id=40</font>
@@ -33,13 +33,13 @@ disable it, then note the section 'Custom data' which in 'Data Template' should 
 
 1. Change ss_get_mysql_stats.php file for enable connect mysql use different port. An error occured when connect mysql use host:port method. mysql_connect can use.eg: http://www.php.net/manual/en/mysqli.construct.php
 error:
-<pre>
+```
    [root@me scripts]# php ss_test.php --host t1 --items nn --port 3306
    bool(false)
    MySQL: Unknown MySQL server host 't1:3306' (3)
-</pre>
+```
 Script file:
-<pre>
+```
 --- ss_get_mysql_stats.php_20131016     2013-10-16 11:01:01.490394353 +0800
 +++ ss_get_mysql_stats.php      2013-10-16 11:13:51.346582456 +0800
 @@ -254,8 +254,7 @@
@@ -65,19 +65,19 @@ Script file:
     }
     if ( !$conn ) {
        debug("MySQL connection failed: " . mysqli_error());
-</pre>
+```
 
 2. Change the port allow nulls property that in 'Data Input Methods'.
-<pre>
+```
    select * from data_input_fields where data_input_id in (select id from data_input where name regexp 'MySQL') and name = 'Port';
 
    update data_input_fields set allow_nulls = '' where name = 'Port' and data_input_id in (select id from data_input where name regexp 'MySQL');
-</pre>
+```
 
 3. Change value that in 'Data template -- Custom data', involed every data input fields.
 
-<pre>
+```
    mysql> select id into outfile '/tmp/idinfo.txt' from data_input where input_string regexp 'ss_get_mysql_stats.php';
    Query OK, 43 rows affected (0.01 sec)
    # for x in `cat /tmp/idinfo.txt`; do mysql -S /tmp/mysql.sock -D cacti -Bse "update data_input_data set t_value = 'on' where data_input_field_id = (select id from data_input_fields where data_input_id = $x and name = 'Port') and data_template_data_id  = (select id from data_template_data where data_input_id = $x and local_data_template_data_id = 0)";echo ok;done
-</pre>
+```

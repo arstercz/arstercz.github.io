@@ -30,30 +30,30 @@ percona手册页中提供了很详细的示例来说明使用stream选项做备�
 
 下面的方式可以达到我们的目标, 不用解压而直接获得解压后的备份文件, 以 nc(netcat) 方式为例说明:
 # server1
-<pre>
+```
 mkdir ./2015-01-12-19-55
 nc -l 12345 | tar xivf - -C 2015-01-12-19-55/
-</pre>
+```
 
 # server2
-<pre>
+```
 innobackupex --defaults-file=./my.cnf --slave-info --stream=tar ./ | nc server1 12345
-</pre>
+```
 执行完成后提示使用-i选项提取tar中的数据流, 这也是server1的tar命令为什么会加上-i参数的原因.
 150112 19:55:52  innobackupex: Connection to database server closed
 innobackupex: You must use -i (--ignore-zeros) option for extraction of the tar stream.
 
 以 ssh 为例说明:
 
-<pre>
+```
 ssh root@server1 "cd /data/2015-01-12-19-55; nc -l 12345 | tar xvif - " & sleep 1; \
 innobackupex --stream=tar ./ --defaults-file=./my.cnf --slave-info | nc server1 12345
-</pre>
+```
 
 
 如果高版本系统,如Centos 7不支持nc命令的话, 可以使用ssh方式完成:
-<pre>
+```
 innobackupex --defaults-file=./my.cnf --stream=tar ./ | ssh server1 "tar xivf - -C /data/xtrabackup/2015-01-12-19-55/"
-</pre>
+```
 
 备份完成后,记得使用--apply-log恢复日志信息.

@@ -27,7 +27,7 @@ Real server2: 10.0.21.17
 
 Director配置:
 
-<pre>
+```
 net.ipv4.ip_forward = 1  # 开启ip转发
 
 ip addr add 10.0.21.222/32 dev eth0; arping -c 3 -U 10.0.21.222 -I eth0 #配置vip并通告网络
@@ -46,10 +46,10 @@ Prot LocalAddress:Port Scheduler Flags
 TCP  10.0.21.222:3301 rr
   -> 10.0.21.7:3301               Route   1      0          0         
   -> 10.0.21.17:3301              Route   1      0          0
-</pre>
+```
 
 real server配置:
-<pre>
+```
 #将 vip 配置到 lo网卡, 并配置路由
 ip addr add 10.0.21.222/32 broadcast 10.0.21.222 dev lo 
 ip route add 10.0.21.222/32 via 10.0.21.222
@@ -59,14 +59,14 @@ echo "1" >/proc/sys/net/ipv4/conf/lo/arp_ignore
 echo "2" >/proc/sys/net/ipv4/conf/lo/arp_announce
 echo "1" >/proc/sys/net/ipv4/conf/all/arp_ignore
 echo "2" >/proc/sys/net/ipv4/conf/all/arp_announce
-</pre>
+```
 
 连接测试, 不要在 vip 主机中测试, 可以在 client 主机中测试请求的信息:
-<pre>
+```
 [root@cz ~]# mysql -h 10.0.21.222 -P 3301 -upercona percona -Bse "show global variables like 'hostname'"
 hostname	cz-test2
 [root@cz ~]# mysql -h 10.0.21.222 -P 3301 -upercona percona -Bse "show global variables like 'hostname'"
 hostname	cz-test3
 [root@cz ~]# mysql -h 10.0.21.222 -P 3301 -upercona percona -Bse "show global variables like 'hostname'"
 hostname	cz-test2
-</pre>
+```

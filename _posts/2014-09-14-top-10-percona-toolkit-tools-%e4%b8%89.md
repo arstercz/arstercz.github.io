@@ -54,7 +54,7 @@ tags:
 ```
 部分信息并不是我们所必须的， 同样有些信息也没有出现， 比如ip地址信息, 不过bash shell脚本给我们定制功能提供了很大的便利性，大家可以按需修改。
 其它参数:
-<pre>
+```
 --save-samples: 将报告生成在指定的空目录下, 类似pt-mysql-summary, 不同的信息按照文件存放.比如:
 #pt-summary --save-samples=summary
 [root@z6 ~]# ls summary
@@ -64,7 +64,7 @@ dmesg_file  dmidecode  ip  memory  mounted_fs  netstat  network_devices  notable
 # pt-summary --read-samples=summary
 
 --sleep: 在搜集vmstat信息的时候， sleep多长时间。
-</pre>
+```
 
 ### 6. pt-online-schema-change
 <a href="http://www.percona.com/doc/percona-toolkit/2.2/pt-online-schema-change.html"><font color="green">http://www.percona.com/doc/percona-toolkit/2.2/pt-online-schema-change.html</font></a>

@@ -36,14 +36,14 @@ tags:
 以下为安装及测试replication-listener
 1. install mysql-replication-listener
 
-<pre>
+```
 export JAVA_HOME=/opt/jdk
 export MYSQL_DIR=/opt/mysql/
 export MySQL_INCLUDE_DIR=/opt/mysql/include
 export MySQL_LIBRARY=/opt/mysql/lib
 export JAVA_AWT_LIBRARY=/opt/jdk/jre/lib/amd64/libawt.so
 export JAVA_JVM_LIBRARY=/opt/jdk/jre/lib/amd64/server/libjvm.so
-</pre>
+```
 
 openssl-devel.x86_64  gcc   gcc-c++   cmake make
 error: ‘MYSQL_TYPE_TIME2’ 为5.6版本的错误
@@ -56,18 +56,18 @@ error: ‘MYSQL_TYPE_TIME2’ 为5.6版本的错误
 install boost.x86_64 boost-debuginfo.x86_64 libodb-boost-devel.x86_64 boost-static.x86_64
 
 boost没有debug包, 做以下改动:
-<pre>
+```
 cp /usr/lib64/libboost_thread-mt.a /usr/lib64/libboost_thread-mt-d.a
 cp /usr/lib64/libboost_thread-mt.so.5 /usr/lib64/libboost_thread-mt-d.so.5
 cp /usr/lib64/libboost_date_time-mt.so.5 /usr/lib64/libboost_date_time-mt-d.so.5
 ......
 cp /usr/lib64/libboost_regex-mt.so.5 /usr/lib64/libboost_regex-mt-d.so.5
 ......
-</pre>
+```
 如果安装了boost-debuginfo.x86_64，做以下改动,跳过debuh库的依赖检测:
 
 注释 vi /usr/lib64/boost/Boost.cmake以下信息:
-<pre>
+```
 534 #  foreach(file ${_IMPORT_CHECK_FILES_FOR_${target}} )
 535 #    if(NOT EXISTS "${file}" )
 536 #      message(FATAL_ERROR "The imported target \"${target}\" references the file
@@ -81,10 +81,10 @@ cp /usr/lib64/libboost_regex-mt.so.5 /usr/lib64/libboost_regex-mt-d.so.5
 544 #")
 545 #    endif()
 546 #  endforeach()
-</pre>
+```
 
 CMakeLists.txt增加以下信息：
-<pre>
+```
 --- ../../replication-booster-for-mysql/CMakeLists.txt	2014-11-06 16:32:01.466160057 +0800
 +++ CMakeLists.txt	2014-11-06 17:19:06.346764919 +0800
 @@ -5,9 +5,9 @@
@@ -99,7 +99,7 @@ CMakeLists.txt增加以下信息：
  include_directories(${MySQL_INCLUDE_DIR})
  
  # Find MySQL replication listener and header files
-</pre>
+```
 cmake . -DCMAKE_PREFIX_PATH=/home/mysql/mysql-replication-listener/   #指定replication listener的路径
 make编译增加共享库
 ln -s /usr/lib64/libicuuc.so.42 /usr/lib64/libicuuc.so
@@ -113,7 +113,7 @@ cp /opt/5.6.15/lib/libmysqlclient.so.18 /usr/lib64/
 指定s选项以执行prefetch转换,如下的processlist:
 # replication_booster --user=root --password=xxxxxx --admin_user=root --admin_password=xxxxxx --socket=/srv/mysql/date3301/data/s8301 -s 10
 
-<pre>
+```
 2014-11-06 18:20:36: Reading relay log file: /srv/mysql/data3301/data/relay-bin.000877 from relay log pos: 173556941
 2014-11-06 18:20:36: Replication Booster started.
 ^C2014-11-06 18:22:26: Stopping Replication Booster..
@@ -133,11 +133,11 @@ Statistics:
  Error SELECT queries: 0
  Number of times to read relay log limit: 5385
  Number of times to reach end of relay log: 0
-</pre>
+```
 
 将更新的sql转为select语句在slave中执行, 通过预加载记录来实现快速更新的目的. 
-<pre>
+```
 | 67332 | root        | localhost          | data | Query   |     0 | preparing                        | select isnull(coalesce( old_vendorid='7218B947-F03D-4897-92B4-C0A0A57A7B8A', mac='1b0f3abf7bb874a828b1854291f268fb48f31eb5', update_time = now())) from login  user_id = 11111                       |         0 |             0 |         1 |
 | 67333 | root        | localhost          | data | Query   |     0 | init                             | select isnull(coalesce( old_vendorid='71B3F8D0-BEB2-4C52-940D-954379996CA6', mac='7b97cc6b16c31565b0377ba2d1c58ececf7cc8f1', update_time = now())) from login  where  user_id = 11111111        |         0 |             0 |         1 |
 | 67334 | root        | localhost          | data | Query   |     0 | statistics                       | select isnull(coalesce( charge_status = 1, charge_time = now())) from order_char where  id = 1111111
-</pre>
+```

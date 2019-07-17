@@ -26,16 +26,15 @@ mha (Mysql Master High Availability Manaager) 流程及部署说明
 
 一. 系统环境
 **  管理节点
-<pre>
+```
    Hostname | mgr.com
     Platform | Linux
      Release | CentOS release 6.4 (Final)
       Kernel | 2.6.32-358.el6.i686
 Architecture | CPU = 32-bit, OS = 32-bit
-</pre>
-<!--more-->
+```
 **  节点1
-<pre>
+```
     Hostname | node1.com
       System | innotek GmbH; VirtualBox; v1.2 (Other)
  Service Tag | 0
@@ -43,10 +42,10 @@ Architecture | CPU = 32-bit, OS = 32-bit
      Release | CentOS release 5.5 (Final)
       Kernel | 2.6.18-194.el5
 Architecture | CPU = 32-bit, OS = 32-bit
-</pre>
+```
 
 **   节点2
-<pre>
+```
     Hostname | node2.com
       System | innotek GmbH; VirtualBox; v1.2 (Other)
  Service Tag | 0
@@ -54,40 +53,40 @@ Architecture | CPU = 32-bit, OS = 32-bit
      Release | CentOS release 5.5 (Final)
       Kernel | 2.6.18-194.el5
 Architecture | CPU = 32-bit, OS = 32-bit
-</pre>
+```
 
 **  节点3
-<pre>
+```
     Hostname | node3.com
     Platform | Linux
      Release | CentOS release 6.4 (Final)
       Kernel | 2.6.32-358.el6.i686
 Architecture | CPU = 32-bit, OS = 32-bit
-</pre>
+```
 
 二. 实验环境:
-<pre>
+```
 192.168.56.108 (current master)
  +--192.168.56.109
  +--192.168.56.110
  
 vip - 192.168.56.200
-</pre>
+```
  
 From:
-<pre>
+```
 192.168.56.108 (current master)
  +--192.168.56.109
  +--192.168.56.110
-</pre>
+```
 
 To:
-<pre>
+```
 192.168.56.109 (new master)
  +--192.168.56.110
-</pre>
+```
   详细参数:
-<pre>
+```
 node1.com  192.168.56.108
 Version         5.5.30-rel30.2-log
 Server ID       199914
@@ -121,13 +120,13 @@ InnoDB version  5.5.30-rel30.2
    Slave mode      STRICT
    Auto-increment  increment 1, offset 1
    InnoDB version  5.5.30-rel30.2
-</pre>
+```
 
 三. 配置说明
   详细参数见 : <a href="https://code.google.com/p/mysql-master-ha/wiki/Parameters">Parameters</a>
   
   全局配置:
-<pre>
+```
 [root@mgr tmha]# cat global.conf 
 [server default]
 user=root
@@ -141,10 +140,10 @@ ping_interval=3
 master_ip_failover_script=/usr/local/bin/master_ip_failover        ## 不定义stop函数 (见流程说明), 定义start函数 切换vip地址
 #shutdown_script=/usr/local/bin/power_manager
 report_script=/usr/local/bin/send_report                           ## mail 命令发送报告
-</pre>
+```
 
   应用配置 (主从对)
-<pre>
+```
 [root@mgr tmha]# cat tcase.cnf 
 [server default]
 manager_workdir=/web/log/mha/tcase1
@@ -161,18 +160,18 @@ candidate_master=1               #  master 候选
 [server3]
 hostname=192.168.56.110
 no_master=1                      #  永远不做master.
-</pre>
+```
 
 mha启用
-<pre>
+```
 nohup masterha_manager --global_conf=/web/tmha/global.conf --conf=/web/tmha/tcase.cnf --ignore_last_failover > /web/tmha/manager.log 2>&1 & 
-</pre>
+```
 
 
 四. 流程说明   
 <a href="https://code.google.com/p/mysql-master-ha/wiki/Sequences_of_MHA">Sequences_of_MHA</a>
 
-<pre>
+```
  | 复制设置和当前 master 的检测 |    注 1
              |
              |
@@ -207,7 +206,7 @@ nohup masterha_manager --global_conf=/web/tmha/global.conf --conf=/web/tmha/tcas
    | recovering rest slaves | 
              |
      | notification |  [optional]  --- sending mails
-</pre>
+```
 
 ### 注 :
 

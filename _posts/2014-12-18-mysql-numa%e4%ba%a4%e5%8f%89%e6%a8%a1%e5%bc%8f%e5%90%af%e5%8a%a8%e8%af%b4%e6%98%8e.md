@@ -29,12 +29,12 @@ db02: 关闭numa interleave; RAM 64G;
 
 
 mysqld_safe部分配置增加numa参数:
-<pre>
+```
 #NUMA support
 numa_interleave = 1
 innodb_buffer_pool_populate = 1
 flush_caches=1
-</pre>
+```
 
 innodb_buffer_pool_populate: 如果服务器为NUMA架构，且内存的选择策略为selected, 在buffer pool分配的内存大小大于节点的可用内存时,系统则会进行swap交换操作,即便其它节点还有可用的内存。该选项功能引用自Twitter's的MySQL补丁, 启用的该选项在buffer cache还是clean的时候(即空机) 启动实例后为InnoDB进行预分配页空间以强制决定NUMA分配的策略;
 <a href="http://www.ibm.com/developerworks/cn/linux/l-numa/">http://www.ibm.com/developerworks/cn/linux/l-numa/</a>
@@ -43,7 +43,7 @@ swap对numa架构的影响见:
 <a href="http://blog.jcole.us/2010/09/28/mysql-swap-insanity-and-the-numa-architecture/">http://blog.jcole.us/2010/09/28/mysql-swap-insanity-and-the-numa-architecture/</a>
 
 db01:
-<pre>
+```
 available: 2 nodes (0-1)
 node 0 cpus: 0 2 4 6 8 10 12 14 16 18 20 22
 node 0 size: 32722 MB
@@ -55,10 +55,10 @@ node distances:
 node   0   1 
   0:  10  20 
   1:  20  10
-</pre>
+```
 
 db02:
-<pre>
+```
 available: 2 nodes (0-1)
 node 0 cpus: 0 2 4 6 8 10 12 14 16 18 20 22
 node 0 size: 32722 MB
@@ -70,7 +70,7 @@ node distances:
 node   0   1 
   0:  10  20 
   1:  20  10
-</pre>
+```
 
 
 可以看到 db01启用interleave模式后, node1, node2同时对外服务, 尽管对于内存而言存在本地和远端模式的访问, 但比起swap操作, 开销更少;

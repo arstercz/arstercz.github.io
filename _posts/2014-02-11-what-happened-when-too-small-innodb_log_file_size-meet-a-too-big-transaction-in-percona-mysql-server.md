@@ -24,7 +24,7 @@ tags:
   - log
 ---
 <b>ENV</b>
-<pre>
+```
 # Percona Toolkit System Summary Report ######################
     Platform | Linux
      Release | CentOS release 5.5 (Final)
@@ -51,20 +51,20 @@ Sandbox
 Percona MySQL
   Percona-Server-5.1.63-rel13.4-443.Linux.x86_64.tar.gz
   Percona-Server-5.5.30-rel30.2-500.Linux.i686.tar.gz
-</pre>
+```
 <!--more-->
 <b>The following steps are the test case in sandbox.</b>
 
 <b>step 1:</b>
-<pre>
+```
 when Server start:
 -rw-rw---- 1 zhechen zhechen  10M Feb 13 16:33 ibdata1
 -rw-rw---- 1 zhechen zhechen 2.0M Feb 13 16:33 ib_logfile0
 -rw-rw---- 1 zhechen zhechen 2.0M Feb 13 16:31 ib_logfile1
-</pre>
+```
 
 <b>step 2:</b>
-<pre>
+```
 create table and make a big transaction:
 as follows:
 mysql [localhost] {msandbox} (test) > create table ts(name char(20),year int(3),des varchar(100));
@@ -105,11 +105,11 @@ as follows:
 -rw-rw---- 1 zhechen zhechen 146M Feb 13 17:03 ibdata1
 -rw-rw---- 1 zhechen zhechen 2.0M Feb 13 17:03 ib_logfile0
 -rw-rw---- 1 zhechen zhechen 2.0M Feb 13 17:03 ib_logfile1
-</pre>
+```
 
 <b>Conclusion:</b>
-<pre>
+```
 Percona MySQL occupy the share tablespace (ibdata) when there is too small innodb_log_file_size meet a big transaction, both the ibdata (undo log contained in share space) and ib_logfile (roundrobin checkpoints) are frequently modified (negative effects on MySQL Performace).
 
 The error that like "InnoDB: ERROR: the age of the last checkpoint is 241588252, InnoDB: which exceeds the log group capacity 241588224." is not present in msandbox.err file.
-</pre>
+```

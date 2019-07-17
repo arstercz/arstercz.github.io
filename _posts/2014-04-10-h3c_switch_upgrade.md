@@ -27,7 +27,7 @@ http://www.h3c.com.cn/Service/Software_Download/Switches/Catalog/H3C_S5120/H3C_S
 
 
 <b>升级前：1505P09</b>
-<pre>
+```
 H3C Comware Platform Software
 Comware Software, Version 5.20, Release 1505P09
 Copyright (c) 2004-2012 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
@@ -42,11 +42,11 @@ Hardware Version is REV.A
 CPLD Version is 002
 Bootrom Version is 155
 [SubSlot 0] 48GE+4SFP Hardware Version is REV.A
-</pre>
+```
 <!--more-->
 
 <b>传文件：</b>
-<pre>
+```
 <dxt-k09-s3-bak>tftp 10.0.21.5 get S5120SI_E-CMW520-R1513P81.bin     #最新版
 
 <dxt-k09-s3-bak>dir
@@ -57,19 +57,19 @@ Directory of flash:/
    2     -rw-      5002  May 01 2000 05:07:29   startup.cfg
    3     -rw-  13491152  Jun 19 2012 15:30:06   s5120si_e-cmw520-r1505p09.bin
    4     drw-         -  Apr 26 2000 12:00:07   logfile
-</pre>
+```
 
 
 <b>升级:</b>
-<pre>
+```
 <dxt-k09-s3-bak>bootrom update file flash:/s5120si_e-cmw520-r1513p81.bin slot 1 to 1 
   This command will update bootrom file on the specified board(s), Continue? [Y/N]:y
   Now updating bootrom, please wait...
   BootRom file updating finished!
-</pre>
+```
 
 <b>重启:</b>
-<pre>
+```
 <dxt-k09-s3-bak>reboot
  Start to check configuration with next startup configuration file, please wait.........DONE!
  This command will reboot the device. Current configuration will be lost, save current configuration? [Y/N]:y
@@ -114,11 +114,11 @@ The main application file is self-decompressing.................................
 ....................................................................Done!
 System is starting...
 User interface aux0 is available.
-</pre>
+```
 
 
 <b>升级后版本: 1513P81</b>
-<pre>
+```
 <dxt-k09-s3-bak>display version 
 H3C Comware Platform Software
 Comware Software, Version 5.20, Release 1513P81
@@ -134,7 +134,7 @@ Hardware Version is REV.A
 CPLD Version is 002
 Bootrom Version is 169
 [SubSlot 0] 48GE+4SFP Hardware Version is REV.A
-</pre>
+```
 
 
 <b>配置不变。</b>

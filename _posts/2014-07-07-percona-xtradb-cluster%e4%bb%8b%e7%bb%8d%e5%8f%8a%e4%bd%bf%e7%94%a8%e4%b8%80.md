@@ -36,7 +36,7 @@ oracle官方在5.5系列中做出了很大的代价来保证基础功能的稳�
 3.xtradb cluster和Oracle MySQL有什么不同?
 全部兼容MySQL Server,也可以从Percona MySQL Server升级到Xtradb cluster。两个鲜明的特征包括数据同步和故障恢复。
 xtradb cluster主要不同于MySQL包括以下几方面：
-<pre>
+```
 1. 节点之间的复制(replication)仅支持InnoDB引擎, 其它类型的write不会复制(包括mysql.*表),DDL语句以statement级别复制,即意味着create user ... 和 grant ...可以复制，但是insert into mysql.user .... 不会被复制。
 
 2. 没有主键的表在各节点可能以不同的顺序显示出来,比如select ... limit..., DELETE操作在没有主键的表中不被支持。不要使用没有主键的表(也可能基于row格式的复制)
@@ -54,7 +54,7 @@ xtradb cluster主要不同于MySQL包括以下几方面：
 8. 不要使用binlog-do-db和binlog-ignore-db, 这些选项仅支持DML语句, 不支持DDL语句, 使用这些选项可能会引起数据的错乱。
 
 9. 如果选择rsync方式传输, 就不要指定character_set_server为utf16, utf32或ucs2字符集, Server可能会崩溃.
-</pre>
+```
 
 <strong>一. percona XtraDB Cluster 术语说明</strong>
 
@@ -94,9 +94,9 @@ xtradb cluster主要不同于MySQL包括以下几方面：
 <strong>二. percona XtraDB Cluster生成文件说明</strong>
 
 <b>GRA_x.log</b>：在row格式下执行失败的事务(比如drop一个不存在的表等),这些文件保存了这些事务的binlog events。该功能禁止了slave thread应用这些执行失败的事务。warning或error信息会在mysql error log中显示。比如在一个node中drop不存在的表, 其他node会生成GRA_x.log文件,error log中也会显示一下信息:
-<pre>
+```
 Jun  5 11:34:42 cz-test2 mysqld-3321: 2014-06-05 11:34:42 26423 [ERROR] Slave SQL: Error 'Unknown table 'percona.list'' on query. Default database: 'percona'. Query: 'drop table list', Error_code: 1051
-</pre>
+```
 
 <b>galera.cache</b>: 该文件存储主要的写集(writeset), 被实现为一个永久的环路缓冲区(ring-buffer),在node初始化的时候,它被用来在磁盘上预分配空间,默认128M, 这个值过大的话，更多的写集会被缓冲, 而且重新加入的的节点(rejoining node)更倾向于采用IST来取代SST传输数据。
 
@@ -108,16 +108,16 @@ Jun  5 11:34:42 cz-test2 mysqld-3321: 2014-06-05 11:34:42 26423 [ERROR] Slave SQ
 所有的query在本地node执行， 并且仅在commit存在特殊的处理。当commit有问题时， 事务必须在所有node验证, 没有验证通过则返回error信息. 随后，事务被应用到本地node。
 
 commit响应时间包括:
-<pre>
+```
 网络轮询时间；
 验证时间；
 本地应用；(远程apply事务不影响commit响应时间)。
-</pre>
+```
 两个重要的特性:
-<pre>
+```
 1. 控制wsrep_slave_threads参数来实现多并发replication.
 2. 一些其它因素，比如master的性能更好,执行事件要比slave快，这就造成了短暂的同步不一致(out-of-sync),这时候读取slave结果就为空, wsrep_causal_reads参数用来控制读取slave的行为，它使得操作一直等待直到事件被执行；
-</pre>
+```
 
 <b>四. 监控</b>
 <b>1. cluster完整性检测</b>
@@ -133,10 +133,10 @@ wsrep_cluster_status:  正常情况下值为Primary, 如果不为Primay,则该no
 
 如果cluster中没有node 连接上(connected) PC(就是所有node属于同一部分,但是node都是non-primary状态), 可以参考<a href="http://galeracluster.com/documentation-webpages/quorumreset.html#id1">http://galeracluster.com/documentation-webpages/quorumreset.html#id1</a> 来操作Reset quorum。
 如果不能Reset quorum, cluster则必须手动进行重引导(rebootstrapped),如下:
-<pre>
+```
 1. 关闭所有node节点；
 2. 从最近更新(most advanced node)的node节点开始重启所有的nodes(检查 wsrep_last_committed状态变量找到最近更新的node节点)。
-</pre>
+```
 
 <b>2. 节点状态检查</b>
 wsrep_ready: 该状态变量为On(Ture)时， 该node可以接受SQL,否则所有sql query返回'Unknown Command Error',并且需要检查wsrep_connected和wsrep_local_state_comment,在一个PC中wsrep_local_state_comment变量的值通常包括Joining, Waiting for SST, Joined, Synced或者Donor。在wsrep_ready = OFF时， 且wsrep_local_state_comment为Joining, Waiting for SST,或者Joined时，该node仍然在和cluster同步(syncing)；在non-primay部分里,节点的wsrep_local_state_comment状态应该是Initialized。
@@ -159,12 +159,12 @@ wsrep_local_send_queue_avg: 该变量的值较高的话， 网络链接可能存
 一旦一个node或多个node断开连接, 剩下的node则会进行quorum的选举操作; 在断开之前，如果总nodes里的多数node保持连接,则保留分区。对于网络分区(network partition) 一些node可能在非连接(network disconnect)区域内继续存活(alive and active),这种状况下只有quorum是一直运行的，没有quorum运行的分区中的节点则会进入non-primary状态。
 
 鉴于以上的原因，在2个node的集群中做自动故障恢复几乎是不可能的， 因为失败的node节点会使得剩下的node进入non-primary状态(只有一个node没法做quorum)。更多的，在网络不连通的时候，不同交换机下的两个node可能会有一点满足分裂(split brain)条件的可能性,这时候不会保留quorum,并且两个node都会进入non-primary状态。所以对自动故障恢复来说，以下的'3 原则'值得推荐:
-<pre>
+```
   单交换机下的cluster至少应该有3个node；
   分布不同交换机下的cluster, 应该至少跨越3个交换机；
   分布不同网络(子网)下的cluster, 应该至少3个网络；
   分布于不同数据中心下的cluster, 应该至少3个数据中心；
-</pre>
+```
 以上是在预防自动故障恢复工作过程中的防止分裂的方法。当然出于成本的考虑，增加交换机、数据中心等在很多情况下是不太现实的，Galera arbitrator(仲裁)是个可选的方式，它可以参与到quorum的选举，以组织split brain发生，但是它不会保留任何数据，也不会启动mysqld服务, 它是一个独立的deamon程序，详见<a href="http://galeracluster.com/documentation-webpages/arbitrator.html">http://galeracluster.com/documentation-webpages/arbitrator.html</a>
 
 

@@ -28,15 +28,15 @@ tags:
 创建新从库
 
 移除旧目录：
-<pre>
+```
 [root@bigdb node3303]# pwd
 /srv/mysql/node3303
 [root@bigdb node3303]# mv data data_20130221
 [root@bigdb node3303]# mkdir data;chown mysql.root data
-</pre>
+```
 <!--more-->
 恢复数据：
-<pre>
+```
 避免错误：innobackupex: fatal error: no 'mysqld' group in MySQL options
 声明xtrabackup/bin目录：PATH=$PATH:$HOME/bin:/opt/xtrabackup/bin/
 [root@bigdb node3303]# pwd
@@ -46,23 +46,23 @@ tags:
 ...
 innobackupex: Finished copying back files.
 130221 14:51:03  innobackupex: completed OK!
-</pre>
+```
 注意data权限(innobackupex恢复操作保持备份时文件及目录的权限)：
-<pre>
+```
 [root@bigdb node3303]# chown mysql.mysql data -R
-</pre>
+```
 查看data目录：
-<pre>
+```
 [root@bigdb node3303]# ls data
 me_thread  ibdata1  mysql  xtrabackup_slave_info
 启动实例(注意my.node.cnf文件的skip-slave-start选项)
 [root@bigdb node3303]# ./start
 waiting node start . node on pid=30374 port=3303 hostid=121
-</pre>
+```
 启动slave；
      查看master_log信息:注意xtrabackup_binlog_info和xtrabackup_slave_info两个文件的区别：前者为当前备份执行到的位置，  后者为slave对应master执行的位置，如果更换了master，需要查看xtrabackup_binlog_info 或 xtrabackup_binlog_pos_innodb信息以确定master位置；
 xtrabackup 备份的时候观察日志信息:出现如下notice:
-<pre>
+```
 ...
  [notice (again)]
  If you use binary log and do not use any hack of group commit,
@@ -75,12 +75,12 @@ This output can also be found in the xtrabackup_binlog_pos_innodb file, but it i
 If other storage engines are used (i.e. MyISAM), you should use the xtrabackup_binlog_info file to retrieve the position.
 
 The message about hacking group commit refers to an early implementation of emulated group commit in Percona Server.
-</pre>
+```
 如果库中只使用了innodb或者XtraDB引擎，恢复的时候使用xtrabackup_binlog_pos_innodb文件确定pos信息;
 如果还有其他引擎(如MyISAM)，恢复的时候使用xtrabackup_binlog_info确定pos信息;
 
 <b>恢复操作:</b>
-<pre>
+```
 [root@bigdb var3]# cat xtrabackup_binlog_info 
 mysql-bin.000003 33960805
 
@@ -116,34 +116,34 @@ mysql root@[localhost:s3303 (none)] > show slave status\G
               Relay_Log_Space: 8869
     ......
         Seconds_Behind_Master: 0
-</pre>
+```
 
 至此完成恢复过程，并恢复主从关系。
 
 <strong>MySQL 5.6 GTID恢复说明</strong>
 
 xtrabackup 从 2.0.7开始支持GTID(5.6复制模式)的复制模式, 开启GTID特性需要以下操作:
-<pre>
+```
 1. 使用5.6版本;
 2. 实例需要开启 gtid_mode = 1
 3. 实例需要开启 auto_position
-</pre>
+```
 
 GTID恢复类似传统的恢复, 不过在innobackupex备份的时候会输出详细的信息,如下:
-<pre>
+```
 innobackupex: Backup created in directory '/web/xtrabackup/2014-11-26_11-14-26'
 innobackupex: MySQL binlog position: filename 'mysql-bin.000001', position 421, gtid_executed 62f821d2-7453-11e4-bebb-fa163e43bfe5:1
-</pre>
+```
 gtid_executed为当前master执行的信息;
 
 备份完成后查看文件信息如下:
-<pre>
+```
 # cat /web/xtrabackup/2014-11-26_11-14-26/xtrabackup_binlog_info 
 mysql-bin.000001	421		62f821d2-7453-11e4-bebb-fa163e43bfe5:1
-</pre>
+```
 
 新起slave的时候使用以下操作:
-<pre>
+```
 slave1 > SET GLOBAL gtid_purged="62f821d2-7453-11e4-bebb-fa163e43bfe5:1";
 slave1 > CHANGE MASTER TO MASTER_HOST="10.0.1.1", master_user="msandbox", master_password="msandbox", MASTER_AUTO_POSITION = 1;
-</pre>
+```

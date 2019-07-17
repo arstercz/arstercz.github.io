@@ -31,7 +31,7 @@ tags:
 
 生成报告举例如下:
 # pt-query-digest query_slow.log
-<pre>
+```
 # Query 5: 0 QPS, 0x concurrency, ID 0x84B3C3C1C1C732F4 at byte 37257 ____
 # This item is included in the report because it matches --limit.
 # Scores: V/M = 0.00
@@ -76,17 +76,17 @@ tags:
 SELECT CONCAT(table_schema,'.',table_name,',',engine,',',IFNULL(create_time,'0000-00-00 00:00:00')) 
      FROM information_schema.tables 
      WHERE table_schema NOT IN ('mysql','information_schema','performance_schema')\G
-</pre>
+```
 时间分布， 数据发送量， 行数检查等都非常详细.
 tcpdump监听举例如下:
-<pre>
+```
 tcpdump -s 65535 -x -nn -q -tttt -c 500000 -i any port 3305 > mysql.3305.txt
 pt-query-digest --type tcpdump --watch-server='10.0.10.10:3305' mysql.3305.txt >3301.log
-</pre>
+```
 报告列表同上述的slow log分析。
 
 其它参数:
-<pre>
+```
 --attribute-aliases: query语句中可能会出现alias相关的信息, 比如 tb1 as a, 该参数为没有主属性的事件添加一个alias属性, 如果有主属性，则移除alias相关的属性；
 
 --[no]continue-on-error: 用于指定在分析的时候出现错误， 是否停止继续分析， 默认为继续分析；
@@ -110,12 +110,12 @@ pt-query-digest --type tcpdump --watch-server='10.0.10.10:3305' mysql.3305.txt >
 --type：用于指定来源query的类型, 包括binlog(binary log), genlog(general log), slowlog(slow query logs), tcpdump(tcp监听的文件信息), rawlog(一行一条sql的文本文件)；
 
 --watch-server：如果MySQL通过vip对外服务, 可以指定该参数指定实际服务的ip和port, 如上述的tcpdump示例；
-</pre>
+```
 
 8. pt-stalk
 <a href=http://www.percona.com/doc/percona-toolkit/2.2/pt-stalk.html><font color="green">http://www.percona.com/doc/percona-toolkit/2.2/pt-stalk.html</font></a>
 pt-stalk: 该工具用于在发生问题时， 采集相关的取证分析数据,没有发生问题时一直等待直到触发的条件满足则进行相关信息的搜集工作，包括出问题时磁盘的使用,gdb信息, 内存，cpu, MySQL执行语句的镜像, 相关的参数和状态信息, 基本包括了所有能搜集的信息;该工具被设计为使用root权限作为daemon进行运行。触发的条件可以是 --function, --variable, --threshold, 和 --cycles, 默认情况下该工具监控MySQL直到满足触发条件则进行数据收集, 通常的执行逻辑如下:
-<pre>
+```
 while true; do
    if --variable from --function > --threshold; then
       cycles_true++
@@ -148,11 +148,11 @@ if --collect process are still running; then
    wait up to --run-time * 3 seconds
    kill any remaining --collect processes
 fi
-</pre>
+```
 相关的数据被写到以timestamp开头的文件,可以使用pt-sift帮助我们查看和分析生成的数据；
 常用的示例见: <a href="http://www.percona.com/blog/2013/01/03/percona-toolkit-by-example-pt-stalk/"><font color="green">http://www.percona.com/blog/2013/01/03/percona-toolkit-by-example-pt-stalk/</font></a>
 举例如下:
-<pre>
+```
 #pt-stalk --sleep=10 --function=processlist --variable Host --match localhost --threshold=1 --defaults-file=./my.node.cnf --host=127.0.0.1 --user=root --password=xxxxxx --socket=data/s3306
 2014_10_19_12_41_19 Starting /usr/bin/pt-stalk --function=processlist --variable=Threads_running --threshold=25 --match= --cycles=5 --interval=1 --iterations= --run-time=30 --sleep=10 --dest=/var/lib/pt-stalk --prefix= --notify-by-email= --log=/var/log/pt-stalk.log --pid=/var/run/pt-stalk.pid --plugin=
 2014_10_19_12_50_58 Check results: processlist(Host)=2, matched=yes, cycles_true=1
@@ -164,9 +164,9 @@ fi
 2014_10_19_12_51_02 Collect 1 PID 28678
 2014_10_19_12_51_02 Collect 1 done
 2014_10_19_12_51_02 Sleeping 10 seconds after collect
-</pre>
+```
 本地连接数超过达到预警值1得时候开始收集信息, /var/lib/pt-stalk目录列表如下:
-<pre>
+```
 [root@cz ~]# ls /var/lib/pt-stalk/
 2014_10_19_12_51_02-df              2014_10_19_12_51_02-netstat_s       2014_10_19_12_51_21-df              2014_10_19_12_51_21-netstat_s
 2014_10_19_12_51_02-disk-space      2014_10_19_12_51_02-opentables1     2014_10_19_12_51_21-disk-space      2014_10_19_12_51_21-opentables1
@@ -184,9 +184,9 @@ fi
 2014_10_19_12_51_02-mutex-status1   2014_10_19_12_51_02-variables       2014_10_19_12_51_21-mutex-status1   2014_10_19_12_51_21-variables
 2014_10_19_12_51_02-mysqladmin      2014_10_19_12_51_02-vmstat          2014_10_19_12_51_21-mysqladmin      2014_10_19_12_51_21-vmstat
 2014_10_19_12_51_02-netstat         2014_10_19_12_51_02-vmstat-overall  2014_10_19_12_51_21-netstat         2014_10_19_12_51_21-vmstat-overall
-</pre>
+```
 使用pt-sift来查看生成的报告:
-<pre>
+```
 [root@cz pt-stalk]# pt-sift .
 
   2014_10_19_12_51_02  2014_10_19_12_51_21
@@ -223,9 +223,9 @@ wa 0% . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
     No stack trace file exists
 --oprofile--
     No opreport file exists
-</pre>
+```
 其它参数:
-<pre>
+```
 --collect-gdb： 搜集MySQL线程相关的堆栈信息, 在非常繁忙的主机中频繁搜集gdb信息可能会引起MySQL崩溃, 该参数默认关闭;
 
 --collect-oprofile： 搜集oprofile相关的信息, 该参数默认开启oprofile会话，详细可参考系统相关的oprofile文档；
@@ -245,4 +245,4 @@ wa 0% . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
        touch /tmp/foo
     }
   在执行collect之前，会先指定before_collect扩展, 创建/tmp/foo文件;
-</pre>
+```

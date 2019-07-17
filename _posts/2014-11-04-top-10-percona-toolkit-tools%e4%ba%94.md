@@ -30,21 +30,21 @@ tags:
 
 该工具默认情况下创建percona.checksums表用于保存校验的结果, 该表有2个作用:
 (1) 方面查看哪些信息不一致, 可以使用以下语句:
-<pre>
+```
 SELECT db, tbl, SUM(this_cnt) AS total_rows, COUNT(*) AS chunks FROM checksums WHERE ( master_cnt <> this_cnt OR master_crc <> this_crc OR ISNULL(master_crc) <> ISNULL(this_crc)) GROUP BY db, tbl;
-</pre>
+```
 (2) 方便pt-table-sync(数据纠错)的增量使用.
 
 举例如下:
-<pre>
+```
 [root@cz ~]# pt-table-checksum h=10.3.254.110,u=root,p=xxxxxx,P=30587 --databases="part1" --tables="book" --nocheck-replication-filters 
             TS ERRORS  DIFFS     ROWS  CHUNKS SKIPPED    TIME TABLE
 04-11T12:09:46      0      1   168949       4       0   1.218 part1.book
-</pre>
+```
 diffs列显示主从约有1个分组的记录不一致, book表一共检测了168949行记录, 分4次校验完.
 
 参数信息也可以写到文件里,通过--config参数指定,比如对test表进行校验, 将参数写到pt-table.cnf文件中:
-<pre>
+```
 host           = 127.0.0.1
 user           = root
 password       = xxxxxxxx
@@ -58,11 +58,11 @@ recursion-method=processlist
 recurse        = 1
 #resume
 #replicate-check-only
-</pre>
+```
 # pt-table-checksum --config pt-table.cnf  即可开始校验test.test表, 不指定tables参数, 则检测test库的所有表;
 
 其它参数:
-<pre>
+```
 --[no]check-binlog-format： 默认情况下该工具检测所有server的binlog_format, 该参数用来控制是否检测.
 
 --check-interval: 如果指定了 --max-log参数， 则每次检测的时候sleep指定的时间,默认为1s.
@@ -82,13 +82,13 @@ recurse        = 1
 --function: 用于指定校验数据时用的函数, 默认为crc32, 可以是FNV1A_64, MURMUR_HASH, SHA1, MD5, CRC32等.
 
 --resume: 从上一次校验完成后的chunk开始执行本次的校验, 该参数可用于增量校验大表数据. 如果应用有很多update或delete操作, 则不应该启用该参数.
-</pre>
+```
 
 10. pt-table-sync
 <a href="http://www.percona.com/doc/percona-toolkit/2.2/pt-table-sync.html"><font color="green">http://www.percona.com/doc/percona-toolkit/2.2/pt-table-sync.html</font></a>
 数据同步工具: 该工具主要用不同MySQL的表之间的数据同步, 可以是master->slave, master->master或一个instance到另一个instance. 同步功能会做一些数据的修改操作, 如果表信息很重要, 操作前可以备份好相关的表. 这里主要介绍指定replicate或sync-to-master参数时, pt-table-sync工具如何工作. 
 以下为该工具的处理逻辑:
-<pre>
+```
 if DSN has a t part, sync only that table:
    if 1 DSN:
       if --sync-to-master:
@@ -109,19 +109,19 @@ else:
    else:
       find tables, filtering with --databases etc, and sync each
       DSN to the first.
-</pre>
+```
 按照手册页的例子来说明:
-<pre>
+```
 (1) pt-table-sync --execute --sync-to-master slave1
-</pre>
+```
 如果指定了sync-to-master选项, DSN应该为slave的连接信息, 这时pt-table-sync会连接该slave的master, 并将master的数据同步到该slave.
-<pre>
+```
 (2) pt-table-sync --execute --replicate test.checksum master1
-</pre>
+```
 replicate选项用到了上一个工具pt-table-checksum, 其读取pt-table-checksum生成的checksum表信息， 然后进行同步操作, master1表示同步master1的数据到所有的slave节点.
-<pre>
+```
 (3) pt-table-sync --execute --replicate test.checksum --sync-to-master slave1
-</pre>
+```
 同上面的命令, 但是只同步master1的数据到slave1节点.
 在同步方面, 安全的方式是在master上更新数据(比如,delete或replace等), 通过主从复制来完成同步, 这种方式和其它正常的更新一样,通过主从机制完成. 
 同步的过程:
@@ -130,15 +130,15 @@ replicate选项用到了上一个工具pt-table-checksum, 其读取pt-table-chec
 (2) 如果指定了replicate选项, 则读取checksums表, 该步骤免去了校验过程, 可以得到不同的chunk组信息, 后续的过程同(1)的操作.
 
 pt-table-sync的校验过程举例如下:
-<pre>
+```
 [root@cz rsandbox_Percona-Server-5_6_15]# pt-table-sync --databases percona --execute --sync-to-master  h=localhost,P=19681,u=root,p=xxxxxx,S=/tmp/mysql_sandbox19681.sock --verbose --print --recursion-method=hosts --chunk-size=1
 # Syncing P=19681,S=/tmp/mysql_sandbox19681.sock,h=localhost,p=...,u=root
 # DELETE REPLACE INSERT UPDATE ALGORITHM START    END      EXIT DATABASE.TABLE
 REPLACE INTO `percona`.`dept`(`id`, `name`) VALUES ('30', 'insert test') /*percona-toolkit src_db:percona src_tbl:dept src_dsn:P=19680,S=/tmp/mysql_sandbox19681.sock,h=127.0.0.1,p=...,u=root dst_db:percona dst_tbl:dept dst_dsn:P=19681,S=/tmp/mysql_sandbox19681.sock,h=localhost,p=...,u=root lock:1 transaction:1 changing_src:1 replicate:0 bidirectional:0 pid:9674 user:root host:z10*/;
 #      0       1      0      0 Chunk     15:37:33 15:37:33 2    percona.dept
-</pre>
+```
 上述信息描述了同步percona.dept表的信息过程, master比slave多了一条记录('30', 'insert test'), pt-table-checksum检测到后通过在master上使用replace这条sql实现了两边的同步, 打开master或slave的general log参数, 可以看到以下信息:
-<pre>
+```
                    67 Query     START TRANSACTION /*!40108 WITH CONSISTENT SNAPSHOT */
                    67 Query     SELECT /*percona.dept:18/20*/ 17 AS chunk_num, COUNT(*) AS cnt, COALESCE(LOWER(CONV(BIT_XOR(CAST(CRC32(CONCAT_WS('#', `id`, `name`, CONCAT(ISNULL(`id`), ISNULL(`name`)))) AS UNSIGNED)), 10, 16)), 0) AS crc FROM `percona`.`dept` FORCE INDEX (`id_idx`) WHERE (`id` >= '28' AND `id` < '29') FOR UPDATE
                    68 Query     SHOW MASTER STATUS
@@ -155,11 +155,11 @@ REPLACE INTO `percona`.`dept`(`id`, `name`) VALUES ('30', 'insert test') /*perco
                    67 Query     commit
                    67 Query     START TRANSACTION /*!40108 WITH CONSISTENT SNAPSHOT */
                    67 Query     SELECT /*percona.dept:20/20*/ 19 AS chunk_num, COUNT(*) AS cnt, COALESCE(LOWER(CONV(BIT_XOR(CAST(CRC32(CONCAT_WS('#', `id`, `name`, CONCAT(ISNULL(`id`), ISNULL(`name`)))) AS UNSIGNED)), 10, 16)), 0) AS crc FROM `percona`.`dept` FORCE INDEX (`id_idx`) WHERE (`id` IS NULL) FOR UPDATE
-</pre>
+```
 可以看到校验的过程和pt-table-checksum是类似的, 通过chunk(chunk-size=1)的方式分组校验master和slave的数据, 上述信息的where id >= ? 信息可以看到此变化, 找到id=30的记录后(slave没有id=30的记录), 在master上执行replace语句, 通过主从复制保证了两边表数据的最终一致.
 
 其它参数:
-<pre>
+```
 --algorithms：使用什么算法来发现两边数据的不同, 默认为chunk, 详细可以参见手册页algorithms部分.
 
 --[no]bin-log: pt-table-sync在执行更新操作的时候(如上面的replace语句), 是否需要记录到binlog日志里, 默认为记录.
@@ -181,4 +181,4 @@ REPLACE INTO `percona`.`dept`(`id`, `name`) VALUES ('30', 'insert test') /*perco
 --lock: 在校验数据的时候是否进行锁表操作.
 
 --print: 打印更新操作的sql语句信息.
-</pre>
+```

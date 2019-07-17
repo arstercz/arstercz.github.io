@@ -34,33 +34,33 @@ MySQL 5.6 允许用户配置复制的延迟时间, 保证 slave 的 sql thread �
 
 延迟特性是在 slave 中实现的, 不会影响 master, relay log的接收等同传统的复制方式, 只是 sql thread 执行更新的过程延迟了指定的时间, 笔者猜测是根据比对sql的执行时间, 只有时间差 >= 指定的delay 时间才会更新到 slave中.
 以下命令指定已有复制的延迟时间为 20秒
-<pre>
+```
 slave> STOP SLAVE;
 
 slave> CHANGE MASTER TO MASTER_DELAY = 20;
 
 slave> START SLAVE;
-</pre>
+```
 此后, master 中更新一个操作, slave 则在20s 后才进行更新. 这个时间有点短, 如果master 执行了误操作, 需要在 20s 内对slave 进行操作, 为避免更新操作的丢失, 需要先找到 master 中误操作之前的 binlog 位置信息, 可以 mysqlbinlog 查看binary log文件, 也可以在 master 中执行 SHOW BINLOG EVENTS 找到相应的位置信息： binlog_filename, binlog_position, 在 slave 中可以使用复制的 UNTIL 特性让 slave 更新到 误操作之前的位置:
-<pre>
+```
 slave> START SLAVE UNTIL
  -> MASTER_LOG_FILE=binlog_filename,
  -> MASTER_LOG_POS=binlog_position;
-</pre>
+```
 
 2. MySQL 5.1/5.5 的延迟复制
 遗憾的是只有5.6支持延迟复制, 不过可以通过 pt-slave-delay 工具 <a href="https://www.percona.com/doc/percona-toolkit/2.2/pt-slave-delay.html">https://www.percona.com/doc/percona-toolkit/2.2/pt-slave-delay.html</a> 实现延迟复制特性.
 先看看简单的示例:
-<pre>
+```
 pt-slave-delay --delay 1m --interval 15s --run-time 10m slavehost
-</pre>
+```
 pt-slave-delay 工具监控 slave , 通过 start 或 stop 保证复制的 sql thread 线程的更新落后于我们指定的时间, delay 参数为延迟的时间, interval 为工具执行的频率, 所以在实际工作中, slave 延迟的时间在 delay 和 delay + interval 范围内. 
 该工具默认基于slave 的 relay log 的位置信息, 所以不需要连接 master(该特性解析relay log, 获取sql执行的时间进行时间差比对). 这种情况适合在 io thread (接收master的更新操作)落后master 时间比较少的时候, 如果落后很多, 工具则需要连接 master 获取 binlog 的相关信息.
 
 该工具监控 slave 中的 IO thread 状态, 如果 io thread 的状态是 'waiting for the SQL thread to free some relay log space' 相关的信息, 则开始连
 
 接 master 获取 binlog 相关的信息, 如下代码所示, 可以看到 master 为可选配置:
-<pre>
+```
 4179    my $master_dbh;
 4180    if ( $master_dsn ) {
 4181       PTDEBUG && _d('Connecting to master via DSN from cmd-line');
@@ -75,16 +75,16 @@ pt-slave-delay 工具监控 slave , 通过 start 或 stop 保证复制的 sql th
 4190       my $spec    = "h=$status->{master_host},P=$status->{master_port}";
 4191       $master_dbh = get_dbh($dp, $dp->parse($spec, $slave_dsn));
 4192    }
-</pre>
+```
 
 最后来看看 delay 如何实现: 
 
-<pre>
+```
 4229    $slave_dbh->do('START SLAVE IO_THREAD');   #确保 IO thread 正常运行
 4236       $now = time();                          #取当前时间点
-</pre>
+```
 注意以下的信息, position 结构以当前时间, slave复制master的文件位置信息组成, 每次通过 SHOW SLAVE STATUS获取相关的信息, 下面部分的while循环中处理 $now - delay 到 $now 之间的更新操作. 以此方式保证 slave 落后于 master 指定的delay 时间值. 
-<pre>
+```
 4302          {
 4303             push @positions,
 4304                [ $now, $res->{file}, $res->{position} ];
@@ -98,9 +98,9 @@ pt-slave-delay 工具监控 slave , 通过 start 或 stop 保证复制的 sql th
 4339             $pos = $i;
 4340             $i++;
 4341          }
-</pre>
+```
 在 sql_thread 停止的时候:
-<pre>
+```
 
 
 # 找出上述的 binlog 后，通过 start slave sql_thread until ... 保证slave 总是落后 master delay的秒数, 处理上述 $now - delay 到 $now之间的更新.
@@ -113,10 +113,10 @@ pt-slave-delay 工具监控 slave , 通过 start 或 stop 保证复制的 sql th
 4362                      . "MASTER_LOG_POS = $position->[$POS]"
 4363                );
 
-</pre>
+```
 
 在 sql_thread 启动的时候, 没有显示的 STOP SLAVE until ..., 因为上述的 START 过程确保了延迟复制.该过程是一个循环检测的过程, 一旦 seconds_behind_master < delay 值, 就进行关闭 sql_thread 操作.
-<pre>
+```
 4382       elsif ( ($status->{seconds_behind_master} || 0) < $o->get('delay') ) {
 4383          my $position = $positions[-1];
 4384          my $behind = $status->{seconds_behind_master} || 0;
@@ -135,7 +135,7 @@ pt-slave-delay 工具监控 slave , 通过 start 或 stop 保证复制的 sql th
 4397 
 4398       sleep($o->get('interval'));
 4399    }
-</pre>
+```
 pt-slave-delay 通过 SHOW  SLAVE  STATUS方式来实现复制延迟, 因为没有解析 relay log, 所以并不能通过 sql 更新的时间戳达到目标, 这点可能不同于 MySQL 5.6, 但实现的目标是一样的.
 
 综上, MySQL 5.6 和 pt-slave-delay 工具的延迟功能都确保了 relay-log 能够以传统方式接受 master 的更新操作, 延迟的实现在 slave 端, 该特性确保了在延迟复制的过程中, IO thread 一直接收 master 的更新操作, 所以即便master 出现问题, 更新操作也不会丢失.

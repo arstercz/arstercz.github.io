@@ -25,7 +25,7 @@ tags:
 
 
 在其它机房并未重现该问题, 查看 /etc/init.d/iptables 脚本, 跟踪到 stop 函数中的代码
-<pre>
+```
 IPTABLES=iptables
 IPV=${IPTABLES%tables}  # ip
 ...
@@ -52,10 +52,10 @@ stop() {
     fi
     ...
 }
-</pre>
+```
 
 脚本从 /etc/sysconfig/iptables-config 文件中读取配置 IPTABLES_MODULES_UNLOAD, 判断是否为 yes, 默认都是yes, 则 stop 函数执行卸载模块操作, rmmod_r 函数如下:
-<pre>
+```
 rmmod_r() {
     ...
     # Get referring modules.
@@ -81,26 +81,26 @@ rmmod_r() {
     fi
     ...
 }
-</pre>
+```
 rmmod_r 函数通过递归方式卸载从 stop 函数传过来的模块名(注意 NF_MODULES_COMMON 信息); modprobe -r $mod 即为卸载模块操作, 改函数会下载 stop 函数传过来的 nf_conntrack 模块; 在新机房中手工操作 modprobe -r nf_conntrack 可以正常卸载, 在其它机房手工操作，提示错误:
-<pre>
+```
 FATAL: Module nf_conntrack is in use.
-</pre>
+```
 
 跟踪模块信息:
-<pre>
+```
 [root@cz ~]# lsmod | grep '^nf_conntrack'
 nf_conntrack_ipv6       7985  2 
 nf_conntrack           79206  3 nf_conntrack_ipv4,nf_conntrack_ipv6,xt_state
-</pre>
+```
 可以看到 nf_conntrack 被三个模块使用, 对比新机房的信息:
-<pre>
+```
 [root@database6 ~]# lsmod | grep '^nf_conntrack'
 nf_conntrack_ipv4       9154  1 
 nf_conntrack           79206  2 nf_conntrack_ipv4,xt_state
-</pre>
+```
 可以看到 nf_conntrack_ipv6 模块的使用才是该文问题的原因, 由此可以关联到 ip6tables 正在使用 nf_conntrack 模块, 所以没有卸载 nf_conntrack 模块, 我们关掉 ip6tables 后, 看看其它机房的机器能否重现该文的问题:
-<pre>
+```
 [root@db02 ~]# /etc/init.d/ip6tables stop
 ip6tables: Setting chains to policy ACCEPT: filter         [  OK  ]
 ip6tables: Flushing firewall rules:                        [  OK  ]
@@ -114,11 +114,11 @@ ip6tables: Applying firewall rules:                        [  OK  ]
 [root@cz ~]# sysctl -a |grep nf_conntrack_max
 net.netfilter.nf_conntrack_max = 65536
 net.nf_conntrack_max = 65536
-</pre>
+```
 以上重现了新机房的问题, conntrack 参数恢复成了默认值.
 
 再来看看 ip6table 的设置:
-<pre>
+```
 [root@db02 ~]# ip6tables -vnL
 Chain INPUT (policy ACCEPT 0 packets, 0 bytes)
  pkts bytes target     prot opt in     out     source               destination         
@@ -134,10 +134,10 @@ Chain FORWARD (policy ACCEPT 0 packets, 0 bytes)
 
 Chain OUTPUT (policy ACCEPT 0 packets, 0 bytes)
  pkts bytes target     prot opt in     out     source               destination
-</pre>
+```
 
 允许所有的 ipv6 地址可以连接 22 端口:
-<pre>
+```
 # ping6 -I em1 fe80::eef4:bbff:fecd:d224
 PING fe80::eef4:bbff:fecd:d224(fe80::eef4:bbff:fecd:d224) from fe80::be30:5bff:feed:fde0 em1: 56 data bytes
 64 bytes from fe80::eef4:bbff:fecd:d224: icmp_seq=1 ttl=64 time=2.10 ms
@@ -146,7 +146,7 @@ PING fe80::eef4:bbff:fecd:d224(fe80::eef4:bbff:fecd:d224) from fe80::be30:5bff:f
 # ssh -6 fe80::eef4:bbff:fecd:d224%em1
 Last login: Tue Nov  3 14:04:05 2015 from 172.30.0.30
 [root@cz ~]#  
-</pre>
+```
 
 从这点来看, ipv6 还是存在安全隐患, 不过运行商都没有配置 ipv6 相关的路由, 机器上的 ipv6 也不是运营商分配的, 所以通信仅限于内网的机器, 不过到底是多了一个安全隐患;
 

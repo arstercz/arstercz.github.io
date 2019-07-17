@@ -29,18 +29,18 @@ Flow Control
 <!--more-->
 
 
-<pre>
+```
 1. 节点开始连接到集群中的PC(primary component);
 2. 开始传输状态及数据等, 新加的节点环岛writesets;
 3. 节点接收集群数据状态的镜像, 并且开始应用缓存中的writeset到本地, 流控也切换到减少slave队列的模式;
 4. 节点赶上了cluster, wsrep_ready为on状态,节点可以处理事务请求;
 5. 正常的节点接收到状态传输的请求, 流控将其更为donor状态,如下面的test2;
 6. donor传输完后，更为joined状态；如下的test2;
-</pre>
+```
 
 <strong>详细介绍各节点的状态信息</strong>:
 <strong>open</strong>: 此状态的节点不是Cluster的一部分, 不能进行replicate和缓存writesets操作，也不存在流控；该状态主要用来和Cluster中的其它节点进行必要的信息(如UUID等)校验, 并完成选举(quorum),如以下信息:
-<pre>
+```
 <font color=red>Jul 10 14:16:51 cz-test3 mysqld-3321: 2014-07-10 14:16:51 399 [Note] WSREP: Shifting CLOSED -> OPEN (TO: 0)</font>
 Jul 10 14:16:51 cz-test3 mysqld-3321: 2014-07-10 14:16:51 399 [Note] WSREP: Opened channel 'test-cluster'
 Jul 10 14:16:51 cz-test3 mysqld-3321: 2014-07-10 14:16:51 399 [Note] WSREP: Waiting for SST to complete.
@@ -59,9 +59,9 @@ Jul 10 14:16:51 cz-test3 mysqld-3321: #011act_id     = 47,
 Jul 10 14:16:51 cz-test3 mysqld-3321: #011last_appl. = -1,
 Jul 10 14:16:51 cz-test3 mysqld-3321: #011protocols  = 0/5/2 (gcs/repl/appl),
 Jul 10 14:16:51 cz-test3 mysqld-3321: #011group UUID = 9848cdcf-e869-11e3-94a5-3f8583faad7e
-</pre>
+```
 <strong>primary</strong>:和open状态类似,此状态的节点不是Cluster的一部分, 不能进行replicate和缓存writesets操作，也不存在流控;该状态完成(state transfer)状态及数据传输的准备工作, 如计算增量的传输信息, 数据传输的方式, 选取哪个节点为donor等，如下:
-<pre>
+```
 Jul 10 14:16:51 cz-test3 mysqld-3321: 2014-07-10 14:16:51 399 [Note] WSREP: Flow-control interval: [28, 28]
 <font color=red>Jul 10 14:16:51 cz-test3 mysqld-3321: 2014-07-10 14:16:51 399 [Note] WSREP: Shifting OPEN -> PRIMARY (TO: 47)</font>
 Jul 10 14:16:51 cz-test3 mysqld-3321: 2014-07-10 14:16:51 399 [Note] WSREP: State transfer required: 
@@ -81,10 +81,10 @@ Jul 10 14:16:56 cz-test3 mysqld-3321: 2014-07-10 14:16:56 399 [Note] WSREP: Assi
 Jul 10 14:16:56 cz-test3 mysqld-3321: 2014-07-10 14:16:56 399 [Note] WSREP: Service thread queue flushed.
 Jul 10 14:16:56 cz-test3 mysqld-3321: 2014-07-10 14:16:56 399 [Note] WSREP: Prepared IST receiver, listening at: tcp://10.0.21.17:4568
 <font color=red>Jul 10 14:16:56 cz-test3 mysqld-3321: 2014-07-10 14:16:56 399 [Note] WSREP: Member 2.0 (cz-test3) requested state transfer from '*any*'. Selected 0.0 (cz-test2)(SYNCED) as donor.</font>
-</pre>
+```
 该过程中选取了test2节点为donor.
 <strong>donor</strong>: 新加的节点选取该节点为Cluster的数据源进行数据及状态的传输,如下:
-<pre>
+```
 <font color=red>Jul 10 14:16:56 cz-test2 mysqld-3321: 2014-07-10 14:16:56 26423 [Note] WSREP: Shifting SYNCED -> DONOR/DESYNCED (TO: 47)</font>
 Jul 10 14:16:56 cz-test2 mysqld-3321: 2014-07-10 14:16:56 26423 [Note] WSREP: IST request: 9848cdcf-e869-11e3-94a5-3f8583faad7e:31-47|tcp://10.0.21.17:4568
 Jul 10 14:16:56 cz-test2 mysqld-3321: 2014-07-10 14:16:56 26423 [Note] WSREP: wsrep_notify_cmd is not defined, skipping notification.
@@ -102,9 +102,9 @@ Jul 10 14:16:58 cz-test2 mysqld-3321: WSREP_SST: [INFO] Cleaning up temporary di
 Jul 10 14:17:03 cz-test2 mysqld-3321: 2014-07-10 14:17:03 26423 [Note] WSREP: 0.0 (cz-test2): State transfer to 2.0 (cz-test3) complete.
 <font color=red>Jul 10 14:17:03 cz-test2 mysqld-3321: 2014-07-10 14:17:03 26423 [Note] WSREP: Shifting DONOR/DESYNCED -> JOINED (TO: 47)</font>
 Jul 10 14:17:03 cz-test2 mysqld-3321: 2014-07-10 14:17:03 26423 [Note] WSREP: 2.0 (cz-test3): State transfer from 0.0 (cz-test2) complete.
-</pre>
+```
 <strong>joiner</strong>:该状态的节点不会应用writesets到本地, 而是缓存writesets,缓存的大小受gcs.recv_q_hard_limit,gcs_max_throttle和gcs.recv_q_soft_limit三个参数的控制, 如下,接收donor传输过来的数据到本地cache:
-<pre>
+```
 <font color=red>Jul 10 14:16:56 cz-test3 mysqld-3321: 2014-07-10 14:16:56 399 [Note] WSREP: Shifting PRIMARY -> JOINER (TO: 47)</font>
 Jul 10 14:16:56 cz-test3 mysqld-3321: 2014-07-10 14:16:56 399 [Note] WSREP: Requesting state transfer: success, donor: 0
 Jul 10 14:16:58 cz-test3 mysqld-3321: WSREP_SST: [INFO] xtrabackup_ist received from donor: Running IST (20140710 14:16:58.232)
@@ -120,18 +120,18 @@ Jul 10 14:17:03 cz-test3 mysqld-3321: 2014-07-10 14:17:03 399 [Note] WSREP: Rece
 Jul 10 14:17:03 cz-test3 mysqld-3321: 2014-07-10 14:17:03 399 [Note] WSREP: IST received: 9848cdcf-e869-11e3-94a5-3f8583faad7e:47
 Jul 10 14:17:03 cz-test3 mysqld-3321: 2014-07-10 14:17:03 399 [Note] WSREP: 0.0 (cz-test2): State transfer to 2.0 (cz-test3) complete.
 Jul 10 14:17:03 cz-test3 mysqld-3321: 2014-07-10 14:17:03 399 [Note] WSREP: 2.0 (cz-test3): State transfer from 0.0 (cz-test2) complete.
-</pre>
+```
 
 <strong>joined</strong>:此状态的节点可以应用writeset到本地, flow control也通过控制writeset缓存来确保该节点可以赶上cluster集群。如下(测试的时候没有做数据更细, 就没有显示apply相关的信息):
-<pre>
+```
 <font color=red>Jul 10 14:17:03 cz-test3 mysqld-3321: 2014-07-10 14:17:03 399 [Note] WSREP: Shifting JOINER -> JOINED (TO: 47)</font>
 Jul 10 14:17:03 cz-test3 mysqld-3321: 2014-07-10 14:17:03 399 [Note] WSREP: Member 0.0 (cz-test2) synced with group.
 Jul 10 14:17:03 cz-test3 mysqld-3321: 2014-07-10 14:17:03 399 [Note] WSREP: Member 2.0 (cz-test3) synced with group.
-</pre>
+```
 <strong>synced</strong>:flow control切换到尽量减少slave队列的模式， 该状态的节点wsrep_ready为on，及可以接受应用程序的sql请求。如下:
-<pre>
+```
 <font color=red>Jul 10 14:17:03 cz-test3 mysqld-3321: 2014-07-10 14:17:03 399 [Note] WSREP: Shifting JOINED -> SYNCED (TO: 47)</font>
 Jul 10 14:17:03 cz-test3 mysqld-3321: 2014-07-10 14:17:03 399 [Note] WSREP: Synchronized with group, ready for connections
-</pre>
+```
 
 综上, 流控发生在joined和synced两个状态, 即正常运行的node， 都有发生的可能, 本质上是为了控制复制及复制相关的处理。更多信息见: <a href="http://www.mysqlperformanceblog.com/2013/05/02/galera-flow-control-in-percona-xtradb-cluster-for-mysql/"><font color="green">http://www.mysqlperformanceblog.com/2013/05/02/galera-flow-control-in-percona-xtradb-cluster-for-mysql/</font></a>

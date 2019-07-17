@@ -28,7 +28,7 @@ masterha_manager检测分为3部分: ping检测, ssh检测, MySQL connection检�
 
 masterha_manager循环检测，直到做一次主从切换(不论切换成功或失败)就退出(退出后发送报告,report_script参数指定); 调用unix daemonize让masterha_manager命令检测作为守护进程运行:
 <!--more-->
-<pre>
+```
 #yum install daemonize
 
 /web/scripts/mha_monitor/
@@ -39,11 +39,11 @@ masterha_manager循环检测，直到做一次主从切换(不论切换成功或
 
 #!/bin/bash
 daemonize -p /web/scripts/mha_monitor/3306.pid -l /web/scripts/mha_monitor/3306.lock  /usr/bin/masterha_manager --global_conf=/etc/masterha/app_default.cnf --conf=/etc/masterha/app_<name>.conf >> /web/scripts/mha_monitor/3306.log 2>&1
-</pre>
+```
 
 
 详细的检测输出见: /web/masterhalog/app_<name>.log 文件;健康检测情况见masterhalog目录的health文件,按照ping_interval参数的指定时间刷新:
-<pre># stat app_<name>.master_status.health 
+```# stat app_<name>.master_status.health 
   File: `app_<name>.master_status.health'
   Size: 34        	Blocks: 8          IO Block: 4096   regular file
 Device: 801h/2049d	Inode: 935793      Links: 1

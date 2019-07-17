@@ -16,7 +16,7 @@ tags:
   - percona
 ---
 最近使用工具 pt-osc (pt-online-schema-change) 对一张约200w记录多列组成的唯一索引的表进行更改索引操作, 在第一条 chunk 操作的时候就开始报错(版本 pt 2.2.7 和 pt 2.2.11), 如下所示:
-<pre>
+```
 [root@cz table_check]# pt-online-schema-change --alter="drop key idx_guux, add unique key idx_ugux(user_id,goods_id,updatetime,keycode)" 
 
 A=utf8,h=cz1,P=3306,D=mybase,t=test --ask-pass --execute --nocheck-replication-filters
@@ -48,12 +48,12 @@ Altered `mybase`.`_test_new` OK.
 2015-05-21T10:10:05 Error copying rows from `mybase`.`test` to `mybase`.`_test_new`: 2015-05-21T10:10:05 Error copying rows at chunk 1 of mybase.test because MySQL used 
 
 only 306 bytes of the idx_ugux index instead of 505.  See the --[no]check-plan documentation for more information.
-</pre>
+```
 <!--more-->
 
 
 表的结构如下, idx_guux 为4个列组成的唯一索引:
-<pre>
+```
 CREATE TABLE `test` (
   `user_id` varchar(100) NOT NULL DEFAULT '',
   `dispname` varchar(100) DEFAULT NULL,
@@ -66,10 +66,10 @@ CREATE TABLE `test` (
   KEY `idx_goods_uptime` (`goods_id`,`updatetime`),
   UNIQUE KEY `idx_guux` (`goods_id`,`user_id`,`updatetime`,`keycode`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
-</pre>
+```
 
 加上 --print 参数看下 pt-osc 到底做了哪些 sql:
-<pre>
+```
 2015-05-21T10:48:53 Created triggers OK.
 2015-05-21T10:48:53 Copying approximately 1964857 rows...
 INSERT LOW_PRIORITY IGNORE INTO `mybase`.`_test_new` (`user_id`, `dispname`, `type`, `key_id`, `goods_id`, `updatetime`, `ip`, `keycode`) SELECT `user_id`, `dispname`, `type`, `key_id`, `goods_id`, `updatetime`, `ip`, `keycode` FROM `mybase`.`test` FORCE INDEX(`idx_guux`) WHERE ((`goods_id` > ?) OR (`goods_id` = ? AND `user_id` > ?) OR (`goods_id` = ? AND `user_id` = ? AND ((? IS NULL AND `updatetime` IS NOT NULL) OR (`updatetime` > ?))) OR (`goods_id` = ? AND `user_id` = ? AND ((? IS NULL AND `updatetime` IS NULL) OR (`updatetime` = ?)) AND `keycode` >= ?)) AND ((`goods_id` < ?) OR (`goods_id` = ? AND `user_id` < ?) OR (`goods_id` = ? AND `user_id` = ? AND ((? IS NOT NULL AND `updatetime` IS NULL) OR (`updatetime` < ?))) OR (`goods_id` = ? AND `user_id` = ? AND ((? IS NULL AND `updatetime` IS NULL) OR (`updatetime` = ?)) AND `keycode` <= ?)) LOCK IN SHARE MODE /*pt-online-schema-change 7135 copy nibble*/ SELECT /*!40001 SQL_NO_CACHE */ `goods_id`, `goods_id`, `user_id`, `goods_id`, `user_id`, `updatetime`, `updatetime`, `goods_id`, `user_id`, `updatetime`, `updatetime`, `keycode` FROM `mybase`.`test` FORCE INDEX(`idx_guux`) WHERE ((`goods_id` > ?) OR (`goods_id` = ? AND `user_id` > ?) OR (`goods_id` = ? AND `user_id` = ? AND ((? IS NULL AND `updatetime` IS NOT NULL) OR (`updatetime` > ?))) OR (`goods_id` = ? AND `user_id` = ? AND ((? IS NULL AND `updatetime` IS NULL) OR (`updatetime` = ?)) AND `keycode` >= ?)) ORDER BY `goods_id`, `user_id`, `updatetime`, `keycode` LIMIT ?, 2 /*next chunk boundary*/
@@ -77,14 +77,14 @@ INSERT LOW_PRIORITY IGNORE INTO `mybase`.`_test_new` (`user_id`, `dispname`, `ty
 DROP TRIGGER IF EXISTS `mybase`.`pt_osc_mybase_test_del`;
 DROP TRIGGER IF EXISTS `mybase`.`pt_osc_mybase_test_upd`;
 DROP TRIGGER IF EXISTS `mybase`.`pt_osc_mybase_test_ins`;
-</pre>
+```
 
 这里的 select 查询用到了 FORCE INDEX(`idx_ggux`), pt-osc 默认情况下为保证数据安全使用 --check-plan参数检查 query的执行计划(优先选择能够对表进行 chunk 分组的索引), 提示信息  See the --[no]check-plan documentation for more information, 告诉我们可以指定 --nocheck-plan 跳过检测query的执行, 选用其它的索引, 如果其它索引不能满足 chunk 分组的条件, 也会执行失败(或者执行特别慢), 本例中指定 -nocheck-plan 参数后的sql 为:
-<pre>
+```
 2015-05-21T10:51:36 Created triggers OK.
 2015-05-21T10:51:36 Copying approximately 1964857 rows...
 INSERT LOW_PRIORITY IGNORE INTO `mybase`.`_test_new` (`user_id`, `dispname`, `type`, `key_id`, `goods_id`, `updatetime`, `ip`, `keycode`) SELECT `user_id`, `dispname`, `type`, `key_id`, `goods_id`, `updatetime`, `ip`, `keycode` FROM`mybase`.`test` FORCE INDEX(`idx_goods_uptime`) WHERE ((`goods_id` > ?) OR (`goods_id` = ? AND (? IS NULL OR `updatetime` >= ?))) AND ((`goods_id` < ?) OR (`goods_id` = ? AND (? IS NULL OR `updatetime` <= ?))) LOCK IN SHARE MODE /*pt-online-schema-change 23939 copy nibble*/SELECT /*!40001 SQL_NO_CACHE */ `goods_id`, `goods_id`, `updatetime`, `updatetime` FROM `mybase`.`test` FORCE INDEX(`idx_goods_uptime`) WHERE ((`goods_id` > ?) OR (`goods_id` = ? AND (? IS NULL OR `updatetime` >= ?))) ORDER BY `goods_id`, `updatetime` LIMIT ?, 2 /*next chunk boundary*/
-</pre>
+```
 
 这里选用了 FORCE INDEX(`idx_goods_uptime`) 进行分组处理.
 

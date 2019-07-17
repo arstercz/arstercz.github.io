@@ -32,7 +32,7 @@ tags:
 
    Gearman通过三部分组件来实现与应用程序之间的交互，分别为Client, Worker和Job Server.
 以Gearman::XS(c代码实现的一种perl封装)模块为例,包含以下列表:
-<pre>
+```
 Gearman
 ├── XS
 │   ├── Client.pm     # client组件
@@ -40,7 +40,7 @@ Gearman
 │   ├── Task.pm       # 并行执行
 │   └── Worker.pm     # Worker组件
 └── XS.pm
-</pre>
+```
 
    Client：用来生成可以发送给Job 端并且可以运行的请求, 即为生产者；
    Job Server：用来将生产者的请求发送到合适的Worker端，即为协调者(下面的Gearmand说明)；
@@ -56,11 +56,11 @@ Worker组件可以注册、删除函数，添加选项连接Job等, Client可以
 1. Gearmand安装
 
    可从<a href="https://launchpad.net/gearmand/+download">https://launchpad.net/gearmand/+download</a> 下载源码包, 也可使用epel源进行YUM安装：
-<pre>
+```
 libgearman-1.1.8-2.el6.x86_64
 gearmand-1.1.8-2.el6.x86_64
 libgearman-devel-1.1.8-2.el6.x86_64      #视驱动类型, 封装c源码的驱动需要
-</pre>
+```
 
 2. Gearman驱动下载
 
@@ -70,17 +70,17 @@ libgearman-devel-1.1.8-2.el6.x86_64      #视驱动类型, 封装c源码的驱�
 1. 参数
 
    Gearmand(Job Server)默认监控0.0.0.0:4730端口,分别对应host和port端口, 可以额外增加thread数目(默认4)和backlog队列数目(默认32)如下:
-<pre>
+```
 # cat /etc/sysconfig/gearmand 
 ### Settings for gearmand
 OPTIONS="-t 50 -b 500"
-</pre>
+```
 
 2. Gearmand(Job Server)冗余
    可以在Client,Worker端操作, 仅在第一台gearmand不可用时, 则访问后面gearmand。可以配置成冗余状态(至少两台), 后续驱动程序的函数会注册到多台服务中。
-<pre>
+```
 Now you’re probably asking what if the job server dies? You are able to run multiple job servers and have the clients and workers connect to the first available job server they are configured with. This way if one job server dies, clients and workers automatically fail over to another job server. 
-</pre>
+```
    以perl说明,添加Server可以通过add_server($host, $port)连接单个的gearmand服务, 也可以通过add_servers("$host1:$port1,$host2:$port2")实现冗余, 冗余后函数的注册和清除分别在$host1, $host2中操作.
 
 <strong>示例说明</strong>

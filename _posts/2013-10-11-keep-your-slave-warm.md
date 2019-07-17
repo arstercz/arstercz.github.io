@@ -29,32 +29,32 @@ pt-query-digest 2.2.x had removed this function.
 pt-query-digest 2.1.9
 
 workflow:
-<pre>
+```
               filter select sql                 replay sql on slave
    | master |------------------->| text file |---------------------->| slave |
-</pre>
+```
 <!--more-->
 steps:
 1. capture select statement on master server, and save result into text file. 
 
-<pre>
+```
 pt-query-digest  --charset=utf8 --processlist h=172.33.0.3,u=book_user,p='xxxxxx',P=3306,D=dbname \
  --interval=1 --run-time=30s --filter '$event->{arg} =~ m/^select/i' --print --no-report
-</pre> 
+``` 
 
 2. replay select sql statement on slave server. 
 
-<pre>
+```
 pt-query-digest master_select.log \
  --charset=utf8 --execute-throttle 70,30,5 --no-report --statistics \
  --execute h=172.33.0.8,P=3306,u=book_user,p='xxxxxx',D=dbname 
-</pre>
+```
 
 <b>use one statement instead:</b>
-<pre>
+```
 pt-query-digest --charset=utf8 --processlist h=172.33.0.3,u=book_user,p='xxxxxx',P=3306,D=dbname --interval=1 --run-time=30s --filter 
  '$event->{arg} =~ m/^select/i' --execute h=172.33.0.8,P=3306,D=dbname,u=book_user,p='xxxxxx' --execute-throttle 70,30,5 --no-report
-</pre>
+```
 
 interval: How frequently to poll the processlist, default is .1 (means 100ms), and .01 means 10ms, .001 means 1ms.
 

@@ -34,7 +34,7 @@ sql_audit脚本读取audit插件的日志信息, 通过SQL::Audit完成检查和
 <!--more-->
 
 
-<pre>
+```
          +--------------------+
          |MySQL (audit plugin)| (1) audit插件生成audit.log日志.
          +--------------------+
@@ -73,7 +73,7 @@ sql_audit脚本读取audit插件的日志信息, 通过SQL::Audit完成检查和
                                           |    +-------------------------+
                                           |----| SQL::Audit::Email::Send | (9) 邮件发送分析的结果.
                                                +-------------------------+
-</pre>
+```
 
 <strong>3.模块说明</strong>
 
@@ -138,14 +138,14 @@ Send模块完成以下功能:
 
 <strong>5.SQL::Audit安装说明</strong>
 
-<pre>
+```
    git clone https://github.com/arstercz/cz-sql-audit.git
 
    perl Makefile.PL
    make
    make test
    make install
-</pre>
+```
 
 详细信息见:
 perldoc SQL::Audit
@@ -175,18 +175,18 @@ perl-MD5
 
 <strong>7.示例说明</strong>
 进入cz-sql-audit/examples目录, 执行审核脚本:
-<pre>
+```
 perl sql_log_audit.pl --verbose --host=127.0.0.1 --user=audit --port=3306 --password=xxxxxxxx --memhost=127.0.0.1 --memport=11211 --mail=mail.cnf
-</pre>
+```
 --user指定的用户名应该是mysql-audit插件的白名单用户, 以避免File::Tail模块重复的读取相同sql的日志信息.
 --mail指定的文件内容为收件人,如下格式:
-<pre>
+```
 recv = arstercz@gmail.com, ......
-</pre>
+```
 多个收件人以逗号(,)分隔; 如果以系统的mail命令发送邮件, Centos 5中的mail命令不支持 -r 选项可能会引起邮件发送异常.
 
 接收邮件信息如下:
-<pre>
+```
 +-- Date: 2014-11-05T16:34:43
 +-- Thread: 239191
 +-- Client: 127.0.0.1, Server: localhost
@@ -194,7 +194,7 @@ recv = arstercz@gmail.com, ......
 +-- Query: select * from test where op = 1 and type = 1 order by show_rank
 +-- error index: ALL
 +-- error index: Using_filesort
-</pre>
+```
 Date: sql执行时的时间, 即记录到audit.log文件的时间;
 Thread: 运行该sql的线程id, 后期版本可以通过thread信息验证事务是否正常使用(执行时间过长或没有commit提交);
 Client: 哪台机器连接的Server端;
@@ -203,8 +203,8 @@ Database： sql执行连接的database信息;
 Table:  sql执行操作的表的信息;
 Query: Client端执行的sql语句, 不显示Rewrite之后的语句;
 Conver to: 如果是更新的语句, 会被Rewrite模块改写为SELECT语句,比如:
-<pre>
+```
 +-- Query: update site set time = '2014-10-22 17:00:00' where id = 1
 +-- convert to: SELECT  time FROM site WHERE  id = 1
-</pre>
+```
 error index: ALL: 表示没有使用索引, 为全表扫描; Using_filesort: 表示用到了文件排序; Using_temporary: 表示用到了临时表.

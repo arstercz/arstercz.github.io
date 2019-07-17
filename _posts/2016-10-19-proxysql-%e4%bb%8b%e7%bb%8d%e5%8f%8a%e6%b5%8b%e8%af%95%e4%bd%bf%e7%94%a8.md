@@ -29,13 +29,13 @@ proxysql 的简单配置使用可以参考 <a href="https://www.percona.com/blog
 
 系统环境:
 
-<pre><code>Centos 6.5 final, Linux cz-test1 2.6.32-431.3.1.el6.x86_64
+```<code>Centos 6.5 final, Linux cz-test1 2.6.32-431.3.1.el6.x86_64
 proxysql-1.4.3-1.x86_64.rpm
 </code></pre>
 
 MySQL 主从配置:
 
-<pre><code>version: Percona-Server-5.5.36
+```<code>version: Percona-Server-5.5.36
 repl :
     10.0.21.5:3303(current master: read_only = 0)
        +-- 10.0.21.7:3303(current slave: read_only = 1)
@@ -45,7 +45,7 @@ proxysql 配置:
 
 /etc/proxysql.cnf 中的主要配置:
 
-<pre><code>admin_variables=
+```<code>admin_variables=
 {
         admin_credentials="admin:admin"
         mysql_ifaces="0.0.0.0:6032"
@@ -133,7 +133,7 @@ mysql_replication_hostgroups=
 
 <h4>先来看看 proxysql 的整个实例代理, 连接 proxysql 等同连接 mysql server:</h4>
 
-<pre><code>mysql -h 10.0.21.5 -P 6033 -u percona per2 -e "select database()"
+```<code>mysql -h 10.0.21.5 -P 6033 -u percona per2 -e "select database()"
 +------------+
 | database() |
 +------------+
@@ -151,7 +151,7 @@ mysql -h 10.0.21.5 -P 6033 -u percona percona -e "select database()"
 
 下面结果为连接 proxysql 接口的信息:
 
-<pre><code>[root@cz-centos7 sql-bench]# ./test-insert --host 10.0.21.5:6033 --user=percona --database=percona 
+```<code>[root@cz-centos7 sql-bench]# ./test-insert --host 10.0.21.5:6033 --user=percona --database=percona 
 Testing server 'MySQL 5.5.36 34.1 rel34.1 log' at 2016-10-18 22:33:55
 
 Testing the speed of inserting data into 1 table and do some selects on it.
@@ -262,7 +262,7 @@ Total time: 3385 wallclock secs (263.76 usr 175.71 sys +  0.00 cusr  0.00 csys =
 
 下面的结果为直连 MySQL 的信息:
 
-<pre><code>[root@cz-centos7 sql-bench]# ./test-insert --host 10.0.21.5:3303 --user=percona --database=percona 
+```<code>[root@cz-centos7 sql-bench]# ./test-insert --host 10.0.21.5:3303 --user=percona --database=percona 
 Testing server 'MySQL 5.5.36 34.1 rel34.1 log' at 2016-10-18 23:36:54
 
 Testing the speed of inserting data into 1 table and do some selects on it.
@@ -377,7 +377,7 @@ Total time: 2658 wallclock secs (240.54 usr 175.23 sys +  0.00 cusr  0.00 csys =
 
 下面为连接 proxysql 的结果:
 
-<pre><code>[root@cz-centos7 sql-bench]# /opt/Percona-Server-5.5.33-rel31.1-566.Linux.x86_64/bin/mysqlslap -h 10.0.21.5 -P 6033 -upercona percona -a --auto-generate-sql-execute-number=3000 --auto-generate-sql-load-type=read --auto-generate-sql-secondary-indexes=3 --auto-generate-sql-unique-query-number=1 --auto-generate-sql-write-number=1000 -c 10
+```<code>[root@cz-centos7 sql-bench]# /opt/Percona-Server-5.5.33-rel31.1-566.Linux.x86_64/bin/mysqlslap -h 10.0.21.5 -P 6033 -upercona percona -a --auto-generate-sql-execute-number=3000 --auto-generate-sql-load-type=read --auto-generate-sql-secondary-indexes=3 --auto-generate-sql-unique-query-number=1 --auto-generate-sql-write-number=1000 -c 10
 Benchmark
     Average number of seconds to run all queries: 38.865 seconds
     Minimum number of seconds to run all queries: 38.865 seconds
@@ -388,7 +388,7 @@ Benchmark
 
 下面为直连 MySQL 结果:
 
-<pre><code>[root@cz-centos7 sql-bench]# /opt/Percona-Server-5.5.33-rel31.1-566.Linux.x86_64/bin/mysqlslap -h 10.0.21.5 -P 3303 -upercona percona -a --auto-generate-sql-execute-number=3000 --auto-generate-sql-load-type=read --auto-generate-sql-secondary-indexes=3 --auto-generate-sql-unique-query-number=1 --auto-generate-sql-write-number=1000 -c 10
+```<code>[root@cz-centos7 sql-bench]# /opt/Percona-Server-5.5.33-rel31.1-566.Linux.x86_64/bin/mysqlslap -h 10.0.21.5 -P 3303 -upercona percona -a --auto-generate-sql-execute-number=3000 --auto-generate-sql-load-type=read --auto-generate-sql-secondary-indexes=3 --auto-generate-sql-unique-query-number=1 --auto-generate-sql-write-number=1000 -c 10
 Benchmark
     Average number of seconds to run all queries: 37.446 seconds
     Minimum number of seconds to run all queries: 37.446 seconds
@@ -403,7 +403,7 @@ Benchmark
 
 可以查询管理接口的 mysql_collations 表查看 proxysql 支持的字符集:
 
-<pre><code>mysql&gt; select * from mysql_collations where charset like '%utf8%';
+```<code>mysql&gt; select * from mysql_collations where charset like '%utf8%';
 +-----+-----------------------+---------+---------+
 | Id  | Collation             | Charset | Default |
 +-----+-----------------------+---------+---------+
@@ -420,7 +420,7 @@ Benchmark
 
 使用 utf8 编码简单测试:
 
-<pre><code>$ export LANG="en_US.UTF-8"
+```<code>$ export LANG="en_US.UTF-8"
 $ mysql -h 10.0.21.5 -P 6033 -u percona -p -Bse "create table tags(id int(10) auto_increment primary key, name varchar(50), msg text)"
 $ mysql -h 10.0.21.5 -P 6033 -u percona -p -Bse "insert into tags(name, msg) values(\"测试啊\", \"hello 每个人都有的bbbb\")"
 $ mysql -h 10.0.21.5 -P 6033 -u percona -p percona -e "select * from tags"

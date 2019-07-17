@@ -22,9 +22,9 @@ Mongodb cacti monitor plugins:
 download from : <a href = "https://github.com/arstercz/mongodb-cacti-plugins">https://github.com/arstercz/mongodb-cacti-plugins</a>
 
 require and features:
-<pre>
+```
 1. require mongo client command should be find by PATH( export PATH=$PATH:mongo_client_path)
 2. user and passwd can be set in conf file.
 3. cacti template is from percona monitor pluings for mongodb.
 4. enable mutiple port monit.
-</pre>
+```
