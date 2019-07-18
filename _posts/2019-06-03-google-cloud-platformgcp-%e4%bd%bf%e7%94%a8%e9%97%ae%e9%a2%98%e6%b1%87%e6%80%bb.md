@@ -66,3 +66,13 @@ tags:
 google 云主机磁盘性能的限制随磁盘大小变化, 一定范围内, 磁盘越大性能越好;可以直接加大磁盘大小而不影响数据, 在后台 web 中 `resize` 数据盘大小, 保存后在云主机中执行 `xfs_growfs /dev/sdb` 即可, 其它文件系统可参考 growpart 命令, 更多见 <a href="https://cloud.google.com/compute/docs/disks/add-persistent-disk">gcp-disk</a>; 减小磁盘会影响已有数据, 可以附加新磁盘设备来替换数据.
 
 另外 google 云主机磁盘(本地ssd,标准盘等)的性能都受磁盘大小的影响, 一定范围内磁盘越大, 随机 io 和吞吐量越大, 所以在准备缩减磁盘的时候需要考虑到磁盘的性能问题.
+
+### 8. 负载均衡代理多端口问题
+
+`google load balancer` 的后端(backend) 在 tcp 模式中只能是实例组(`instane group`) 的方式提供服务, 如果存在不同的 lb 代理同样实例组的不通端口, 就需要在对应的实例组中创建多个端口名称映射(`Port name mapping`), 不然新建的 `load balance` 会覆盖以前的后端端口; 如下所示:
+
+```
+Port name mapping (Optional)
+
+A load balancer sends traffic to an instance group through a named port. Create a named port to map the incoming traffic to a specific port number and then go to "HTTP load balancing" to create a load balancer using this instance group.
+```
