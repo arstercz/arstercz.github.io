@@ -27,11 +27,11 @@ innobackupex封装了xtrabackup(InnoDB备份)工具，大致的备份流程如�
 ```
 在 `xtrabackup` 备份 `InnoDB` 过程中，InnoDB 相关变化如下显示:
 
-![备份过程](http://img.arstercz.com/articles/201405/xtrabackup_1.jpg)
+![备份过程](images/articles/201405/xtrabackup_1.jpg)
 上述部分为拷贝文件阶段，文件的变化及拷贝文件工作流程见下图:
-![拷文件流程](http://img.arstercz.com/articles/201405/xtrabackup_2.jpg)
+![拷文件流程](images/articles/201405/xtrabackup_2.jpg)
 在备份InnoDB的过程中，记录的变更保存于xtrabackup_logfile文件，所以在prepare(--apply-log)的时候，重放该部分数据到表空间即可，如下:
-![重放过程](http://img.arstercz.com/articles/201405/xtrabackup_3.jpg)
+![重放过程](images/articles/201405/xtrabackup_3.jpg)
 以上就完成了在拷贝文件完成后的那个时间点的全量备份;
 
 ### FAQ:

@@ -24,10 +24,9 @@ Flow Control
 以下说明以重启test3节点为例:
 
 按手册的介绍来看， 节点状态分为以下6种:
-<img src="http://img.arstercz.com/articles/201407/galerafsm.png"></img>
-集群节点状态变化
-<!--more-->
+![galerafsm](images/articles/201407/galerafsm.png)
 
+集群节点状态变化
 
 ```
 1. 节点开始连接到集群中的PC(primary component);

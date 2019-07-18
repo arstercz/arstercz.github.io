@@ -45,13 +45,13 @@ tags:
         可参考 <a href="http://code.google.com/p/javamelody/wiki/UserGuide">http://code.google.com/p/javamelody/wiki/UserGuide</a>  16节Security  对web.xml配置进行配置
 
    新增加 resin-web.xml增加用户口令信息 
-<img src="http://img.arstercz.com/articles/201405/resin_web.jpg"  alt="resin_web.xml" />
+![resin_web](images/articles/201405/resin_web.jpg)
 
  
 
 还可以在/web/resin/conf/resin.passport.com.conf文件中增加authenticator属性信息,可参考链接：<a href="http://www.caucho.com/resin-3.1/doc/resin-security.xtp#authenticator">http://www.caucho.com/resin-3.1/doc/resin-security.xtp#authenticator</a>
 
 再新增password.xml文件到WEB-INFO目录下，重启应用即可;
-<img src="http://img.arstercz.com/articles/201405/password.jpg"  alt="password.xml" />
+![password.xml](images/articles/201405/password.jpg)
 
 第一种方式简单方便，但不全面可靠，第二种方式尽管可靠，但每个待监控的项目都需要相关的配置，作业量很大;

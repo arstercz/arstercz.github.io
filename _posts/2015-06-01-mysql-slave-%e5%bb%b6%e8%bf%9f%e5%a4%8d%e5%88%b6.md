@@ -24,10 +24,8 @@ MySQL slave 延迟复制
 延迟复制是一个很简单的概念，区别于传统的异步复制(接近实时), 比如用户误操作, 删除了重要的表, 延迟复制特性保证了用户有机会从延迟的 slave 中恢复误删除的表. 该特性的问题在于需要保证用户有足够的时间从 slave 阻止误操作复制的发生. 
 
 要理解该特性如何实现, 我们先简单回顾下 MySQL replication 如何实现, 见下图:
-<img src="https://img.zhechen.me/articles/201506/Delayed_Replication.jpg"  alt="主从复制" />
+![replication](images/articles/201506/Delayed_Replication.jpg)
 当 master 有一个更新操作(create, drop, delete, insert, update 等), 该更新操作应用到本地的磁盘并写到 binary log 里，之后更新操作异步(接近于实时)的从master 的 binary log 复制到 slave 的 relay log, 最后 slave 的 sql thread 线程读取 relay log, 将更新操作应用到 slave 表中.
-
-<!--more-->
 
 1. MySQL 5.6 的延迟复制
 MySQL 5.6 允许用户配置复制的延迟时间, 保证 slave 的 sql thread 线程的更新操作落后于 master 的更新. 详见 <a href="http://dev.mysql.com/doc/refman/5.6/en/change-master-to.html">http://dev.mysql.com/doc/refman/5.6/en/change-master-to.html</a> 不过需要注意的是, 即便在延迟复制的过程中, master 出现问题, 更新操作也不会丢失，因为更新操作已经复制到了 slave 的 relay log 中.

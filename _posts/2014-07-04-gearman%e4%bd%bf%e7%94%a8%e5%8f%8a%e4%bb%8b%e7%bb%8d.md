@@ -25,10 +25,10 @@ tags:
    官网： <a href="http://gearman.org/">http://gearman.org/</a>
    工程： <a href="https://launchpad.net/gearmand/+download">https://launchpad.net/gearmand/+download</a>
    协议： <a href="http://gearman.org/protocol/">http://gearman.org/protocol/</a>
-<!--more-->
+
 <strong>Gearman工作机制</strong>
 见下图:
-<img src="http://img.arstercz.com/articles/201407/stack.png" alt="stack" />
+![stack](images/articles/201407/stack.png)
 
    Gearman通过三部分组件来实现与应用程序之间的交互，分别为Client, Worker和Job Server.
 以Gearman::XS(c代码实现的一种perl封装)模块为例,包含以下列表:
