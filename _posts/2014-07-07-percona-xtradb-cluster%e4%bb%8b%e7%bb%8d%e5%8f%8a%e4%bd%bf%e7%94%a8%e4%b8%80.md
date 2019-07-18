@@ -103,7 +103,7 @@ Jun  5 11:34:42 cz-test2 mysqld-3321: 2014-06-05 11:34:42 26423 [ERROR] Slave SQ
 <b>grastate.dat</b>：保存了Galera的状态信息。
 
 <b>三. Percona XtraDB Cluster 如何保证写一致性(consistency of writes)</b>
-![xtradb](images/articles/201407/XtraDBClusterUML1.png)
+![xtradb]({{ site.baseurl }}/images/articles/201407/XtraDBClusterUML1.png)
 
 所有的query在本地node执行， 并且仅在commit存在特殊的处理。当commit有问题时， 事务必须在所有node验证, 没有验证通过则返回error信息. 随后，事务被应用到本地node。
 

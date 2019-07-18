@@ -28,7 +28,7 @@ tags:
 
 <strong>Gearman工作机制</strong>
 见下图:
-![stack](images/articles/201407/stack.png)
+![stack]({{ site.baseurl }}/images/articles/201407/stack.png)
 
    Gearman通过三部分组件来实现与应用程序之间的交互，分别为Client, Worker和Job Server.
 以Gearman::XS(c代码实现的一种perl封装)模块为例,包含以下列表:

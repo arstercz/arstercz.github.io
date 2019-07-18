@@ -52,4 +52,4 @@ audit插件包括两种输出格式:
 2. socket文件
 这种方式意味着我们可以编写一个socket监听程序(Server端), audit插件连接socket文件以client身份发送信息到程序端, 程序端可以按需处理。
 如下所示:
-![socket](images/articles/201411/audit-1.png)
+![socket]({{ site.baseurl }}/images/articles/201411/audit-1.png)

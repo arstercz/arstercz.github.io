@@ -24,7 +24,7 @@ Flow Control
 以下说明以重启test3节点为例:
 
 按手册的介绍来看， 节点状态分为以下6种:
-![galerafsm](images/articles/201407/galerafsm.png)
+![galerafsm]({{ site.baseurl }}/images/articles/201407/galerafsm.png)
 
 集群节点状态变化
 
