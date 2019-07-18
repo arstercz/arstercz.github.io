@@ -64,7 +64,7 @@ PUD: 上级页目录(Page Upper Directory)
 PMD: 中间页目录(Page Middle Directory)
 PTE: 页表(PTE)
 ```
-![four-level-pt.png](https://img.arstercz.com/articles/201905/four-level-pt.png) 
+![four-level-pt.png]({{ site.baseurl }}/images/articles/201905/four-level-pt.png) 
 
 如上图所示,每个运行的进程都有一个指向 `PGD` 的指针, `PGD` 的每个条目指向一个 `PUD`, `PUD` 的每个条目指向一个 `PMD`, `PMD` 的每个条目指向一个 `PTE`, `PTE` 的每个条目指向一个页面的物理首地址. 内核遍历每个级别, 如果有条目无效则打印出对应的  `bad p{g,u,m}d`  消息.这类错误没有恢复的话, 应用程序在访问其虚拟地址就会出错, 对应的程序也会被内核杀掉. 正如上述错误提示的, `telegraf` 进程异常退出. 
 
@@ -123,7 +123,7 @@ void exit_mmap(struct mm_struct *mm)
   memtest86+ may not always find all memory problems. It is possible that the system memory can have a fault that memtest86+ does not detect.
 ```
 如下所示, `memtest86+` 会进行多组测试, 持续时间会比较长(目测需要4个小时), 可通过 `ESC` 键取消测试:
-![memtest](https://img.arstercz.com/articles/201905/memtest.png)
+![memtest]({{ site.baseurl }}/images/articles/201905/memtest.png)
 
 ## 参考
 

@@ -32,7 +32,7 @@ Total cpu usage: 241.8
 ```
 
 系统 [snoopy](https://arstercz.com/how-does-snoopy-log-every-executed-command/)日志同样也有十几秒的中断, 占用 cpu 资源增长的很快(注: 监控每 10s 取最新的数据, 再和上次的值做差值平均, 和真实的情况会略有偏差, 不过能反映整体的情况):
-![cpu](https://img.arstercz.com/articles/201810/cpu.bmp)
+![cpu]({{ site.baseurl }}/images/articles/201810/cpu.bmp)
 
 ## 系统环境
 
@@ -709,7 +709,7 @@ int __cond_resched_lock(spinlock_t *lock)
 从上述的分析来看, 应用程序不响应是因为 `dentry` 释放的原因造成的, 那么为什么主机中会有这么多 `dentry` 条目, 我们的程序没有上传文件等需要缓存 `dentry` 的操作, 甚至还有两台机器只跑了几个检测脚本, 却有接近3亿多的目录缓存对象. 
 
 参考红帽知识库 [access-55818](https://access.redhat.com/solutions/55818) , 其中提到了 `dentry` 增长的原因等问题, 不过场景和我们的不同, 我们的系统并没有那么多子目录或文件. 不过下面的评论却值得一提, 如下所示:
-![replay](https://img.arstercz.com/articles/201810/redhat_replay.png)
+![replay]({{ site.baseurl }}/images/articles/201810/redhat_replay.png)
 
 一些依赖 `nss-softokn` 老版本库的工具, 比如 curl 在访问 `https` 的时候, 由于 `sdb_measureAccess` 方法会访问很多 `/etc/pki/nssdb/.xxxxx.db` 不存在的文件, 进而造成 `dentry` 数量增加, 更详细见: [bugzilla-1044666](https://bugzilla.redhat.com/show_bug.cgi?id=1044666) .  这点正好符合我们环境,几台主机都有 `curl https` 相关的脚本在执行, 每秒三四次 curl, 每次 curl 产生约 800 左右的不存在文件, 算下来每秒差不多 3000 左右, 每天就需要缓存 2.6亿左右的条目, 比较符合我们情况. 
 
@@ -736,7 +736,7 @@ nohup tttt.sh &
 
 如下所示, 主机可用内存不在像以前一样频繁使用, 更改后的可用内存更稳定:
 
-![memory](https://img.arstercz.com/articles/201810/memory.bmp)
+![memory]({{ site.baseurl }}/images/articles/201810/memory.bmp)
 
 设置 `NSS_SDB_USE_CACHE` 变量后, 主机没有再出现卡顿的现象. 
 
@@ -825,7 +825,7 @@ nohup tttt.sh &
 ```
 
 不过 kswapd 在周期性清理缓存对象或者可用内存不足时, 并不是每次都会调用 shrink_slab 函数, 如下所示, balance_pgdata 在收缩内存的时候, 会按照函数或其他参数的优先级进行调用, 调用高优先级的函数后如何系统可用内存足够则不需要调用低优先级的函数, 下图中的 shrink_slab 函数优先级较低, 这就说明内存足够的情况下不会调用 shrink_slab 函数, 使用脚本 shrink_slab.stp 进行抓取也发现该函数并不是周期性的调用, 当然手动 drop_cache 会触发该函数执行. 
-![shrink](https://img.arstercz.com/articles/201810/kswapd_shrink.bmp)
+![shrink]({{ site.baseurl }}/images/articles/201810/kswapd_shrink.bmp)
 
 ## 总结说明
 

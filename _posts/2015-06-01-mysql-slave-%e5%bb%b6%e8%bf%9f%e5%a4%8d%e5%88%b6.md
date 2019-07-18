@@ -25,12 +25,13 @@ MySQL slave 延迟复制
 
 要理解该特性如何实现, 我们先简单回顾下 MySQL replication 如何实现, 见下图:
 ![replication]({{ site.baseurl }}/images/articles/201506/Delayed_Replication.jpg)
-当 master 有一个更新操作(create, drop, delete, insert, update 等), 该更新操作应用到本地的磁盘并写到 binary log 里，之后更新操作异步(接近于实时)的从master 的 binary log 复制到 slave 的 relay log, 最后 slave 的 sql thread 线程读取 relay log, 将更新操作应用到 slave 表中.
+当 master 有一个更新操作(`create, drop, delete, insert, update 等`), 该更新操作应用到本地的磁盘并写到 `binary log` 里，之后更新操作异步(接近于实时)的从master 的 `binary log` 复制到 slave 的 `relay log`, 最后 slave 的 sql thread 线程读取 relay log, 将更新操作应用到 slave 表中.
 
 1. MySQL 5.6 的延迟复制
-MySQL 5.6 允许用户配置复制的延迟时间, 保证 slave 的 sql thread 线程的更新操作落后于 master 的更新. 详见 <a href="http://dev.mysql.com/doc/refman/5.6/en/change-master-to.html">http://dev.mysql.com/doc/refman/5.6/en/change-master-to.html</a> 不过需要注意的是, 即便在延迟复制的过程中, master 出现问题, 更新操作也不会丢失，因为更新操作已经复制到了 slave 的 relay log 中.
 
-延迟特性是在 slave 中实现的, 不会影响 master, relay log的接收等同传统的复制方式, 只是 sql thread 执行更新的过程延迟了指定的时间, 笔者猜测是根据比对sql的执行时间, 只有时间差 >= 指定的delay 时间才会更新到 slave中.
+MySQL 5.6 允许用户配置复制的延迟时间, 保证 slave 的 sql thread 线程的更新操作落后于 master 的更新. 详见 [change-master-to](http://dev.mysql.com/doc/refman/5.6/en/change-master-to.html) 不过需要注意的是, 即便在延迟复制的过程中, master 出现问题, 更新操作也不会丢失，因为更新操作已经复制到了 slave 的 relay log 中.
+
+延迟特性是在 slave 中实现的, 不会影响 master, `relay log` 的接收等同传统的复制方式, 只是 `sql thread` 执行更新的过程延迟了指定的时间, 笔者猜测是根据比对sql的执行时间, 只有时间差 `>=` 指定的delay 时间才会更新到 slave 中.
 以下命令指定已有复制的延迟时间为 20秒
 ```
 slave> STOP SLAVE;
@@ -113,7 +114,7 @@ pt-slave-delay 工具监控 slave , 通过 start 或 stop 保证复制的 sql th
 
 ```
 
-在 sql_thread 启动的时候, 没有显示的 STOP SLAVE until ..., 因为上述的 START 过程确保了延迟复制.该过程是一个循环检测的过程, 一旦 seconds_behind_master < delay 值, 就进行关闭 sql_thread 操作.
+在 sql_thread 启动的时候, 没有显示的 `STOP SLAVE until ...`, 因为上述的 START 过程确保了延迟复制.该过程是一个循环检测的过程, 一旦 `seconds_behind_master < delay` 值, 就进行关闭 sql_thread 操作.
 ```
 4382       elsif ( ($status->{seconds_behind_master} || 0) < $o->get('delay') ) {
 4383          my $position = $positions[-1];
@@ -136,10 +137,10 @@ pt-slave-delay 工具监控 slave , 通过 start 或 stop 保证复制的 sql th
 ```
 pt-slave-delay 通过 SHOW  SLAVE  STATUS方式来实现复制延迟, 因为没有解析 relay log, 所以并不能通过 sql 更新的时间戳达到目标, 这点可能不同于 MySQL 5.6, 但实现的目标是一样的.
 
-综上, MySQL 5.6 和 pt-slave-delay 工具的延迟功能都确保了 relay-log 能够以传统方式接受 master 的更新操作, 延迟的实现在 slave 端, 该特性确保了在延迟复制的过程中, IO thread 一直接收 master 的更新操作, 所以即便master 出现问题, 更新操作也不会丢失.
+综上, `MySQL 5.6` 和 `pt-slave-delay` 工具的延迟功能都确保了 relay-log 能够以传统方式接受 master 的更新操作, 延迟的实现在 slave 端, 该特性确保了在延迟复制的过程中, `IO thread` 一直接收 master 的更新操作, 所以即便master 出现问题, 更新操作也不会丢失.
 
 参见:
-<a href="http://www.clusterdb.com/mysql-replication/delayed-replication-in-mysql-5-6-development-release">http://www.clusterdb.com/mysql-replication/delayed-replication-in-mysql-5-6-development-release</a>
-<a href="https://www.percona.com/doc/percona-toolkit/2.2/pt-slave-delay.html">https://www.percona.com/doc/percona-toolkit/2.2/pt-slave-delay.html</a>
-<a href="http://www.xaprb.com/blog/2007/08/04/introducing-mysql-slave-delay/">http://www.xaprb.com/blog/2007/08/04/introducing-mysql-slave-delay/</a>
-<a href="http://mechanics.flite.com/blog/2014/02/12/fast-forwarding-a-delayed-mysql-replica/">http://mechanics.flite.com/blog/2014/02/12/fast-forwarding-a-delayed-mysql-replica/</a>
+[delayed-replication-in-mysql-5-6-development-release](http://www.clusterdb.com/mysql-replication/delayed-replication-in-mysql-5-6-development-release)
+[pt-slave-delay](https://www.percona.com/doc/percona-toolkit/2.2/pt-slave-delay.html">https://www.percona.com/doc/percona-toolkit/2.2/pt-slave-delay.html)
+[introducing-mysql-slave-delay](http://www.xaprb.com/blog/2007/08/04/introducing-mysql-slave-delay/">http://www.xaprb.com/blog/2007/08/04/introducing-mysql-slave-delay/)
+[fast-forwarding-a-delayed-mysql-replica](http://mechanics.flite.com/blog/2014/02/12/fast-forwarding-a-delayed-mysql-replica/">http://mechanics.flite.com/blog/2014/02/12/fast-forwarding-a-delayed-mysql-replica/)

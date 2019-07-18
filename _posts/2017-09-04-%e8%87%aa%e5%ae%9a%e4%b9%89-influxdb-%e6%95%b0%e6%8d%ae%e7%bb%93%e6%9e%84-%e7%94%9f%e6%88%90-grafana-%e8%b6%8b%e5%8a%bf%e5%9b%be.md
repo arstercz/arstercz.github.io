@@ -21,10 +21,10 @@ tags:
 grafana 支持的图形方式则更为丰富[graph](http://docs.grafana.org/features/panels/graph/), 各种图形属性及展示方式应有尽有. 当然更为方便的是我们可以根据数据源的信息做出更为精细的图像进而展示. 以管理员经常用到的监控工具为例, nagios 适合报警触发, cacti 适合查看图像趋势, zabbix 则稍微好点, 包含了报警和图形趋势. 但是 cacti/zabbix 本身是以指定间隔时间采集数据, 时间太短的话会引起采集脚本负担太重, 时间太长则可能磨平问题发生时的图像尖峰. 而 grafana 支持较多的数据源, 如果我们将采集到的数据存储到基于时间序列的数据库中, 就有可能实现生成基于秒, 分钟的监控图像. 比如下图所示, 在访问突然增大的情况下, cacti 已经将尖峰削去了很多, grafana 则显示的更为精细, 这在故障发生进行追踪分析的时候就显得特别有用, 如下所示, 更精确的监控更能接近问题的真相:
 
 cacti 监控:
-![cacti1](https://img.arstercz.com/articles/201709/cacti1.bmp)
+![cacti1]({{ site.baseurl }}/images/articles/201709/cacti1.bmp)
 
 grafana 监控
-![grafana1](https://img.arstercz.com/articles/201709/grafana1.bmp)
+![grafana1]({{ site.baseurl }}/images/articles/201709/grafana1.bmp)
 
 下面的我们介绍的实例基于数据源 influxdb, influxdb 官方的 [telegraf](https://docs.influxdata.com/telegraf/v1.3/) 已经实现了大多数我们经常用到的软件的监控, 并可以将监控数据送到 influxdb 供 grafana 生成图像. 如果需要自定义数据进行采集, 可参考以下链接:
 
@@ -95,7 +95,7 @@ time                           metric region value
 ## 在 grafana 中添加图像
 
 在上述的介绍中, 我们已经将搜集到的信息存到了 influxdb 中, 要生成对应的图像只需要选择对应的数据源即可, 如下所示, 选择 influxDB 作为数据源:
-![create1](https://img.arstercz.com/articles/201709/create1.jpg)
+![create1]({{ site.baseurl }}/images/articles/201709/create1.jpg)
 
 选择好对应的表名, 和 `test_influxdb` 作为数据源, 另外因为我们每次都是获取的最大的自增 id, 所以图像中如果要计算增量情况则需要选择好对应的 difference 函数进行计算, 而且搜集的数据是每分钟一次, 所以我们需要指定按照1分钟`group by (1m)` 进行计算. 
 
@@ -104,7 +104,7 @@ time                           metric region value
 SELECT difference(last("value")) FROM "test_user" WHERE "metric" = 'maxid' AND $timeFilter GROUP BY time(1m) fill(null)
 ```
 last(value) 即为value 列每次取的最新的值, drifference 为两次值的差, group by 按照 1 分钟(脚本多长时间收集一次数据, 这里就选多长时间)聚合运算. 最后生成的图如下:
-![graph2](https://img.arstercz.com/articles/201709/graph2.bmp)
+![graph2]({{ site.baseurl }}/images/articles/201709/graph2.bmp)
 
 ## 总结
 
