@@ -90,6 +90,7 @@ crash> kmem -i
 ```
 
 上述的 bt 显示了崩溃时的堆栈信息, 即系统在处理 `down_read_trylock+9` 时崩溃, `kmem` 则显示了崩溃时的内存使用信息, 可以看到当时可用的内存仅为 363.2MB, 不过从整个堆栈的信息来看, kswapd0 进程通过 `balance_pgdat` 开始均衡各自 CPU 节点(`node0`, 对应上述的 `CPU: 22`)对应的内存, 进而开始进行内存的回收操作(`shrink_zone, shrink_active_list`函数), 后续内核开始检测匿名页(`page_referenced -> page_referenced_anon -> page_lock_anon_vma_read`), 最后在 `down_read_trylock` 函数中崩溃. 如下所示, 内存的消耗速度很快:
+
 ![mem_eat]({{ site.baseurl }}/images/articles/201907/mem_eat.png)
 
 参考红帽文档 [redhat-277985](https://access.redhat.com/solutions/2779851), 可以获取到以下信息:
