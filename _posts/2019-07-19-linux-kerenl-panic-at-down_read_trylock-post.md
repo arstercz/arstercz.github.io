@@ -115,6 +115,17 @@ crash> kmem ffffe7f22a9b0000
       PAGE         PHYSICAL      MAPPING       INDEX CNT FLAGS
 ffffe7f22a9b0000  aa6c00000 ffff9c956f7b4231 7fe793e00  2 2fffff00084048 uptodate,active,head,swapbacked
 
+crash> struct page {
+  flags = 13510794587684936, 
+  mapping = 0xffff9c956f7b4231, 
+  {
+    {
+      index = 34334129664, 
+....
+
+crash> struct page.mapping ffff9c956f7b4231
+  mapping = 0x0   # 空指针
+
 crash> kmem 0xffff9c956f7b4231
       PAGE         PHYSICAL      MAPPING       INDEX CNT FLAGS
 ffffe7f280bded00 202f7b4000                0        0  1 6fffff00000000
@@ -123,7 +134,7 @@ crash> kmem 0000000000000008
       PAGE         PHYSICAL      MAPPING       INDEX CNT FLAGS
 ffffe7f200000000          0                0        0  0 400 reserved
 ```
-R13 的地址即为 `page_lock_anon_vma_read` 函数中的 page 指针地址, 不过使用 kmem 来看, `page.mapping(ffff9c956f7b4231)` 对应的 `MAPPING` 为 `NULL` 指针, RDI(目标地址寄存器) `0000000000000008` 同样为 `NULL` 指针, 为保留的区域. 后续的程序指令寄存器(`RIP: down_read_trylock+9`) 访问了空指针进而引起崩溃, 地址对应的内核代码大致如下所示:
+R13 的地址即为 `page_lock_anon_vma_read` 函数中的 page 指针地址, 不过使用 kmem 来看, `page.mapping(ffff9c956f7b4231)` 为 `NULL` 指针, RDI(目标地址寄存器) `0000000000000008` 同样为 `NULL` 指针, 为保留的区域. 后续的程序指令寄存器(`RIP: down_read_trylock+9`) 访问了空指针进而引起崩溃, 地址对应的内核代码大致如下所示:
 
 ```c
 # /source/kernel/rwsem.c
