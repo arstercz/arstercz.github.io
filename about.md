@@ -8,7 +8,8 @@ Focus on `database`, `Linux` operating system and `performance` tuning.
 
 ### Contact me
 
-[arstercz@gmail.com](mailto:arstercz@gmail.com)
+[arstercz@gmail.com](mailto:arstercz@gmail.com)  
+[github](https://github.com/arstercz)  
 
 ### Favorite websites
 
