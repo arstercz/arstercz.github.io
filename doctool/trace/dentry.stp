@@ -1,0 +1,6 @@
+probe kernel.function("dentry_lru_add")
+{
+    printf("%s - tid: %d, ppid: %d, path: /%s\n", 
+		tz_ctime(gettimeofday_s()), tid(), ppid(), 
+		reverse_path_walk($dentry))
+}

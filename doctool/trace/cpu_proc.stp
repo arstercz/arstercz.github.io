@@ -1,0 +1,20 @@
+#!/usr/bin/env stap
+
+global statcpu
+
+probe timer.profile {
+  if (!user_mode())
+    statcpu["kernel", cpu()]++
+  else
+    statcpu["user", cpu()]++
+}
+
+probe timer.s(2) {
+  printf("----------------------------------------------\n")
+  printf("begin at: %s\n", tz_ctime(gettimeofday_s()))
+  printf("%10s %5s %10s\n", "MODE", "CPU", "COUNT")
+  foreach([t, c+] in statcpu){
+    printf("%10s %5d %10d\n", t, c, statcpu[t, c])
+  }
+  delete statcpu
+}

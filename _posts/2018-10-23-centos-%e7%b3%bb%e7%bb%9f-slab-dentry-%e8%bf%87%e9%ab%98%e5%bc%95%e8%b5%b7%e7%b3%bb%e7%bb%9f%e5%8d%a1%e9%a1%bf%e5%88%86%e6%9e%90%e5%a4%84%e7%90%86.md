@@ -17,7 +17,7 @@ tags:
 ---
 ## 问题说明
 
-近期几台主机系统都出现卡顿几秒甚至十几秒的现象, 期间没有网络问题. 每次出现卡顿现象的时间也不固定. 服务请求数和流量也没有异常变化, 我们使用 [cpu_capture](http://get.arstercz.com/trace/cpu_capture.sh) 状态脚本解析 top 命令的输出, 正常情况几百毫秒即可输出, 在异常时耗时很长, 如下可以看到耗时接近 15s:
+近期几台主机系统都出现卡顿几秒甚至十几秒的现象, 期间没有网络问题. 每次出现卡顿现象的时间也不固定. 服务请求数和流量也没有异常变化, 我们使用 [cpu_capture]({{ site.baseurl }}/doctool/trace/cpu_capture.sh) 状态脚本解析 top 命令的输出, 正常情况几百毫秒即可输出, 在异常时耗时很长, 如下可以看到耗时接近 15s:
 ```
 begin time: 2018-09-24T23:26:25.347257868
   end time: 2018-09-24T23:26:40.062807607
@@ -31,7 +31,7 @@ Total cpu usage: 241.8
      7 -> cpu: 0.00, state: S, cmd: migration/1
 ```
 
-系统 [snoopy](https://arstercz.com/how-does-snoopy-log-every-executed-command/)日志同样也有十几秒的中断, 占用 cpu 资源增长的很快(注: 监控每 10s 取最新的数据, 再和上次的值做差值平均, 和真实的情况会略有偏差, 不过能反映整体的情况):
+系统 [snoopy]({{ site.baseurl }}/how-does-snoopy-log-every-executed-command/)日志同样也有十几秒的中断, 占用 cpu 资源增长的很快(注: 监控每 10s 取最新的数据, 再和上次的值做差值平均, 和真实的情况会略有偏差, 不过能反映整体的情况):
 ![cpu]({{ site.baseurl }}/images/articles/201810/cpu.bmp)
 
 ## 系统环境
@@ -49,9 +49,9 @@ CentOS release 6.10:
 
 ## 分析处理
 
-在问题描述部分中, snoopy 和 cpu 检测日志可以说明检测脚本在一段时间内没有任何操作, 不过脚本检测都是在用户空间运行, 如果仅是用户空间卡顿, 在没有脚本执行的时候 snoopy 日志也不会有任何输出(原理见: [snoopy 如何工作](https://arstercz.com/how-does-snoopy-log-every-executed-command/), 如果是系统内核空间卡顿, 那我们就有幸碰到了传说中的系统冻结 (system freeze) 问题, 这种情况下系统不会有任何响应, 早期的系统在冻结的时候, 可能出现 cpu 风扇都不正常转动的情况. 不过现代的操作系统应该不会有这种情况, 即便有也不会卡顿十几秒之久. 
+在问题描述部分中, snoopy 和 cpu 检测日志可以说明检测脚本在一段时间内没有任何操作, 不过脚本检测都是在用户空间运行, 如果仅是用户空间卡顿, 在没有脚本执行的时候 snoopy 日志也不会有任何输出(原理见: [snoopy 如何工作]({{ site.baseurl }}/how-does-snoopy-log-every-executed-command/), 如果是系统内核空间卡顿, 那我们就有幸碰到了传说中的系统冻结 (system freeze) 问题, 这种情况下系统不会有任何响应, 早期的系统在冻结的时候, 可能出现 cpu 风扇都不正常转动的情况. 不过现代的操作系统应该不会有这种情况, 即便有也不会卡顿十几秒之久. 
 
-基于此我们增加systemtap 脚本 [thread-times.stp](http://get.arstercz.com/trace/thread-times.stp) 和 [cpu_proc.stp](http://get.arstercz.com/trace/cpu_proc.stp) 来检测出现问题的时候卡顿发生在用户空间还是内核空间. `thread-times.stp` 脚本在 `perf.sw.cpu_clock` 和 `timer.profile` 两个探测点按照进程, pid 等信息进行用户空间和内核空间的统计, 最终输出每个进程的使用率; `cpu_proc.stp` 则在 `timer.profile` 探测点按每颗 cpu 输出用户空间及内核空间的调用次数. 如果是内核空间卡顿, 基于两个脚本编译的内核模块在出问题的时候不会有信息输出, 如果是用户空间则正常输出信息.
+基于此我们增加systemtap 脚本 [thread-times.stp]({{ site.baseurl }}/doctool/trace/thread-times.stp) 和 [cpu_proc.stp]({{ site.baseurl }}/doctool/trace/cpu_proc.stp) 来检测出现问题的时候卡顿发生在用户空间还是内核空间. `thread-times.stp` 脚本在 `perf.sw.cpu_clock` 和 `timer.profile` 两个探测点按照进程, pid 等信息进行用户空间和内核空间的统计, 最终输出每个进程的使用率; `cpu_proc.stp` 则在 `timer.profile` 探测点按每颗 cpu 输出用户空间及内核空间的调用次数. 如果是内核空间卡顿, 基于两个脚本编译的内核模块在出问题的时候不会有信息输出, 如果是用户空间则正常输出信息.
 
 以内核模块的方式抓取出现卡顿现象时的日志如下:
 
@@ -713,7 +713,7 @@ int __cond_resched_lock(spinlock_t *lock)
 
 一些依赖 `nss-softokn` 老版本库的工具, 比如 curl 在访问 `https` 的时候, 由于 `sdb_measureAccess` 方法会访问很多 `/etc/pki/nssdb/.xxxxx.db` 不存在的文件, 进而造成 `dentry` 数量增加, 更详细见: [bugzilla-1044666](https://bugzilla.redhat.com/show_bug.cgi?id=1044666) .  这点正好符合我们环境,几台主机都有 `curl https` 相关的脚本在执行, 每秒三四次 curl, 每次 curl 产生约 800 左右的不存在文件, 算下来每秒差不多 3000 左右, 每天就需要缓存 2.6亿左右的条目, 比较符合我们情况. 
 
-参考国内的文章 [aliyun-131870](https://yq.aliyun.com/articles/131870) , 也出现了类似的问题, 不过其分析 `slab` 分配器 `dentry` 对象的代码没有对外开放, 遍历整个 `dentry` 的对象对线上环境影响也较大, 所以我们增加 [dentry.stp](http://get.arstercz.com/trace/dentry.stp) 脚本来查看, 该脚本在内核函数 dentry_lru_add 增加探针, 可以帮助我们查看系统在 dentry 对象中增加的到底是什么目录条目, 如下所示:
+参考国内的文章 [aliyun-131870](https://yq.aliyun.com/articles/131870) , 也出现了类似的问题, 不过其分析 `slab` 分配器 `dentry` 对象的代码没有对外开放, 遍历整个 `dentry` 的对象对线上环境影响也较大, 所以我们增加 [dentry.stp]({{ site.baseurl }}/doctool/trace/dentry.stp) 脚本来查看, 该脚本在内核函数 dentry_lru_add 增加探针, 可以帮助我们查看系统在 dentry 对象中增加的到底是什么目录条目, 如下所示:
 
 ```
 ......
