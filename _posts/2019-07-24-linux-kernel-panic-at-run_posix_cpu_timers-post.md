@@ -148,26 +148,86 @@ crash> dis -rl ffffffff8108e8c7
  13 {
  14         return this_cpu_read_stable(current_task);
  15 }
+
+crash> dis -rl ffffffff8108e8ee
+/usr/src/debug/kernel-3.10.0-327.18.2.el7/linux-3.10.0-327.18.2.el7.x86_64/kernel/timer.c: 1370
+...
+/usr/src/debug/kernel-3.10.0-327.18.2.el7/linux-3.10.0-327.18.2.el7.x86_64/arch/x86/include/asm/current.h: 14
+0xffffffff8108e89c <update_process_times+28>:   mov    %gs:0xb7c0,%rbx
+/usr/src/debug/kernel-3.10.0-327.18.2.el7/linux-3.10.0-327.18.2.el7.x86_64/kernel/timer.c: 1375
+0xffffffff8108e8a5 <update_process_times+37>:   mov    %rbx,%rdi
+0xffffffff8108e8a8 <update_process_times+40>:   callq  0xffffffff810bbec0 <account_process_tick>
+/usr/src/debug/kernel-3.10.0-327.18.2.el7/linux-3.10.0-327.18.2.el7.x86_64/kernel/timer.c: 1402
+0xffffffff8108e8ad <update_process_times+45>:   callq  0xffffffff810aa670 <hrtimer_run_queues>
+/usr/src/debug/kernel-3.10.0-327.18.2.el7/linux-3.10.0-327.18.2.el7.x86_64/kernel/timer.c: 1403
+0xffffffff8108e8b2 <update_process_times+50>:   mov    $0x1,%edi
+0xffffffff8108e8b7 <update_process_times+55>:   callq  0xffffffff81084f30 <raise_softirq>
+/usr/src/debug/kernel-3.10.0-327.18.2.el7/linux-3.10.0-327.18.2.el7.x86_64/kernel/timer.c: 1377
+0xffffffff8108e8bc <update_process_times+60>:   mov    %r12d,%esi
+0xffffffff8108e8bf <update_process_times+63>:   mov    %r13d,%edi
+0xffffffff8108e8c2 <update_process_times+66>:   callq  0xffffffff81126690 <rcu_check_callbacks>
+/usr/src/debug/kernel-3.10.0-327.18.2.el7/linux-3.10.0-327.18.2.el7.x86_64/arch/x86/include/asm/thread_info.h: 211
+0xffffffff8108e8c7 <update_process_times+71>:   mov    %gs:0xb7b8,%rax
+/usr/src/debug/kernel-3.10.0-327.18.2.el7/linux-3.10.0-327.18.2.el7.x86_64/kernel/timer.c: 1379
+0xffffffff8108e8d0 <update_process_times+80>:   testl  $0x3ff0000,-0x3fbc(%rax)
+0xffffffff8108e8da <update_process_times+90>:   je     0xffffffff8108e8e1 <update_process_times+97>
+/usr/src/debug/kernel-3.10.0-327.18.2.el7/linux-3.10.0-327.18.2.el7.x86_64/kernel/timer.c: 1380
+0xffffffff8108e8dc <update_process_times+92>:   callq  0xffffffff81156070 <irq_work_tick>
+/usr/src/debug/kernel-3.10.0-327.18.2.el7/linux-3.10.0-327.18.2.el7.x86_64/kernel/timer.c: 1382
+0xffffffff8108e8e1 <update_process_times+97>:   callq  0xffffffff810b75c0 <scheduler_tick>
+/usr/src/debug/kernel-3.10.0-327.18.2.el7/linux-3.10.0-327.18.2.el7.x86_64/kernel/timer.c: 1383
+0xffffffff8108e8e6 <update_process_times+102>:  mov    %rbx,%rdi     // task_struct variable
+0xffffffff8108e8e9 <update_process_times+105>:  callq  0xffffffff810a8650 <run_posix_cpu_timers>
+/usr/src/debug/kernel-3.10.0-327.18.2.el7/linux-3.10.0-327.18.2.el7.x86_64/kernel/timer.c: 1384
+0xffffffff8108e8ee <update_process_times+110>:  pop    %rbx
 ```
 
-从上述的信息来看, `update_process_times` 将进程的信息传给了 `run_posix_cpu_timers` 函数. `run_posix_cpu_timers` 函数的汇编代码中, 寄存器 `R15` 和 `RDI` 对应的值相同, 并且 RDI 寄存器为 `run_posix_cpu_timers` 函数的第一个参数, 查看 `RDI` 对应的 `task_struct` 结果体的数据, 1291 行代码对应的 `tsk->signal` 为空, 如下所示 `signal = 0x0`:
+从上述的信息来看, `update_process_times` 将进程的信息传给了 `run_posix_cpu_timers` 函数. `run_posix_cpu_timers` 函数的汇编代码中, 寄存器 `R15` 和 `RDI` 对应的值相同, 并且 RDI 寄存器为 `run_posix_cpu_timers` 函数的第一个参数, 上述的汇编代码中 `mov    %gs:0xb7c0,%rbx`, 0xb7c0 即为 `update_process_times` 函数的task_struct 结构体的 p 指针变量. 从下述的分析可以看到 p 变量的 signal_struct 变量正常, cputimer.running 为 0:
 ```c
-crash> struct task_struct ffffffff81a684e0
+crash> kmem -o | grep 'CPU 0'
+  CPU 0: ffff88103f200000
+crash> eval ffff88103f200000 + 0xb7c0
+hexadecimal: ffff88103f20b7c0  
+    decimal: 18446612202092804032  (-131871616747584)
+      octal: 1777774201007710133700
+     binary: 1111111111111111100010000001000000111111001000001011011111000000
+crash> rd ffff88103f20b7c0
+ffff88103f20b7c0:  ffff8807deb08000                    ........
+crash> struct task_struct ffff8807deb08000 
 struct task_struct {
-  state = -1, 
-  stack = 0xffffffffffffffff, 
-  usage = {
-    counter = -1
-  }, 
-  flags = 4294967295, 
-  ......
-  pid = 0, 
-  tgid = 0, 
-  ......
-  signal = 0x0, 
+  state = 0, 
+  stack = 0xffff88046102c000, 
+...
+  signal = 0xffff88108bea8d80,
+  pid = 80589, //commserver task
+  tgid = 80586,
+
+crash> struct signal_struct 0xffff88108bea8d80
+struct signal_struct {
+  sigcnt = {
+    counter = 77
+...
+  cputimer = {
+    cputime = {
+      utime = 0, 
+      stime = 0, 
+      sum_exec_runtime = 0
+    }, 
+    running = 0, 
+    lock = {
 ```
 
-从 1292 行代码即可看到, 程序在引用 `signal_struct` 结构体的 `cuptimer` 成员之前没有做空指针检查, 导致执行 `sig->cputimer.running` 代码的时候出现内核崩溃. 
+不过我们从 1292 行代码即可看到, 程序在引用 `signal_struct` 结构体的 `cuptimer` 成员的时候却成为了空值,导致执行 `sig->cputimer.running` 代码的时候出现内核崩溃. 对比上述的汇编代码来看 `rbx` 寄存器的值在传给 `rdi` 之前经过了以下函数的处理:
+```
+account_process_tick
+hrtimer_run_queues
+raise_softirq
+rcu_check_callbacks
+irq_work_tick
+scheduler_tick
+```
+看起来有可能是上述的哪个函数 pop 了错误的 `rbx`, 导致传给 `run_posix_cpu_timers` 的变量为空值. 
+
 
 ### 触发条件
 
@@ -178,7 +238,7 @@ struct task_struct {
 2. 主机 BIOS 版本为 2.0.1, 到最新的 2.9.1 版本的 changelog 中未见到相关 bug 说明;
 ```
 
-在第二点中, 由于堆栈里显示的是计时器中断没有获取到对应 cpu 0 的进程信息才引起了空指针，如果触发条件和 cpu 无关, 升级 BIOS 其实没什么作用, 在没有批量出现此类问题的时候建议不做任何改动.
+在第二点中, 由于堆栈里显示的是计时器中断没有获取到对应 cpu 0 的进程信息才引起了空指针，如果触发条件和 cpu 无关, 升级 BIOS 其实没什么作用.
 
 ### 参考
 
