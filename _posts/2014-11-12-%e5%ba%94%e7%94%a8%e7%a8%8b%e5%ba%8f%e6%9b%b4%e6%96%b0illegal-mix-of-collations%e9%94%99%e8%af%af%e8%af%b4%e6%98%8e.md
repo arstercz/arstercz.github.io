@@ -4,7 +4,7 @@ title: 应用程序更新Illegal mix of collations错误说明
 date: 2014-11-12T18:39:57+08:00
 author: arstercz
 layout: post
-guid: http://zhechen.me/?p=423
+guid: http://arstercz.com/?p=423
 permalink: '/%e5%ba%94%e7%94%a8%e7%a8%8b%e5%ba%8f%e6%9b%b4%e6%96%b0illegal-mix-of-collations%e9%94%99%e8%af%af%e8%af%b4%e6%98%8e/'
 tagline_text_field:
   - ""
