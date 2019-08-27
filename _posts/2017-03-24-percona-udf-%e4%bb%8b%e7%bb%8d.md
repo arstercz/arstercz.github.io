@@ -30,7 +30,7 @@ tags:
 
 ### fnv 哈希算法
 
-FNV哈希算法最早在1991年提出, 是 Fowler-Noll-Vo 的简写，其以三位发明人`Glenn Fowler`，`Landon Curt Noll`，`Phong Vo`的名字来命名的. 另外现今很多流行的中间件或分布式工具都有该函数的申请, 比如 [twemproxy](https://github.com/twitter/twemproxy) 等工具.
+FNV哈希算法最早在1991年提出, 是 Fowler-Noll-Vo 的简写，其以三位发明人`Glenn Fowler`，`Landon Curt Noll`，`Phong Vo`的名字来命名的. 另外现今很多流行的中间件或分布式工具都有该函数的身影, 比如 [twemproxy](https://github.com/twitter/twemproxy) 等工具.
 
 FNV能快速hash大量数据并保持较小的冲突率，它的高度分散使它适用于 `hash` 一些非常相近的字符串，比如 `URL`，`hostname`，文件名，text，IP地址等. 现有的版本有 `FNV-1` 和 `FNV-1a`, `FNV-0` 已经废弃, `FNV-1` 和 `FNV-1a` 两个函数生成的 hash 值有以下两个限制(`FNV offset basis` 为无符号整数):
 
@@ -42,7 +42,8 @@ hash 值的位数为 2^n (32, 64, 128, 256, 512, 1024 等)
 
 #### FNV-1 函数伪代码:
 
-```   hash = FNV_offset_basis
+```
+   hash = FNV_offset_basis
    for each byte_of_data to be hashed
         hash = hash × FNV_prime
         hash = hash XOR byte_of_data
@@ -51,7 +52,8 @@ hash 值的位数为 2^n (32, 64, 128, 256, 512, 1024 等)
 
 #### FNV-1a 函数伪代码:
 
-```   hash = FNV_offset_basis
+```
+   hash = FNV_offset_basis
    for each byte_of_data to be hashed
         hash = hash XOR byte_of_data
         hash = hash × FNV_prime
