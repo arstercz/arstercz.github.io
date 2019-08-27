@@ -357,14 +357,14 @@ img {
   cursor: pointer;
   font-family: $helveticaNeue;
   font-weight: 300;
-  font-size: 26px;
+  font-size: 30px;
   letter-spacing: 1px;
 }
 
 .site-description {
   margin: -5px 0 0 0;
   color: $gray;
-  font-size: 16px;
+  font-size: 20px;
 
   @include mobile {
     margin: 3px 0;
