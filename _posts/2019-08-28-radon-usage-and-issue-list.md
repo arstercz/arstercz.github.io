@@ -20,7 +20,7 @@ comments: false
 * [唯一性问题](#唯一性问题)
 * [jump consistent hash 介绍](#jump-consistent-hash-介绍)
 * [分区原理说明](#分区原理说明)
-* [~~hash 函数问题~~ 已修复](hash-函数问题)
+* [~~hash 函数问题~~ 已修复](#hash-函数问题)
 * [灵活性问题](#灵活性问题)
 
 关键字问题
