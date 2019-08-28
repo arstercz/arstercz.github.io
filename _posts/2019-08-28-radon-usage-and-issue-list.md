@@ -20,7 +20,7 @@ comments: false
 * [唯一性问题](#唯一性问题)
 * [jump consistent hash 介绍](#jump-consistent-hash-介绍)
 * [分区原理说明](#分区原理说明)
-* [hash 函数问题](hash-函数问题)
+* [~~hash 函数问题~~ 已修复](hash-函数问题)
 * [灵活性问题](#灵活性问题)
 
 关键字问题
@@ -161,6 +161,8 @@ hash 函数问题
 181                 idx = int(jump.HashString(valStr, int32(h.slots), jump.CRC64))
     ......
 ```
+
+**备注:** 官方已修复, 详见 [radon-issue464](https://github.com/radondb/radon/pull/464)
 
 故障恢复
 ========
