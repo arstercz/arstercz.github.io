@@ -18,9 +18,9 @@ comments: false
 * [适用场景问题](#适用场景问题)
 * [列名问题](#列名问题)
 * [唯一性问题](#唯一性问题)
-* [jump consistent hash 介绍](#jump consistent hash 介绍)
+* [jump consistent hash 介绍](#jump-consistent-hash-介绍)
 * [分区原理说明](#分区原理说明)
-* [hash 函数问题](hash 函数问题)
+* [hash 函数问题](hash-函数问题)
 * [灵活性问题](#灵活性问题)
 
 关键字问题
@@ -151,8 +151,7 @@ backend 节点进行操作.
 hash 函数问题
 =============
 
-在 key 为字符串的时候, 通过 `jump consistent hash` 的 HashString 方法中采用了 `jump.CRC64` 作为 KeyHasher 参数的值, 不过 `jump.CRC64` 
-在并发环境中存在安全隐患, 需要改为官方建议的 `NewCRC64` 方法
+在 key 为字符串的时候, 通过 `jump consistent hash` 的 HashString 方法中采用了 `jump.CRC64` 作为 KeyHasher 参数的值, 不过 `jump.CRC64` 在并发环境中存在安全隐患, 需要改为官方建议的 `NewCRC64` 方法, 更多见 [go-jump-consistent-hash-issue6](https://github.com/lithammer/go-jump-consistent-hash/issues/6)
 ```go
 // src/router/hash.go
 163 // GetIndex returns index based on sqlval.
@@ -163,14 +162,10 @@ hash 函数问题
     ......
 ```
 
-更多见 [go-jump-consistent-hash-issue6](https://github.com/lithammer/go-jump-consistent-hash/issues/6)
-
-
 故障恢复
 ========
 
 从分区原理来看, 对可用性要求高的工程, radon 可以采用 vip 或 dns 的方式连接后端的每个 master. 对可以容忍中断一段时间的工程, radon 可以直接连接后端的每个 `master ip`, 在一个后端 master 节点出现故障的时候, 可以手动修改 `radon-meta` 目录中的 `backend.json` 元信息, 不过不能修改 name 字段, 最后重启 radon 进程即可, 如果是通过 peer 配置的多 radon 节点, 则稍微麻烦些, 不过处理的方式都一样.
-
 
 灵活性问题
 ==========
