@@ -538,7 +538,9 @@ nav {
 .tags > .tag {
   a {
     color: $base-color;
+    font-size: $base-font-size;
   }
+  a:hover{color: $oc-blue-5}
   time {
     color: $base-lighten-color;
     font-size: $small-font-size;
