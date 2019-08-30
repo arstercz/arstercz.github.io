@@ -20,19 +20,19 @@ $helveticaNeue: "Helvetica Neue", Helvetica, Arial, sans-serif;
 $georgia: Georgia, serif;
 
 // Fonts
-$base-font: 'Spoqa Han Sans', 'Source Sans Pro', 'Apple SD Gothic Neo', 'Nanum Barun Gothic', 'Nanum Gothic', 'Verdana', 'Arial', 'Dotum', sans-serif;
+$base-font: 'PT Sans', 'Helvetica', 'Spoqa Han Sans', 'Source Sans Pro', 'Apple SD Gothic Neo', 'Nanum Barun Gothic', 'Nanum Gothic', 'Verdana', 'Arial', 'Dotum', sans-serif;
 $code-font: 'Menlo', 'Courier New', 'Monaco', 'Spoqa Han Sans', monospace;
 
 // Font sizes
 $base-font-size: 14px;
-$small-font-size: 12px;
+$small-font-size: 13px;
 
 // Colors
 $base-color: $oc-gray-8;
 $base-lighten-color: $oc-gray-6;
 
-$text-color: $base-color;
-$link-color: $oc-blue-8;
+$text-color: $oc-gray-7;
+$link-color: $oc-blue-6;
 $divider-color: $oc-gray-1;
 
 $table-border-color: $oc-gray-2;
@@ -45,10 +45,10 @@ $footnote-link-border-color: $oc-gray-1;
 $footnote-link-background-over-color: $oc-gray-1;
 
 $selection-color: $oc-black;
-$selection-background-color: $oc-gray-3;
+$selection-background-color: $oc-gray-4;
 
-$pagination-color: $oc-gray-6;
-$pagination-over-color: $oc-gray-7;
+$pagination-color: $oc-blue-5;
+$pagination-over-color: $oc-blue-8;
 
 $tag-index-label-color: $base-color;
 $tag-index-label-background-color: $oc-gray-2;
