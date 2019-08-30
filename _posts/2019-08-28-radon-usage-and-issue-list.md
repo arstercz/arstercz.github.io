@@ -23,8 +23,7 @@ comments: false
 * [~~hash 函数问题~~ 已修复](#hash-函数问题)
 * [灵活性问题](#灵活性问题)
 
-关键字问题
-==========
+## 关键字问题
 
 下面的 keywords 条目限制了一部分 sql, 执行的 sql 需要把关键之反引起来才可以. 
 ```go
@@ -40,8 +39,7 @@ mysql admin@[dbt:3308 db_test rw] > insert into user_test(user_id, app_id, `stat
 Query OK, 1 row affected (0.00 sec)
 ```
 
-权限放大问题
-============
+## 权限放大问题
 
 通过 api 接口创建的用户权限太大, 如下所示, 正式使用的时候希望限制权限, 接口可以增加 host 和 privileges 选项，默认应该仅开启增删改查的权限. 如果程序不做修改, 可以手工在后端的所有节点创建相同权限的普通用户.
 ```go
@@ -55,20 +53,17 @@ Query OK, 1 row affected (0.00 sec)
 ...
 ```
 
-事务问题
-========
+## 事务问题
 
 未支持 `autocommit = 0` 当作开启一个事务, 同类的很多工具都有此问题, 详细见 [proxysql-issue1256](https://github.com/sysown/proxysql/issues/1256).
 
 **备注:** 官方已修复, 详见: [radon-issue465](https://github.com/radondb/radon/pull/465)
 
-压测问题
-========
+## 压测问题
 
 通过 benchyou 创建2个表(32张子表), 单台机器 seq 查询 8w qps, 通过 radon 代理三台DB可以达到 11w 左右, 写扩展较好, 读扩展则受 radon 所在机器的性能, 如果为了提高读可通过 peer 方式创建多个 radon 节点, 应用程序可以通过 dns 或 haproxy 等方式连接.
 
-适用场景问题
-============
+## 适用场景问题
 
 从大的方面来看, 只要数据在不同的节点, 就肯定面临下面的几个问题:
 ```
@@ -89,13 +84,11 @@ mysql admin@[dbt:3308 db_test] > insert into user(user_id, name, create_time) va
 Query OK, 1 row affected (0.00 sec)
 ```
 
-唯一性问题
-==========
+## 唯一性问题
 
 可以通过 radon 创建带多个唯一键的表, 不过不能保证所有的子表的唯一键的唯一性, 需要在业务曾对唯一需求做额外的处理.
 
-jump consistent hash 介绍
-=========================
+## jump consistent hash 介绍
 
 [jump consisten hash](https://arxiv.org/ftp/arxiv/papers/1406/1406.2294.pdf) 哈希算法适合在分 shard 的分布式系统中, 具备均匀分配, 快速计算, 低消耗等特性. 具体的算法为输入一个 64位的 key 和桶的数量, 最后输出桶的编号. 其设计目标包含以下两点:
 
@@ -133,8 +126,7 @@ func HashString(key string, buckets int32, h KeyHasher) int32 {
 }
 ```
 
-分区原理说明
-============
+## 分区原理说明
 
 从 `src/router/hash.go` 源文件中可以看到, radon 采用了 jump consistent hash 算法实现了 shard 操作. 对给定的 key 算出具体的桶编号. 
 从 `src/router/compute.go` 和 `src/backend/scatter.go` 可以看出实际的 backends 仅和 配置文件 `backend.json` 中每个条目的 name 
@@ -149,8 +141,7 @@ backend 节点进行操作.
 }
 ```
 
-hash 函数问题
-=============
+## hash 函数问题
 
 在 key 为字符串的时候, 通过 `jump consistent hash` 的 HashString 方法中采用了 `jump.CRC64` 作为 KeyHasher 参数的值, 不过 `jump.CRC64` 在并发环境中存在安全隐患, 需要改为官方建议的 `NewCRC64` 方法, 更多见 [go-jump-consistent-hash-issue6](https://github.com/lithammer/go-jump-consistent-hash/issues/6)
 ```go
@@ -165,13 +156,11 @@ hash 函数问题
 
 **备注:** 官方已修复, 详见 [radon-issue464](https://github.com/radondb/radon/pull/464)
 
-故障恢复
-========
+## 故障恢复
 
 从分区原理来看, 对可用性要求高的工程, radon 可以采用 vip 或 dns 的方式连接后端的每个 master. 对可以容忍中断一段时间的工程, radon 可以直接连接后端的每个 `master ip`, 在一个后端 master 节点出现故障的时候, 可以手动修改 `radon-meta` 目录中的 `backend.json` 元信息, 不过不能修改 name 字段, 最后重启 radon 进程即可, 如果是通过 peer 配置的多 radon 节点, 则稍微麻烦些, 不过处理的方式都一样.
 
-灵活性问题
-==========
+## 灵活性问题
 
 目前来看仅支持按 `jump consistent hash` 方式进行 shard 分区, 如果已有的工程是按照范围或者一致性 hash 割环方式分区, 需要单独修改 `src/router/hash.go` 中的
 方法以适应已有的工程.
