@@ -13,7 +13,7 @@ comments: false
 
 * [关键字问题](#关键字问题)
 * [权限放大问题](#权限放大问题)
-* [事务问题](#事务问题)
+* [~~事务问题~~ 已修复](#事务问题)
 * [压测问题](#压测问题)
 * [适用场景问题](#适用场景问题)
 * [列名问题](#列名问题)
@@ -60,6 +60,7 @@ Query OK, 1 row affected (0.00 sec)
 
 未支持 `autocommit = 0` 当作开启一个事务, 同类的很多工具都有此问题, 详细见 [proxysql-issue1256](https://github.com/sysown/proxysql/issues/1256).
 
+**备注:** 官方已修复, 详见: [radon-issue465](https://github.com/radondb/radon/pull/465)
 
 压测问题
 ========
