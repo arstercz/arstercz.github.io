@@ -260,5 +260,3 @@ MHA::DBHelper::reset_slave_by_change_master   清楚change master信息, change_
 --new_master_host=192.168.56.109 --new_master_ip=192.168.56.109 
 --new_master_port=3306 --new_master_user='root' --new_master_password='xxxxxx' 
  ```
- 
-五. 切换日志见 <a href=http://doc.highdb.com/upload/2014/06/case1.txt>case.log</a>

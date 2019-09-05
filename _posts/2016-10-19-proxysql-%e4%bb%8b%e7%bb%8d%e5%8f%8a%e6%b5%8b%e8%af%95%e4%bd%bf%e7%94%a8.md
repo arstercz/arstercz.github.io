@@ -469,8 +469,8 @@ $ mysql -h 10.0.21.5 -P 6033 -u percona -p percona -e "select * from tags"
 
 #### FYI
 
-<p><a href="https://github.com/sysown/proxysql/">github</a>
-<p><a href="https://www.percona.com/live/plam16/sessions/proxysql-tutorial">percona live</a>
-<p><a href="https://www.percona.com/blog/2016/08/30/mysql-sharding-with-proxysql/">percona blog</a>
-<p><a href="http://highdb.com/360-atlas%e4%b8%ad%e9%97%b4%e4%bb%b6-%e6%b5%8b%e8%af%95%e5%8f%8a%e4%bd%bf%e7%94%a8%e8%af%b4%e6%98%8e/">atlas 测试使用</a>
-<p><a href="http://highdb.com/mysql-router-%e6%b5%8b%e8%af%95%e4%bd%bf%e7%94%a8/">mysql router 测试使用</a>
+[proxysql](https://github.com/sysown/proxysql/) 
+[proxy tutorial](https://www.percona.com/live/plam16/sessions/proxysql-tutorial) 
+[percona live](https://www.percona.com/blog/2016/08/30/mysql-sharding-with-proxysql/) 
+[atlas 测试使用]({{ site.baseurl }}/360-atlas%e4%b8%ad%e9%97%b4%e4%bb%b6-%e6%b5%8b%e8%af%95%e5%8f%8a%e4%bd%bf%e7%94%a8%e8%af%b4%e6%98%8e/) 
+[mysql router 测试使用]({{ site.baseurl }}mysql-router-%e6%b5%8b%e8%af%95%e4%bd%bf%e7%94%a8/) 

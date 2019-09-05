@@ -134,7 +134,7 @@ Send模块完成以下功能:
 
 <strong>4.MySQL audit插件安装说明</strong>
 
-见: <a href="http://highdb.com/mysql-audit%e5%ae%a1%e8%ae%a1%e6%8f%92%e4%bb%b6/"><font color="green">http://highdb.com/mysql-audit%e5%ae%a1%e8%ae%a1%e6%8f%92%e4%bb%b6/</font></a>
+见: [mysql-audit]({{ site.baseurl }}/mysql-audit%e5%ae%a1%e8%ae%a1%e6%8f%92%e4%bb%b6/)
 
 <strong>5.SQL::Audit安装说明</strong>
 

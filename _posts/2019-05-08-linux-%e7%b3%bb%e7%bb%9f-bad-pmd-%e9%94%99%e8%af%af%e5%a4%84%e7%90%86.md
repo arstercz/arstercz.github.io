@@ -127,7 +127,7 @@ void exit_mmap(struct mm_struct *mm)
 
 ## 参考
 
-[redhat-41282](https://access.redhat.com/solutions/41282)
-[redhat-15693](https://access.redhat.com/solutions/15693)
-[lwn-117749](https://lwn.net/Articles/117749/)
-[kernel-understand006](https://www.kernel.org/doc/gorman/html/understand/understand006.html)
+[redhat-41282](https://access.redhat.com/solutions/41282)  
+[redhat-15693](https://access.redhat.com/solutions/15693)  
+[lwn-117749](https://lwn.net/Articles/117749/)  
+[kernel-understand006](https://www.kernel.org/doc/gorman/html/understand/understand006.html)  

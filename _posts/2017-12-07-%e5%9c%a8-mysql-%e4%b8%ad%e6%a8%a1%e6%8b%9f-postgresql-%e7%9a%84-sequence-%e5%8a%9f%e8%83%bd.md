@@ -15,7 +15,7 @@ tags:
 ---
 ## 介绍
 
-在 [id 生成器介绍](https://highdb.com/id-%E7%94%9F%E6%88%90%E5%99%A8%E4%BB%8B%E7%BB%8D/) 一文中, 我们介绍了几种生成 id 的方式, 其中的 `last_insert_id` 小节中, 简单说明了中小业务可以使用 `last_insert_id` 的方式来生成 id,  在 InnoDB 表的情况下容易产生死锁(下文会介绍在一个事务中操作可以降低死锁概率), 将表改成 MyISAM 也可以提高性能, 不过不利于 [xtrabackup](https://www.percona.com/software/mysql-database/percona-xtrabackup) 的在线备份; 在 `postgresql 序列生成器` 小节中, 介绍了 postgresql 自带序列生成器的功能, 使用起来也很方便.
+在 [id 生成器介绍]({{ site.baseurl }}/id-%E7%94%9F%E6%88%90%E5%99%A8%E4%BB%8B%E7%BB%8D/) 一文中, 我们介绍了几种生成 id 的方式, 其中的 `last_insert_id` 小节中, 简单说明了中小业务可以使用 `last_insert_id` 的方式来生成 id,  在 InnoDB 表的情况下容易产生死锁(下文会介绍在一个事务中操作可以降低死锁概率), 将表改成 MyISAM 也可以提高性能, 不过不利于 [xtrabackup](https://www.percona.com/software/mysql-database/percona-xtrabackup) 的在线备份; 在 `postgresql 序列生成器` 小节中, 介绍了 postgresql 自带序列生成器的功能, 使用起来也很方便.
 
 如果我们使用的是阿里的 MySQL 分支版本 [AliSQL](https://github.com/alibaba/AliSQL), 则可以直接使用内置的 [Sequence](https://github.com/alibaba/AliSQL/wiki/AliSQL-Sequence-Doc_C) 逻辑引擎, 效果类似 PostgreSQL, 不过其基于 MySQL 的 InnoDB 或 MyISAM 引擎, 这样做可以更好的兼容 xtrabackup 等备份.
 
@@ -387,7 +387,7 @@ RECORD LOCKS space id 327 page no 3 n bits 72 index `PRIMARY` of table `sequence
 
 ## last_insert_id 方式压测
 
-同样的我们使用 [id 生成器介绍](https://highdb.com/id-%E7%94%9F%E6%88%90%E5%99%A8%E4%BB%8B%E7%BB%8D/) 中的 last_insert_id 方式进行测试.
+同样的我们使用 [id 生成器介绍]({{ site.baseurl }}/id-%E7%94%9F%E6%88%90%E5%99%A8%E4%BB%8B%E7%BB%8D/) 中的 last_insert_id 方式进行测试.
 
 ### InnoDB 表测试
 

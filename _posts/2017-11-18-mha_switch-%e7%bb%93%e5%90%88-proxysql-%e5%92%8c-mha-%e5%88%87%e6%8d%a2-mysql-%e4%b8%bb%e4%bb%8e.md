@@ -16,7 +16,7 @@ tags:
 ---
 ## mha_switch: 结合 proxysql 和 MHA 切换 MySQL 主从
 
-在之前的文章[proxysql 介绍及测试使用](https://highdb.com/proxysql-%E4%BB%8B%E7%BB%8D%E5%8F%8A%E6%B5%8B%E8%AF%95%E4%BD%BF%E7%94%A8/)中, 详细介绍了 [proxysql](https://github.com/sysown/proxysql) 的安装配置等, 不过经过时间的推移, proxysql 工具做了很多的改进, [自动检测及状态切换](https://github.com/sysown/proxysql/blob/80bad8a811dc5ec28f30e29d9dffd21e355acfbf/doc/admin_tables.md#mysql_servers)等功能带给我们很大的便利, 可以取代传统的 haproxy 代理, 不过由于 proxysql 的检测和状态切换机制不是实时进行, 只是间接性检测, 所以会带来了另外的困扰, 如何与已有的工具如[MHA](https://github.com/yoshinorim/mha4mysql-manager)更好的结合以保证数据的一致性. 
+在之前的文章[proxysql 介绍及测试使用]({{ site.baseurl }}/proxysql-%E4%BB%8B%E7%BB%8D%E5%8F%8A%E6%B5%8B%E8%AF%95%E4%BD%BF%E7%94%A8/)中, 详细介绍了 [proxysql](https://github.com/sysown/proxysql) 的安装配置等, 不过经过时间的推移, proxysql 工具做了很多的改进, [自动检测及状态切换](https://github.com/sysown/proxysql/blob/80bad8a811dc5ec28f30e29d9dffd21e355acfbf/doc/admin_tables.md#mysql_servers)等功能带给我们很大的便利, 可以取代传统的 haproxy 代理, 不过由于 proxysql 的检测和状态切换机制不是实时进行, 只是间接性检测, 所以会带来了另外的困扰, 如何与已有的工具如[MHA](https://github.com/yoshinorim/mha4mysql-manager)更好的结合以保证数据的一致性. 
 
 ## 功能介绍
 

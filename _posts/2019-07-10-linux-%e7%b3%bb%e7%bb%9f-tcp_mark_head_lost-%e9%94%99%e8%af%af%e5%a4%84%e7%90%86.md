@@ -169,10 +169,7 @@ sysctl -w net.ipv4.tcp_sack=0
 
 ### 参考
 
-[redhat-536483](https://access.redhat.com/solutions/536483)
-
-[bug-1367091](https://bugzilla.redhat.com/show_bug.cgi?id=1367091)
-
-[cve-2016-6828](https://access.redhat.com/security/cve/cve-2016-6828)
-
-[kernel-commit](https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=bb1fceca22492109be12640d49f5ea5a544c6bb4)
+[redhat-536483](https://access.redhat.com/solutions/536483)  
+[bug-1367091](https://bugzilla.redhat.com/show_bug.cgi?id=1367091)  
+[cve-2016-6828](https://access.redhat.com/security/cve/cve-2016-6828)  
+[kernel-commit](https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=bb1fceca22492109be12640d49f5ea5a544c6bb4)  

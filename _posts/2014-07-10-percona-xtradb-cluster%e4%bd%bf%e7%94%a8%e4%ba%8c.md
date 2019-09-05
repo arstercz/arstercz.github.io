@@ -137,4 +137,4 @@ mysql root@[localhost:s3321 percona] > select * from test;
 4444: 所有的SST,包括mysqldump;
 ```
 
-术语及理论说明见: <a href="http://highdb.com/percona-xtradb-cluster%e4%bb%8b%e7%bb%8d%e5%8f%8a%e4%bd%bf%e7%94%a8%e4%b8%80/"><font color="blue">http://highdb.com/percona-xtradb-cluster%e4%bb%8b%e7%bb%8d%e5%8f%8a%e4%bd%bf%e7%94%a8%e4%b8%80/</font></a>
+术语及理论说明见: [percona-xtradb-cluster介绍及使用一]({{ site.baseurl }}/percona-xtradb-cluster%e4%bb%8b%e7%bb%8d%e5%8f%8a%e4%bd%bf%e7%94%a8%e4%b8%80/)

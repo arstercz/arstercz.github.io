@@ -233,6 +233,6 @@ This is value ORed together of
 
 ## 参考
 
-[redhat-641323](https://access.redhat.com/solutions/641323)
-[redhat-2209921](https://access.redhat.com/solutions/2209921)
-[kernel-vm](https://www.kernel.org/doc/Documentation/sysctl/vm.txt)
+[redhat-641323](https://access.redhat.com/solutions/641323)  
+[redhat-2209921](https://access.redhat.com/solutions/2209921)  
+[kernel-vm](https://www.kernel.org/doc/Documentation/sysctl/vm.txt)  
