@@ -18,7 +18,7 @@ partition_truncate.sh: line 38: 89891 Segmentation fault      $mysqlcmd -h $HOST
 
 ### 通过 `psam` debug 版本分析查看
 
-通过 debug 版本的 `mysql` 来看, `psam` 在用户执行 `ALTER ..` 语句的时候会先从 `information_schema.tables` 中读取对应表的元数据信息一遍获取对应表的大小. 如下所示, `psam` 在获取对应表大小的时候出现整型溢出的错误:
+通过 debug 版本的 `mysql` 来看, `psam` 在用户执行 `ALTER ..` 语句的时候会先从 `information_schema.tables` 中读取对应表的元数据信息以便获取对应表的大小. 如下所示, `psam` 在获取对应表大小的时候出现整型溢出的错误:
 ```bash
 # mysql -h xxxx --debug=d:t:0,/tmp/client.trace --skip-sql-filter -Bse "alter table table_data_invoke truncate partition p3"
 ......
@@ -39,7 +39,7 @@ partition_truncate.sh: line 38: 89891 Segmentation fault      $mysqlcmd -h $HOST
 
 可以看到 `select round ...` 语句在执行的时候出现了结果值大于 `BIGINT UNSIGNED(18446744073709551615)` 的错误, 进而造成 `psam` 异常. 查看对应表信息如下:
 ```sql
-> select * from tables where table_name = 'dubbo_invoke'\G 
+> select * from tables where table_name = 'table_data_invoke'\G 
 *************************** 1. row ***************************
   TABLE_CATALOG: def
    TABLE_SCHEMA: data_invoke
@@ -70,7 +70,7 @@ DATA_FREE = 18446744073709551615(MAX BIGINT UNSIGNED) - Data_length - Index_leng
 
 ### 通过 gdb 查看 `psam` 运行时的错误
 
-如下所示, 通过 gdb 方式运行 mysql 命令, 在执行 `alter` 语句的时候同样出现错误
+如下所示, 通过 gdb 方式运行 mysql 命令, 在执行 `alter` 语句的时候出现同样的错误:
 
 ```c
 # gdb -ex run -ex bt --args mysql -h xxxxxx --skip-sql-filter data_invoke -p 
@@ -120,7 +120,7 @@ Missing separate debuginfos, use: debuginfo-install glibc-2.17-260.el7.x86_64 li
 3550       if (row_result[0] == NULL)
 ......
 ```
-因为 `select round ...` 执行错误, 引起执行 `mysql_fetch_row` 函数的时候出现错误. 另外从 [C-API mysql-query](https://dev.mysql.com/doc/refman/8.0/en/mysql-query.html) 来看, `mysql_query` 仅在出现错误的时候返回非 0, 不过从笔者的测试来看, 该函数仅在 *sql 执行错误* 的时候返回非 0. 对于上述的 sql 语句, 本身没有语法错误, 可以正常执行, 只是最终的结果出现了整型溢出, 这种情况函数的返回值依旧为 0, 不过 `mysql_errno` 和 `mysql_error` 已经被修改为适当的错误信息. 鉴于这种原因, 我们修改为通过 `result_msg` 判断上述的 sql 是否执行成功, 具体参考: [git-commit-0217bbd](https://github.com/arstercz/percona-server-auto-manager/commit/0217bbd1e0e57b3ba785978250ab2ad5c2170cca).
+因为 `select round ...` 执行错误, 引起执行 `mysql_fetch_row` 函数的时候出现错误. 另外从 [C-API mysql-query](https://dev.mysql.com/doc/refman/8.0/en/mysql-query.html) 来看, `mysql_query` 仅在出现错误的时候返回非 0, 不过从笔者的测试来看, 该函数仅在 **sql 执行错误** 的时候返回非 0. 对于上述的 sql 语句, 本身没有语法错误, 可以正常执行, 只是最终的结果出现了整型溢出, 这种情况函数的返回值依旧为 0, 不过 `mysql_errno` 和 `mysql_error` 已经被修改为适当的错误信息. 鉴于这种原因, 我们修改为通过 `result_msg` 判断上述的 sql 是否执行成功, 具体参考: [git-commit-0217bbd](https://github.com/arstercz/percona-server-auto-manager/commit/0217bbd1e0e57b3ba785978250ab2ad5c2170cca).
 
 ## 总结说明
 
