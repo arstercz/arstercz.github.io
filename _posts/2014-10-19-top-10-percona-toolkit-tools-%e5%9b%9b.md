@@ -21,6 +21,7 @@ tags:
   - MySQL
   - percona
 ---
+
 ### 7. pt-query-digest
 
 [pt-query-digest](http://www.percona.com/doc/percona-toolkit/2.2/pt-query-digest.html) 用来分析query 语句: 该工具可用于统计分析 `slow log`, `processlist`, `binary log` 和 `tcpdump` 相关的sql 语句信息, 生成详细的报表供管理员查看或排错。我们最长用的可能是分析 `slow log` 和 tcpdump 文件, 基于以下几种场景:

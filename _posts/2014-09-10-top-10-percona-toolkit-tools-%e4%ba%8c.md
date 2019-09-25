@@ -17,7 +17,8 @@ tags:
   - percona
   - tool
 ---
-3. pt-show-grants
+
+### 3. pt-show-grants
 
 [pt-show-grants](http://www.percona.com/doc/percona-toolkit/2.2/pt-show-grants.html) 导出权限表信息:以sql语句的形式列出mysql.user表的权限信息，方便管理员进行批量修改, 该功能在迁移数据库, 尤其是不同网段的情况下非常有用; 如下为导出的权限信息:
 
@@ -41,7 +42,7 @@ GRANT PROXY ON ''@'' TO 'root'@'localhost' WITH GRANT OPTION;
 --only:仅输出show grants相关的语句;
 ```
 
-4. pt-mysql-summary
+## 4. pt-mysql-summary
 
 [pt-mysql-summary](http://www.percona.com/doc/percona-toolkit/2.2/pt-mysql-summary.html) 收集 MySQL 信息, 这不是一个调优或分析的工具，只是搜集了很多Server端的详细信息, 方便管理员查看。 pt-mysql-summary生成的报告可以很方便的进行diff或编辑操作; 该脚本以bash shell编写.
 

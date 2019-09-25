@@ -19,6 +19,7 @@ tags:
   - percona
   - tool
 ---
+
 ### 5. pt-summary
 <a href="http://www.percona.com/doc/percona-toolkit/2.2/pt-summary.html"><font color="green">http://www.percona.com/doc/percona-toolkit/2.2/pt-summary.html</font></a>
 搜集系统信息: 非常详细的列出系统相关的信息， 包括硬件信息， CPU, Memory, 分区, 当前运行的进程, 网络连接, 网卡等信息。对于不经常做更新的系统而言， 该工具可以很好的当做系统运行镜像来使用。该工具和pt-mysql-summary类似， 但更侧重于系统信息的搜集。同样以bash shell编写。
@@ -67,8 +68,8 @@ dmesg_file  dmidecode  ip  memory  mounted_fs  netstat  network_devices  notable
 ```
 
 ### 6. pt-online-schema-change
-<a href="http://www.percona.com/doc/percona-toolkit/2.2/pt-online-schema-change.html"><font color="green">http://www.percona.com/doc/percona-toolkit/2.2/pt-online-schema-change.html</font></a>
-在线更改表结构: 可能线上操作经常碰到这样的场景, 一个相对较大的表(比如1个G), 如果写较频繁， 在直接用alter table等语句修改表结构的时候会引起原表较长时间的锁(alter为表级锁),想想alter table表的过程(创建新的临时表结构， 给原表加锁防止数据不一致, 拷贝数据到新的表, 完成后再做交换操作);对应的，连接进来的更新数据的线程会处于锁等待状态， 如果锁的时间很长， 线程数则越积越多， 最终达到设置的上限值， 引起"ERROR: Can't create a new thread"等错误; 这是很常见的表锁引起的问题，我们可通过临时增加进程limit缓解：echo -n "Max processes=SOFT_LIMIT:HARD_LIMIT" > /proc/`pidof mysqld`/limits , pt-online-schema-change工具主要目的在于避免长时间的锁来实现表结构的更改, 主要原理见下:
+
+[pt-online-schema-change](http://www.percona.com/doc/percona-toolkit/2.2/pt-online-schema-change.html) 在线更改表结构: 可能线上操作经常碰到这样的场景, 一个相对较大的表(比如1个G), 如果写较频繁， 在直接用alter table等语句修改表结构的时候会引起原表较长时间的锁(alter为表级锁),想想alter table表的过程(创建新的临时表结构， 给原表加锁防止数据不一致, 拷贝数据到新的表, 完成后再做交换操作);对应的，连接进来的更新数据的线程会处于锁等待状态， 如果锁的时间很长， 线程数则越积越多， 最终达到设置的上限值， 引起"ERROR: Can't create a new thread"等错误; 这是很常见的表锁引起的问题，我们可通过临时增加进程limit缓解：echo -n "Max processes=SOFT_LIMIT:HARD_LIMIT" > /proc/`pidof mysqld`/limits , pt-online-schema-change工具主要目的在于避免长时间的锁来实现表结构的更改, 主要原理见下:
 ```
 [root@cz ~]# pt-online-schema-change -S /web/mysql/data/3306.sock A=utf8,h=localhost,P=3306,D=test,t=tm,p=xxxxxx --alter='engine = "innodb"' --execute
 Operation, tries, wait:

@@ -25,8 +25,6 @@ Manual page: <a href="http://www.percona.com/doc/percona-toolkit/2.2/"><font col
 percona toolkit是针对MySQL, Percona Server和MariaDB的一套命令工具集, 包括搜集统计信息, 在线更改表结构, 归档数据等等方面; 其是由Percona( <a href="http://www.percona.com/"><font color="green">http://www.percona.com/</font></a> )公司维护和开发,且对外开源(perl|shell)。对于DBA来讲， 熟悉这些工具可以极大方便的处理DB相关的工作和任务。
 
 toolkit中的命令集合随版本的更新而出现少许变化, 本文以笔者的percona-toolkit-2.1.5-1版本说明, 目前该版本共计36个工具, 本文介绍最常用的10个命令,包括:
-<!--more-->
-
 
 ```
  1. pt-archiver
@@ -42,7 +40,9 @@ toolkit中的命令集合随版本的更新而出现少许变化, 本文以笔�
 ```
 
 <strong>使用</strong>
+
 ### 1. pt-archiver
+
 <a href="http://www.percona.com/doc/percona-toolkit/2.2/pt-archiver.html"><font color="green">http://www.percona.com/doc/percona-toolkit/2.2/pt-archiver.html</font></a>
 归档表数据: 对于一个大表尤其是更新频繁的表来讲, 如果要归档或清理表中的数据需要考虑到执行时间和锁的问题; 直接delete或select大范围的记录可能会占有长时间的锁, 更新频繁的话可能引起线程吃满的问题; pt-archiver采用分片(nibbles records)的方式，即一次取一点(chunk size指定)记录的方式进行归档; 这里的归档分两种方式: (1)清理表记录; 可以一点点清理过期或不用的记录, 但是清理完成后需要管理员操作释放表空间(也可以pt-online-schema-change操作,见下),也可以指定--optimize选项,但optimize对大表而言可能需要较长的时间, 同样会对表加较长时间的锁 ; (2)转移记录; 即将A主机表的记录移到B主机中的表,表的结构需要一致。
 如下:
@@ -66,6 +66,7 @@ pt-archiver --why-quit --source h=127.0.0.1,D=test,t=user_log --dest h=10.1.1.2,
 ```
 
 ### 2. pt-duplicate-key-checkers
+
 <a href="http://www.percona.com/doc/percona-toolkit/2.2/pt-duplicate-key-checker.html"><font color="green">http://www.percona.com/doc/percona-toolkit/2.2/pt-duplicate-key-checker.html</font></a>
 检测冗余索引: 可能由于不太了解索引相关的信息(比如单列索引于前缀索引)，开发人员或管理员会创建多余的索引; 又或者测试和线上环境的表结构有所差异，而造成了多余索引的创建; 比如下面的索引:
 ```

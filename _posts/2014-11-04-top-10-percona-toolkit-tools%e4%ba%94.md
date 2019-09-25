@@ -19,6 +19,7 @@ tags:
   - MySQL
   - percona
 ---
+
 ### 9. pt-table-checksum
 
 [pt-table-checksum.html](http://www.percona.com/doc/percona-toolkit/2.2/pt-table-checksum.html) 工具用来对主从表数据进行一致校验: 该工具通过分组(chunk)方式以hash, md5, cac32或自定义函数生成每个分组数据的检验串, 分别在master和slave端执行, 如果每个分组的校验串一致, 则认为该分组的数据在master和slave一致。详见: [mysql 主从一致性校验]({{ site.baseurl }}/mysql%E4%B8%BB%E4%BB%8E%E6%95%B0%E6%8D%AE%E4%B8%80%E8%87%B4%E6%80%A7%E6%A0%A1%E9%AA%8C/), 这种方式可以相对有效的找出主从中哪个chunk组的数据不一致, 进而再继续细分chunk, 找出具体的行。 不过分组校验不一定能够严格校验主从的不一致, 这依赖校验函数的冲突率有多大, 默认的crc32函数的冲突率还是偏大的, 如果恰好有几个字符串算出的结果一样, 则该工具出现漏报的可能性, 误报的可能性不能完全杜绝。
@@ -90,6 +91,7 @@ recurse        = 1
 ```
 
 ### 10. pt-table-sync
+
 [pt-table-sync](http://www.percona.com/doc/percona-toolkit/2.2/pt-table-sync.html) 数据同步工具: 该工具主要用不同MySQL的表之间的数据同步, 可以是master->slave, master->master或一个instance到另一个instance. 同步功能会做一些数据的修改操作, 如果表信息很重要, 操作前可以备份好相关的表. 这里主要介绍指定replicate或sync-to-master参数时, pt-table-sync工具如何工作. 以下为该工具的处理逻辑:
 
 ```
