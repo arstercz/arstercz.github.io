@@ -235,7 +235,7 @@ threshold=300
 collect-tcpdump
 collect-jstack
 cycles=3
-dest=/export/sys-stalk
+dest=/data/sys-stalk
 program-name=kafka.logs.dir
 ```
 如果启用 `collect-jstack` 选项, `program-name` 选项可以为全命令行中的标识信息, 比如上述的 `kafka.logs.dir` 可以标识系统唯一的 kafka 进程, 如果系统运行多个相同的进程, 
@@ -324,7 +324,7 @@ Options and values after processing arguments:
 
 如下所示, 读取 sys-stalk 产生的文件, sys-sift 以交互模式生成报告:
 ```bash
-# sys-sift /export/sys-stalk/
+# sys-sift /data/sys-stalk/
 
   2019_09_24_11_34_41  2019_09_24_11_41_08
 
@@ -332,7 +332,7 @@ Select a timestamp from the list [2019_09_24_11_41_08]
 ```
 因为一共执行了两次 sys-stalk 搜集, 分别对应各自的时间戳, sys-sift 默认解析最新的时间戳文件. 也可以手动将以前的时间戳附加到交互模式的末尾, 如下所示对 sys-stalk 在 `2019_09_24_11_41_08` 时间点生成的文件进行汇总:
 ```bash
-# ./sys-sift /export/sys-stalk/
+# ./sys-sift /data/sys-stalk/
 
   2019_09_24_11_34_41  2019_09_24_11_41_08
 
@@ -516,7 +516,7 @@ Press any key to continue
 
 ![perf_report]({{ site.baseurl }}/images/articles/201909/sys-sift_perf.png)
 
-生成报告的时候也会生成对应的火焰图(`/export/sys-stalk/perf-svg-2019_09_24_11_41_08.svg`)
+生成报告的时候也会生成对应的火焰图(`/data/sys-stalk/perf-svg-2019_09_24_11_41_08.svg`)
 
 [Back_to_TOC](#工具列表)
 
@@ -694,7 +694,7 @@ Single Controller Adapter | Fusion-io ioScale 845GB, Product Number:F11-001-845G
   Filesystem   Size Used Type     Opts                                                 Mountpoint
   datapool/db  760G   1% zfs      rw,xattr,noacl                                       /data
   /dev/sda1     10G  66% xfs      rw,relatime,attr2,inode64,noquota                    /
-  /dev/sdb     549G  14% xfs      rw,relatime,attr2,inode64,noquota                    /export
+  /dev/sdb     549G  14% xfs      rw,relatime,attr2,inode64,noquota                    /dataex
   devtmpfs      95G   0% devtmpfs rw,nosuid,size=98925508k,nr_inodes=24731377,mode=755 /dev
   tmpfs         19G   0% tmpfs    rw,nosuid,nodev                                      /run/user/0
   tmpfs         19G   0% tmpfs    rw,nosuid,nodev,mode=755                             /run/user/0
