@@ -183,14 +183,14 @@ collect-pmap
 collect-strace
 collect-perf
 cycles=3
-dest=/export/sys-stalk
+dest=/data/sys-stalk
 program-port=3316
 ```
 sys-stalk 默认以循环的方式运行, 可以通过 Ctrl + c 中断运行. 如下所示, 使用 stalk 模式运行, 匹配 3 次后才开始进行信息搜集, 
 ```bash
 # ./bin/sys-stalk --config etc/stalk.conf 
 # sys-stalk --config /etc/stalk.conf --no-stalk                                 
-2019_09_25_11_28_12 Starting /usr/local/bin/sys-stalk --function=/etc/sys-toolkit/plugin/trg_cpu_usage --variable= --threshold=300 --cycles=0 --interval=1 --iterations= --run-time=30 --sleep=40 --dest=/export/wt-stalk --prefix= --notify-by-email= --log=/var/log/sys-stalk.log --pid=/var/run/sys-stalk.pid --plugin=
+2019_09_25_11_28_12 Starting /usr/local/bin/sys-stalk --function=/etc/sys-toolkit/plugin/trg_cpu_usage --variable= --threshold=300 --cycles=0 --interval=1 --iterations= --run-time=30 --sleep=40 --dest=/data/wt-stalk --prefix= --notify-by-email= --log=/var/log/sys-stalk.log --pid=/var/run/sys-stalk.pid --plugin=
 2019_09_25_11_28_12 Not stalking; collect triggered immediately
 2019_09_25_11_28_12 Collect 1 triggered
 2019_09_25_11_28_12 Collect 1 PID 95713
@@ -204,17 +204,18 @@ sys-stalk 默认以循环的方式运行, 可以通过 Ctrl + c 中断运行. �
 ```
 收到  Ctrl + c 信号后, 工具会等待未完成的子进程结束. `--dest` 指定的目录中最后包含以下文件:
 ```
-# ls /export/sys-stalk/
-2019_09_24_18_25_21-df              2019_09_24_18_25_21-mpstat          2019_09_24_18_25_21-slabinfo
-2019_09_24_18_25_21-disk-space      2019_09_24_18_25_21-mpstat-overall  2019_09_24_18_25_21-ss
-2019_09_24_18_25_21-diskstats       2019_09_24_18_25_21-netstat         2019_09_24_18_25_21-sysctl
-2019_09_24_18_25_21-hostname        2019_09_24_18_25_21-netstat_s       2019_09_24_18_25_21-tcpdump
-2019_09_24_18_25_21-interrupts      2019_09_24_18_25_21-numactl         2019_09_24_18_25_21-top
-2019_09_24_18_25_21-iostat          2019_09_24_18_25_21-output          2019_09_24_18_25_21-trigger
-2019_09_24_18_25_21-iostat-overall  2019_09_24_18_25_21-perf            2019_09_24_18_25_21-vmstat
-2019_09_24_18_25_21-jstack          2019_09_24_18_25_21-procstat        2019_09_24_18_25_21-vmstat-overall
-2019_09_24_18_25_21-lsof            2019_09_24_18_25_21-procvmstat
-2019_09_24_18_25_21-meminfo         2019_09_24_18_25_21-ps
+# ls /data/sys-stalk/
+2019_09_25_11_28_12-audit       2019_09_25_11_28_12-ifconfig        2019_09_25_11_28_12-numainfo    2019_09_25_11_28_12-ss
+2019_09_25_11_28_12-cmdline     2019_09_25_11_28_12-interrupts      2019_09_25_11_28_12-numa-maps   2019_09_25_11_28_12-sysctl
+2019_09_25_11_28_12-cpuinfo     2019_09_25_11_28_12-iostat          2019_09_25_11_28_12-output      2019_09_25_11_28_12-tcpdump
+2019_09_25_11_28_12-devices     2019_09_25_11_28_12-iostat-overall  2019_09_25_11_28_12-perf        2019_09_25_11_28_12-top
+2019_09_25_11_28_12-df          2019_09_25_11_28_12-kallsyms        2019_09_25_11_28_12-procstat    2019_09_25_11_28_12-trigger
+2019_09_25_11_28_12-disk-space  2019_09_25_11_28_12-meminfo         2019_09_25_11_28_12-procvmstat  2019_09_25_11_28_12-uname
+2019_09_25_11_28_12-diskstats   2019_09_25_11_28_12-mount           2019_09_25_11_28_12-ps          2019_09_25_11_28_12-vmstat
+2019_09_25_11_28_12-dmesg       2019_09_25_11_28_12-mpstat          2019_09_25_11_28_12-ps-eo       2019_09_25_11_28_12-vmstat-overall
+2019_09_25_11_28_12-dmidecode   2019_09_25_11_28_12-mpstat-overall  2019_09_25_11_28_12-release
+2019_09_25_11_28_12-fstab       2019_09_25_11_28_12-netstat         2019_09_25_11_28_12-rpmlist
+2019_09_25_11_28_12-getconf     2019_09_25_11_28_12-netstat_s       2019_09_25_11_28_12-slabinfo
 ```
 
 另外也可以通过 `no-stalk` 模式运行工具, 该模式忽略条件的判断, 直接进行信息搜集:
@@ -245,16 +246,17 @@ program-name=kafka.logs.dir
 ```
 同上述一样, `sys-stalk` 会等待未完成的子进程结束, 如下所示包含对应的 jstack 文件:
 ```
-2019_09_24_18_25_21-df              2019_09_24_18_25_21-mpstat          2019_09_24_18_25_21-slabinfo
-2019_09_24_18_25_21-disk-space      2019_09_24_18_25_21-mpstat-overall  2019_09_24_18_25_21-ss
-2019_09_24_18_25_21-diskstats       2019_09_24_18_25_21-netstat         2019_09_24_18_25_21-sysctl
-2019_09_24_18_25_21-hostname        2019_09_24_18_25_21-netstat_s       2019_09_24_18_25_21-tcpdump
-2019_09_24_18_25_21-interrupts      2019_09_24_18_25_21-numactl         2019_09_24_18_25_21-top
-2019_09_24_18_25_21-iostat          2019_09_24_18_25_21-output          2019_09_24_18_25_21-trigger
-2019_09_24_18_25_21-iostat-overall  2019_09_24_18_25_21-perf            2019_09_24_18_25_21-vmstat
-2019_09_24_18_25_21-jstack          2019_09_24_18_25_21-procstat        2019_09_24_18_25_21-vmstat-overall
-2019_09_24_18_25_21-lsof            2019_09_24_18_25_21-procvmstat
-2019_09_24_18_25_21-meminfo         2019_09_24_18_25_21-ps
+2019_09_24_15_28_12-audit       2019_09_24_15_28_12-ifconfig        2019_09_24_15_28_12-netstat_s   2019_09_24_15_28_12-slabinfo
+2019_09_24_15_28_12-cmdline     2019_09_24_15_28_12-interrupts      2019_09_24_15_28_12-numainfo    2019_09_24_15_28_12-ss
+2019_09_24_15_28_12-cpuinfo     2019_09_24_15_28_12-iostat          2019_09_24_15_28_12-numa-maps   2019_09_24_15_28_12-sysctl
+2019_09_24_15_28_12-devices     2019_09_24_15_28_12-iostat-overall  2019_09_24_15_28_12-output      2019_09_24_15_28_12-tcpdump
+2019_09_24_15_28_12-df          2019_09_24_15_28_12-jstack          2019_09_24_15_28_12-perf        2019_09_24_15_28_12-top
+2019_09_24_15_28_12-disk-space  2019_09_24_15_28_12-kallsyms        2019_09_24_15_28_12-procstat    2019_09_24_15_28_12-trigger
+2019_09_24_15_28_12-diskstats   2019_09_24_15_28_12-meminfo         2019_09_24_15_28_12-procvmstat  2019_09_24_15_28_12-uname
+2019_09_24_15_28_12-dmesg       2019_09_24_15_28_12-mount           2019_09_24_15_28_12-ps          2019_09_24_15_28_12-vmstat
+2019_09_24_15_28_12-dmidecode   2019_09_24_15_28_12-mpstat          2019_09_24_15_28_12-ps-eo       2019_09_24_15_28_12-vmstat-overall
+2019_09_24_15_28_12-fstab       2019_09_24_15_28_12-mpstat-overall  2019_09_24_15_28_12-release
+2019_09_24_15_28_12-getconf     2019_09_24_15_28_12-netstat         2019_09_24_15_28_12-rpmlist
 ```
 
 [Back_to_TOC](#工具列表)
