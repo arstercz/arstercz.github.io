@@ -19,31 +19,36 @@ tags:
   - MySQL
   - percona
 ---
-9. pt-table-checksum
-<a href="http://www.percona.com/doc/percona-toolkit/2.2/pt-table-checksum.html"><font color="green">http://www.percona.com/doc/percona-toolkit/2.2/pt-table-checksum.html</font></a>
-主从表数据一致校验: 该工具通过分组(chunk)方式以hash, md5, cac32或自定义函数生成每个分组数据的检验串, 分别在master和slave端执行, 如果每个分组的校验串一致, 则认为该分组的数据在master和slave一致。详见: <a href="http://arstercz.com/mysql%E4%B8%BB%E4%BB%8E%E6%95%B0%E6%8D%AE%E4%B8%80%E8%87%B4%E6%80%A7%E6%A0%A1%E9%AA%8C/"><font color="green">http://arstercz.com/mysql%E4%B8%BB%E4%BB%8E%E6%95%B0%E6%8D%AE%E4%B8%80%E8%87%B4%E6%80%A7%E6%A0%A1%E9%AA%8C/</font></a>, 这种方式可以相对有效的找出主从中哪个chunk组的数据不一致, 进而再继续细分chunk, 找出具体的行。 不过分组校验不一定能够严格校验主从的不一致, 这依赖校验函数的冲突率有多大, 默认的crc32函数的冲突率还是偏大的, 如果恰好有几个字符串算出的结果一样, 则该工具出现漏报的可能性, 误报的可能性不能完全杜绝。
-<!--more-->
+### 9. pt-table-checksum
+
+[pt-table-checksum.html](http://www.percona.com/doc/percona-toolkit/2.2/pt-table-checksum.html) 工具用来对主从表数据进行一致校验: 该工具通过分组(chunk)方式以hash, md5, cac32或自定义函数生成每个分组数据的检验串, 分别在master和slave端执行, 如果每个分组的校验串一致, 则认为该分组的数据在master和slave一致。详见: [mysql 主从一致性校验]({{ site.baseurl }}/mysql%E4%B8%BB%E4%BB%8E%E6%95%B0%E6%8D%AE%E4%B8%80%E8%87%B4%E6%80%A7%E6%A0%A1%E9%AA%8C/), 这种方式可以相对有效的找出主从中哪个chunk组的数据不一致, 进而再继续细分chunk, 找出具体的行。 不过分组校验不一定能够严格校验主从的不一致, 这依赖校验函数的冲突率有多大, 默认的crc32函数的冲突率还是偏大的, 如果恰好有几个字符串算出的结果一样, 则该工具出现漏报的可能性, 误报的可能性不能完全杜绝。
 
 该工具由以下限制:
+```
 (1) 校验数据是假设主从的schema和table结构在master和slave上一致.
 (2) 主从复制格式需要为statement格式, 该工具默认检测binlog_format参数, 如果想忽略检测可以指定 --nocheck-binlog-format
+```
 
 该工具默认情况下创建percona.checksums表用于保存校验的结果, 该表有2个作用:
 (1) 方面查看哪些信息不一致, 可以使用以下语句:
+
+```sql
+SELECT db, tbl, SUM(this_cnt) AS total_rows, COUNT(*) AS chunks FROM checksums WHERE 
+  ( master_cnt <> this_cnt OR master_crc <> this_crc OR ISNULL(master_crc) <> ISNULL(this_crc)) GROUP BY db, tbl;
 ```
-SELECT db, tbl, SUM(this_cnt) AS total_rows, COUNT(*) AS chunks FROM checksums WHERE ( master_cnt <> this_cnt OR master_crc <> this_crc OR ISNULL(master_crc) <> ISNULL(this_crc)) GROUP BY db, tbl;
-```
+
 (2) 方便pt-table-sync(数据纠错)的增量使用.
 
 举例如下:
+
 ```
 [root@cz ~]# pt-table-checksum h=10.3.254.110,u=root,p=xxxxxx,P=30587 --databases="part1" --tables="book" --nocheck-replication-filters 
             TS ERRORS  DIFFS     ROWS  CHUNKS SKIPPED    TIME TABLE
 04-11T12:09:46      0      1   168949       4       0   1.218 part1.book
 ```
-diffs列显示主从约有1个分组的记录不一致, book表一共检测了168949行记录, 分4次校验完.
 
-参数信息也可以写到文件里,通过--config参数指定,比如对test表进行校验, 将参数写到pt-table.cnf文件中:
+diffs列显示主从约有1个分组的记录不一致, book表一共检测了168949行记录, 分4次校验完. 参数信息也可以写到文件里,通过--config参数指定,比如对test表进行校验, 将参数写到pt-table.cnf文件中:
+
 ```
 host           = 127.0.0.1
 user           = root
@@ -59,7 +64,7 @@ recurse        = 1
 #resume
 #replicate-check-only
 ```
-# pt-table-checksum --config pt-table.cnf  即可开始校验test.test表, 不指定tables参数, 则检测test库的所有表;
+`pt-table-checksum --config pt-table.cnf`  即可开始校验test.test表, 不指定tables参数, 则检测test库的所有表;
 
 其它参数:
 ```
@@ -84,10 +89,9 @@ recurse        = 1
 --resume: 从上一次校验完成后的chunk开始执行本次的校验, 该参数可用于增量校验大表数据. 如果应用有很多update或delete操作, 则不应该启用该参数.
 ```
 
-10. pt-table-sync
-<a href="http://www.percona.com/doc/percona-toolkit/2.2/pt-table-sync.html"><font color="green">http://www.percona.com/doc/percona-toolkit/2.2/pt-table-sync.html</font></a>
-数据同步工具: 该工具主要用不同MySQL的表之间的数据同步, 可以是master->slave, master->master或一个instance到另一个instance. 同步功能会做一些数据的修改操作, 如果表信息很重要, 操作前可以备份好相关的表. 这里主要介绍指定replicate或sync-to-master参数时, pt-table-sync工具如何工作. 
-以下为该工具的处理逻辑:
+### 10. pt-table-sync
+[pt-table-sync](http://www.percona.com/doc/percona-toolkit/2.2/pt-table-sync.html) 数据同步工具: 该工具主要用不同MySQL的表之间的数据同步, 可以是master->slave, master->master或一个instance到另一个instance. 同步功能会做一些数据的修改操作, 如果表信息很重要, 操作前可以备份好相关的表. 这里主要介绍指定replicate或sync-to-master参数时, pt-table-sync工具如何工作. 以下为该工具的处理逻辑:
+
 ```
 if DSN has a t part, sync only that table:
    if 1 DSN:
@@ -111,26 +115,36 @@ else:
       DSN to the first.
 ```
 按照手册页的例子来说明:
+
 ```
 (1) pt-table-sync --execute --sync-to-master slave1
+
 ```
 如果指定了sync-to-master选项, DSN应该为slave的连接信息, 这时pt-table-sync会连接该slave的master, 并将master的数据同步到该slave.
+
 ```
 (2) pt-table-sync --execute --replicate test.checksum master1
 ```
 replicate选项用到了上一个工具pt-table-checksum, 其读取pt-table-checksum生成的checksum表信息， 然后进行同步操作, master1表示同步master1的数据到所有的slave节点.
+
 ```
 (3) pt-table-sync --execute --replicate test.checksum --sync-to-master slave1
+
 ```
 同上面的命令, 但是只同步master1的数据到slave1节点.
 在同步方面, 安全的方式是在master上更新数据(比如,delete或replace等), 通过主从复制来完成同步, 这种方式和其它正常的更新一样,通过主从机制完成. 
 同步的过程:
 同步过程主要包括以下操作:
-(1) 如果没有指定replicate选项, 则先对数据进行分组(在master和slave端)校验, 校验的方式同pt-table-checksum, 找到不同的chunk组之后, 再对该组进行细分进行校验直到找到相关的行记录; 找到记录后, 在master中进行数据的更改, 通过主从复制来实现数据的同步.
+```
+(1) 如果没有指定replicate选项, 则先对数据进行分组(在master和slave端)校验, 校验的方式同pt-table-checksum, 找到不同的chunk组之后, 
+    再对该组进行细分进行校验直到找到相关的行记录; 找到记录后, 在master中进行数据的更改, 通过主从复制来实现数据的同步.
+
 (2) 如果指定了replicate选项, 则读取checksums表, 该步骤免去了校验过程, 可以得到不同的chunk组信息, 后续的过程同(1)的操作.
+```
 
 pt-table-sync的校验过程举例如下:
-```
+
+```sql
 [root@cz rsandbox_Percona-Server-5_6_15]# pt-table-sync --databases percona --execute --sync-to-master  h=localhost,P=19681,u=root,p=xxxxxx,S=/tmp/mysql_sandbox19681.sock --verbose --print --recursion-method=hosts --chunk-size=1
 # Syncing P=19681,S=/tmp/mysql_sandbox19681.sock,h=localhost,p=...,u=root
 # DELETE REPLACE INSERT UPDATE ALGORITHM START    END      EXIT DATABASE.TABLE
@@ -156,9 +170,11 @@ REPLACE INTO `percona`.`dept`(`id`, `name`) VALUES ('30', 'insert test') /*perco
                    67 Query     START TRANSACTION /*!40108 WITH CONSISTENT SNAPSHOT */
                    67 Query     SELECT /*percona.dept:20/20*/ 19 AS chunk_num, COUNT(*) AS cnt, COALESCE(LOWER(CONV(BIT_XOR(CAST(CRC32(CONCAT_WS('#', `id`, `name`, CONCAT(ISNULL(`id`), ISNULL(`name`)))) AS UNSIGNED)), 10, 16)), 0) AS crc FROM `percona`.`dept` FORCE INDEX (`id_idx`) WHERE (`id` IS NULL) FOR UPDATE
 ```
+
 可以看到校验的过程和pt-table-checksum是类似的, 通过chunk(chunk-size=1)的方式分组校验master和slave的数据, 上述信息的where id >= ? 信息可以看到此变化, 找到id=30的记录后(slave没有id=30的记录), 在master上执行replace语句, 通过主从复制保证了两边表数据的最终一致.
 
 其它参数:
+
 ```
 --algorithms：使用什么算法来发现两边数据的不同, 默认为chunk, 详细可以参见手册页algorithms部分.
 

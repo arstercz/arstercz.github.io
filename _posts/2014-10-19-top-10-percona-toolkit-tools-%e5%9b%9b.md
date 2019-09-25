@@ -21,17 +21,23 @@ tags:
   - MySQL
   - percona
 ---
-7. pt-query-digest
-<a href="http://www.percona.com/doc/percona-toolkit/2.2/pt-query-digest.html"><font color='green'>http://www.percona.com/doc/percona-toolkit/2.2/pt-query-digest.html</font></a>
-分析query 语句: 该工具可用于统计分析 slow log, processlist, binary log 和 tcpdump 相关的sql 语句信息, 生成详细的报表供管理员查看或排错。我们最长用的可能是分析 slow log 和 tcpdump 文件, 基于以下几种场景: 
+### 7. pt-query-digest
+
+[pt-query-digest](http://www.percona.com/doc/percona-toolkit/2.2/pt-query-digest.html) 用来分析query 语句: 该工具可用于统计分析 `slow log`, `processlist`, `binary log` 和 `tcpdump` 相关的sql 语句信息, 生成详细的报表供管理员查看或排错。我们最长用的可能是分析 `slow log` 和 tcpdump 文件, 基于以下几种场景:
+
+```
 (1) 想详细了解过去一段时间慢查询的整体状况，比如哪类的 sql, 这类 sql 主要的时间分布(us, ms, 还是 s 级别的居多), 主要的行数检查, 数据发送量等；
-(2) 一些执行时间短的 sql 不会出现在 slow log 或 processlist 列表中,管理员也难以全部抓取相关的sql, 可以使用该工具分析tcpdump监听MySQL端口的日志信息, 得到较为全面的报告列表, 包括的列表同(1)中的信息;
-(3)该工具早期的版本支持sql重放等工具, 对InnoDB的预热需求是一个不错的手段, 详见 <a href="http://arstercz.com/keep-your-slave-warm/"><font color="green">http://arstercz.com/keep-your-slave-warm/</font></a>, 也支持统计分析tcpdump监听memcached生成的日志文件。
-<!--more-->
+
+(2) 一些执行时间短的 sql 不会出现在 slow log 或 processlist 列表中,管理员也难以全部抓取相关的sql, 可以使用该工具分析tcpdump监听MySQL端口的
+    日志信息, 得到较为全面的报告列表, 包括的列表同(1)中的信息;
+
+(3)该工具早期的版本支持sql重放等工具, 对InnoDB的预热需求是一个不错的手段, 也支持统计分析tcpdump监听memcached生成的日志文件.
+```
 
 生成报告举例如下:
-# pt-query-digest query_slow.log
-```
+```sql
+$ pt-query-digest query_slow.log
+
 # Query 5: 0 QPS, 0x concurrency, ID 0x84B3C3C1C1C732F4 at byte 37257 ____
 # This item is included in the report because it matches --limit.
 # Scores: V/M = 0.00
@@ -77,12 +83,15 @@ SELECT CONCAT(table_schema,'.',table_name,',',engine,',',IFNULL(create_time,'000
      FROM information_schema.tables 
      WHERE table_schema NOT IN ('mysql','information_schema','performance_schema')\G
 ```
+
 时间分布， 数据发送量， 行数检查等都非常详细.
+
 tcpdump监听举例如下:
-```
+```bash
 tcpdump -s 65535 -x -nn -q -tttt -c 500000 -i any port 3305 > mysql.3305.txt
 pt-query-digest --type tcpdump --watch-server='10.0.10.10:3305' mysql.3305.txt >3301.log
 ```
+
 报告列表同上述的slow log分析。
 
 其它参数:
@@ -112,9 +121,10 @@ pt-query-digest --type tcpdump --watch-server='10.0.10.10:3305' mysql.3305.txt >
 --watch-server：如果MySQL通过vip对外服务, 可以指定该参数指定实际服务的ip和port, 如上述的tcpdump示例；
 ```
 
-8. pt-stalk
-<a href=http://www.percona.com/doc/percona-toolkit/2.2/pt-stalk.html><font color="green">http://www.percona.com/doc/percona-toolkit/2.2/pt-stalk.html</font></a>
-pt-stalk: 该工具用于在发生问题时， 采集相关的取证分析数据,没有发生问题时一直等待直到触发的条件满足则进行相关信息的搜集工作，包括出问题时磁盘的使用,gdb信息, 内存，cpu, MySQL执行语句的镜像, 相关的参数和状态信息, 基本包括了所有能搜集的信息;该工具被设计为使用root权限作为daemon进行运行。触发的条件可以是 --function, --variable, --threshold, 和 --cycles, 默认情况下该工具监控MySQL直到满足触发条件则进行数据收集, 通常的执行逻辑如下:
+### 8. pt-stalk
+
+[pt-stalk](http://www.percona.com/doc/percona-toolkit/2.2/pt-stalk.html) 工具用于在发生问题时, 采集相关的取证分析数据,没有发生问题时一直等待直到触发的条件满足则进行相关信息的搜集工作，包括出问题时磁盘的使用,gdb信息, 内存，cpu, MySQL执行语句的镜像, 相关的参数和状态信息, 基本包括了所有能搜集的信息;该工具被设计为使用root权限作为daemon进行运行。触发的条件可以是 --function, --variable, --threshold, 和 --cycles, 默认情况下该工具监控MySQL直到满足触发条件则进行数据收集, 通常的执行逻辑如下:
+
 ```
 while true; do
    if --variable from --function > --threshold; then
@@ -149,11 +159,14 @@ if --collect process are still running; then
    kill any remaining --collect processes
 fi
 ```
+
 相关的数据被写到以timestamp开头的文件,可以使用pt-sift帮助我们查看和分析生成的数据；
-常用的示例见: <a href="http://www.percona.com/blog/2013/01/03/percona-toolkit-by-example-pt-stalk/"><font color="green">http://www.percona.com/blog/2013/01/03/percona-toolkit-by-example-pt-stalk/</font></a>
+常用的示例见: [percona-toolkit-by-example-pt-stalk](http://www.percona.com/blog/2013/01/03/percona-toolkit-by-example-pt-stalk/)
 举例如下:
-```
-#pt-stalk --sleep=10 --function=processlist --variable Host --match localhost --threshold=1 --defaults-file=./my.node.cnf --host=127.0.0.1 --user=root --password=xxxxxx --socket=data/s3306
+```bash
+#pt-stalk --sleep=10 --function=processlist --variable Host --match localhost --threshold=1 --defaults-file=./my.node.cnf 
+    --host=127.0.0.1 --user=root --password=xxxxxx --socket=data/s3306
+
 2014_10_19_12_41_19 Starting /usr/bin/pt-stalk --function=processlist --variable=Threads_running --threshold=25 --match= --cycles=5 --interval=1 --iterations= --run-time=30 --sleep=10 --dest=/var/lib/pt-stalk --prefix= --notify-by-email= --log=/var/log/pt-stalk.log --pid=/var/run/pt-stalk.pid --plugin=
 2014_10_19_12_50_58 Check results: processlist(Host)=2, matched=yes, cycles_true=1
 2014_10_19_12_50_59 Check results: processlist(Host)=2, matched=yes, cycles_true=2
@@ -165,6 +178,7 @@ fi
 2014_10_19_12_51_02 Collect 1 done
 2014_10_19_12_51_02 Sleeping 10 seconds after collect
 ```
+
 本地连接数超过达到预警值1得时候开始收集信息, /var/lib/pt-stalk目录列表如下:
 ```
 [root@cz ~]# ls /var/lib/pt-stalk/
@@ -186,7 +200,8 @@ fi
 2014_10_19_12_51_02-netstat         2014_10_19_12_51_02-vmstat-overall  2014_10_19_12_51_21-netstat         2014_10_19_12_51_21-vmstat-overall
 ```
 使用pt-sift来查看生成的报告:
-```
+
+```bash
 [root@cz pt-stalk]# pt-sift .
 
   2014_10_19_12_51_02  2014_10_19_12_51_21
@@ -224,7 +239,9 @@ wa 0% . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 --oprofile--
     No opreport file exists
 ```
+
 其它参数:
+
 ```
 --collect-gdb： 搜集MySQL线程相关的堆栈信息, 在非常繁忙的主机中频繁搜集gdb信息可能会引起MySQL崩溃, 该参数默认关闭;
 
@@ -236,13 +253,18 @@ wa 0% . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 --cycles：用于指定满足触发条件多少次才会进行数据搜集；
 
---dest：存放搜集信息的目录， 默认为/var/lib/pt-stalk, pt-stalk 默认删除指定目录下超过一定时间的文件(retention-time指定时间天数), 这里可能会误删我们指定的目录下的文件. --dest 参数的值要尽量设成单一的目录.
+--dest：存放搜集信息的目录， 默认为/var/lib/pt-stalk, pt-stalk 默认删除指定目录下超过一定时间的文件(retention-time指定时间天数), 
+       这里可能会误删我们指定的目录下的文件. --dest 参数的值要尽量设成单一的目录.
 
 --function： 满足触发的参数信息, 可以指定status(show global status)和processlist(show processlist), 默认为status；
 
---plugin：函数相关的扩展, 不一定非要指定, 可用于扩展相关的需要的信息, 包括: before_stalk, before_collect, after_collect, after_collect_sleep, after_interval_sleep, after_stalk, 比如以下信息:
+--plugin：函数相关的扩展, 不一定非要指定, 可用于扩展相关的需要的信息, 包括: 
+           before_stalk, before_collect, after_collect, after_collect_sleep, after_interval_sleep, after_stalk, 
+           比如以下信息:
+
     before_collect() {
        touch /tmp/foo
     }
+
   在执行collect之前，会先指定before_collect扩展, 创建/tmp/foo文件;
 ```
