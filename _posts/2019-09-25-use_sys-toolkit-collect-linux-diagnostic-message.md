@@ -54,7 +54,7 @@ numactl      (可选)
 oprofile     (可选)
 pmap
 perf         (可选)
-cat proc/{diskstats,stat,vmstat,meminfo,slabinfo,interrupts}
+cat proc/{diskstats,stat,vmstat,meminfo,slabinfo,interrupts,cmdline,cpuinfo}
 ps
 route
 ss
@@ -796,11 +796,11 @@ Unable to collect information
   eno4       Unknown!   Unknown!  
 # Network Connections ########################################
   Connections from remote IP addresses
-    172.16.253.67      20
-    172.16.253.144      2
-    172.16.253.253      1
+    10.0.21.5          20
+    10.0.21.7           2
+    10.0.21.17          1
   Connections to local IP addresses
-    172.16.253.6       20
+    10.0.21.5          20
   Connections to top 10 local ports
     10050              20
     22                  1
