@@ -105,13 +105,13 @@ sys-stalk 从 [pt-stalk](https://www.percona.com/doc/percona-toolkit/LATEST/pt-s
 ```
 同时修复以下 bug:
 
-[#1557877](https://bugs.launchpad.net/percona-toolkit/+bug/1557877)
-[#1644694](https://bugs.launchpad.net/percona-toolkit/+bug/1644694)
-[#976179](https://bugs.launchpad.net/percona-toolkit/+bug/976179)
+[#1557877](https://bugs.launchpad.net/percona-toolkit/+bug/1557877)  
+[#1644694](https://bugs.launchpad.net/percona-toolkit/+bug/1644694)  
+[#976179](https://bugs.launchpad.net/percona-toolkit/+bug/976179)  
 
 ### 如何自定义触发条件
 
-sys-stalk 提供 `--function` 选项, 改选项值可以是指定的函数, 也可以是自定是 bash 脚本, bash 脚本中需要包含 trg_plugin 函数, 参考示例:
+sys-stalk 提供 `--function` 选项, 改选项值可以是指定的函数, 也可以是自定义 bash 脚本, bash 脚本中需要包含 trg_plugin 函数, 参考示例:
 
 ```bash
 function trg_plugin()
@@ -298,7 +298,7 @@ vmstat
 
 2. netstat 的解析中, 如果连接很多, 解析的实际可能过长;
 
-3. `flamegraph.pl` 和 `stackcollapse-perf.pl` 为可选项, 主要生成 perf 文件对应的火焰图, 更过见: [FlameGraph](https://github.com/brendangregg/FlameGraph)
+3. `flamegraph.pl` 和 `stackcollapse-perf.pl` 为可选项, 主要生成 perf 文件对应的火焰图, 更多见: [FlameGraph](https://github.com/brendangregg/FlameGraph)
 
 
 ### 备注说明
