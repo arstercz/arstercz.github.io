@@ -23,6 +23,7 @@ tags:
 6. google 服务问题
 7. 磁盘修改问题
 8. 负载均衡代理多端口问题
+9. dnf-automatic 自动更新问题
 ```
 
 ## 详细说明
@@ -76,4 +77,12 @@ google 云主机磁盘性能的限制随磁盘大小变化, 一定范围内, 磁
 Port name mapping (Optional)
 
 A load balancer sends traffic to an instance group through a named port. Create a named port to map the incoming traffic to a specific port number and then go to "HTTP load balancing" to create a load balancer using this instance group.
+```
+
+### 9. dnf-automatic 自动更新问题
+
+同问题 1, 在 Centos8 系统中, `/etc/dnf/automatic.conf` 配置文件指定了 dnf 的更新策略, 没有没有启用 `dnf-automatic` 服务, 就没有自动更新, 如果启用则做以下设置:
+```
+download_updates = no
+apply_updates = no
 ```
