@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Linux 系统动态追踪介绍"
+title: "Linux 系统动态追踪技术介绍"
 tags: [linux, trace]
 comments: false
 ---
@@ -246,6 +246,7 @@ python3-bcc-0.7.0-5.el8.x86_64
 bcc-0.7.0-5.el8.x86_64
 bcc-tools-0.7.0-5.el8.x86_64
 ```
+
 `/usr/share/bcc/tools` 路径即包含可用的工具脚本. 当然也可以继续使用 frace, systemtap 等工具.
 
 ## 总结
