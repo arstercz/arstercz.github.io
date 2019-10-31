@@ -81,7 +81,7 @@ A load balancer sends traffic to an instance group through a named port. Create 
 
 ### 9. dnf-automatic 自动更新问题
 
-同问题 1, 在 Centos8 系统中, `/etc/dnf/automatic.conf` 配置文件指定了 dnf 的更新策略, 没有没有启用 `dnf-automatic` 服务, 就没有自动更新, 如果启用则做以下设置:
+同问题 1, 在 Centos8 系统中, `/etc/dnf/automatic.conf` 配置文件指定了 dnf 的更新策略, 没有启用 `dnf-automatic` 服务, 就没有自动更新, 如果启用则做以下设置:
 ```
 download_updates = no
 apply_updates = no
