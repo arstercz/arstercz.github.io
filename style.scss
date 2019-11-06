@@ -57,6 +57,7 @@ h2 {
 }
 
 h3 {
+  font-family: $base-font;
   font-size: 17px;
 }
 
@@ -413,6 +414,7 @@ nav {
 .post {
   h1 {
     margin-bottom: .1em;
+    font-family: $base-font;
   }
 
   .date {
