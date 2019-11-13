@@ -145,7 +145,19 @@ crash>
 path /var/crash
 ```
 
-如果产生的频率较高, 可以配置 `ssh` 选项, 将产生的崩溃日志直接发送到对应内网的其它机器. 注意内网通信的速度要够快, 越慢则意味着传送文件的速度越慢, 机器正常重启需要的时间越长.
+如果产生的频率较高, 可以配置 `ssh` 选项, 将产生的崩溃日志直接发送到对应内网的其它机器. 注意内网通信的速度要够快, 越慢则意味着传送文件的速度越慢, 机器正常重启需要的时间越长. 配置 ssh 选项需要注意以下设置:
+```
+# /etc/kdump.conf
+
+path /var/crash
+ssh kerenl-crash@collect-host
+default dump_to_rootfs                                      # 如果 ssh 失败则选择将日志转储到本地磁盘路径
+core_collector makedumpfile -l --message-level 1 -d 31 -F   # 如果启用 ssh, 则增加 -F 选项, 使导出到远程机器的数据日志为 flattened 格式. 
+```
+启用 ssh 选项需要在 `makedumpfile` 命令中增加 `-F` 选项, 数据会以 `flattened` 格式存储, 如果 ssh 失败则以本地磁盘的标准格式存储. 远程主机收到日志后, 以 `flat` 为后缀名, 通过 `-R` 选项可以将 flat 格式转为标准格式, 如下所示:
+```
+makedumpfile -R vmcore < vmcore.flat
+```
 
 ### 快速查看原因
 
