@@ -5,7 +5,7 @@ pre, code {
 code.highlighter-rouge {
   font-size: 90%;
   color: $oc-black;
-  background-color: $oc-gray-2;
+  background-color: #f6faf6;
   padding: .1em .2em;
   border-radius: 2px;
 }
@@ -13,13 +13,13 @@ code.highlighter-rouge {
 pre.highlight {
   font-size: $small-font-size;
   padding: .45em .45em .45em .625em;
-  border: 1px solid $oc-gray-3;
-  border-radius: 3px;
+  //border: 1px solid $oc-gray-3;
+  //border-radius: 1px;
   margin: 1em 0;
   max-height: 500px;
   overflow: auto;
-  //background: $oc-lime-0;
-  background: #f6f6f6;
+  //background: $oc-gray-2;
+  background: #f6faf6;
   
 }
 

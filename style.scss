@@ -42,11 +42,11 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1, h2, h3, h4 {
-  font-weight: 410;
+  font-weight: 500;
 }
 
 h1 {
-  font-size: 20px;
+  font-size: 18px;
   a {
     color: inherit;
   }
@@ -407,6 +407,7 @@ nav {
 .posts > .post {
   padding-bottom: 1em;
   border-bottom: 1px solid $divider-color;
+  line-height: 1.0;
 }
 
 .posts > .post:last-child {
@@ -418,13 +419,26 @@ nav {
   h1 {
     margin-bottom: .1em;
     font-family: $base-font;
+    font-size: 23px;
   }
 
   .date {
-    font-weight: 300;
-    font-size: $small-font-size;
+    font-weight: 400;
+    font-size: 14px;
     color: $base-lighten-color;
-    margin-right: 3px;
+    margin-right: 4px;
+  }
+
+  .index-title {
+    font-weight: 450;
+    font-size: 15.2px;
+    font-family: $base-font;
+    > a {
+      color: $oc-black;
+      &:hover, &:active {
+        color: $link-color;
+      }
+    }
   }
 
   .tag {
