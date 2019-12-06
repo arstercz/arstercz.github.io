@@ -38,12 +38,11 @@ h1, h2, h3, h4, h5, h6 {
 
   @include mobile {
     line-height: 1.4;
-    font-weight: 540;
   }
 }
 
 h1, h2, h3, h4 {
-  font-weight: 540;
+  font-weight: 410;
 }
 
 h1 {
