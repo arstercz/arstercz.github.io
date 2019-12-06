@@ -24,11 +24,9 @@ navigation:
     url: /
   - name: About
     url: /about
-  - name: Archive
-    url: /archive
 
 # Pagination
-paginate: 7
+paginate: 16
 
 # Includes an icon in the footer for each username you enter
 footer-links:
