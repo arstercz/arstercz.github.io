@@ -38,6 +38,7 @@ h1, h2, h3, h4, h5, h6 {
 
   @include mobile {
     line-height: 1.4;
+    font-weight: 540;
   }
 }
 
@@ -346,9 +347,11 @@ img {
 
 .site-info {
   float: left;
+  font-weight: 500;
 
   @include mobile {
     float: none;
+    font-weight: 500;
     display: block;
     margin: 0 auto;
   }
