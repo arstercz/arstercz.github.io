@@ -474,7 +474,7 @@ nav {
 }
 
 .pagination {
-  font-weight: 300;
+  font-weight: 400;
   padding: 2em 0;
   width: 100%;
   display: inline-block;
@@ -487,7 +487,8 @@ nav {
     float: left;
     width: 50%;
     a {
-      color: $pagination-color;
+      color: $tag-index-label-color;
+      background-color: #b8d6ec;
       &:hover, &:focus {
         color: $pagination-over-color;
       }
@@ -499,7 +500,8 @@ nav {
     text-align: right;
     width: 50%;
     a {
-      color: $pagination-color;
+      color: $tag-index-label-color;
+      background-color: #b8d6ec;
       &:hover, &:focus {
         color: $pagination-over-color;
       }
