@@ -487,8 +487,11 @@ nav {
     float: left;
     width: 50%;
     a {
+      margin: 3px 3px 3px 0;
+      padding: .5px 4px;
       color: $tag-index-label-color;
-      background-color: #b8d6ec;
+      background-color: #cce6fa;
+      border-radius: 3px;
       &:hover, &:focus {
         color: $pagination-over-color;
       }
@@ -500,8 +503,11 @@ nav {
     text-align: right;
     width: 50%;
     a {
+      margin: 3px 3px 3px 0;
+      padding: .5px 4px;
       color: $tag-index-label-color;
-      background-color: #b8d6ec;
+      background-color: #cce6fa;
+      border-radius: 3px;
       &:hover, &:focus {
         color: $pagination-over-color;
       }
