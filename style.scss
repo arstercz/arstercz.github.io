@@ -423,18 +423,18 @@ nav {
   }
 
   .date {
-    font-weight: 400;
+    font-weight: 300;
     font-size: 14px;
     color: $base-lighten-color;
     margin-right: 4px;
   }
 
   .index-title {
-    font-weight: 450;
+    font-weight: 400;
     font-size: 15.2px;
     font-family: $base-font;
     > a {
-      color: $oc-black;
+      color: $oc-gray-8;
       &:hover, &:active {
         color: $link-color;
       }
