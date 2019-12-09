@@ -433,6 +433,7 @@ nav {
     font-weight: 400;
     font-size: 15.2px;
     font-family: $base-font;
+    a:visited{color: $oc-red-8}
     > a {
       color: $oc-gray-8;
       &:hover, &:active {
