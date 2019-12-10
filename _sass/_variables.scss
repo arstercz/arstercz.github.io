@@ -20,7 +20,7 @@ $helveticaNeue: "Helvetica Neue", Helvetica, Arial, sans-serif;
 $georgia: Georgia, serif;
 
 // Fonts
-$base-font: 'PT Sans', 'Helvetica', 'Spoqa Han Sans', 'Source Sans Pro', 'Apple SD Gothic Neo', 'Nanum Barun Gothic', 'Nanum Gothic', 'Verdana', 'Arial', 'Dotum', sans-serif;
+$base-font: 'sans-serif', 'PT Sans', 'Helvetica', 'Spoqa Han Sans', 'Source Sans Pro', 'Apple SD Gothic Neo', 'Nanum Barun Gothic', 'Nanum Gothic', 'Verdana', 'Arial', 'Dotum', sans-serif;
 $code-font: 'Menlo', 'Courier New', 'Monaco', 'Spoqa Han Sans', monospace;
 
 // Font sizes
@@ -44,8 +44,8 @@ $blockquote-border-color: $oc-gray-3;
 $footnote-link-border-color: $oc-gray-1;
 $footnote-link-background-over-color: $oc-gray-4;
 
-$selection-color: $oc-black;
-$selection-background-color: $oc-gray-4;
+$selection-color: $oc-white;
+$selection-background-color: $oc-blue-5;
 
 $pagination-color: $oc-blue-5;
 $pagination-over-color: $oc-blue-8;
