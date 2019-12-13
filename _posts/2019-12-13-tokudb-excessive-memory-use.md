@@ -54,7 +54,7 @@ We compiled MariaDB from source, with non-standard configuration files. The prob
 
 在 `mysqld_safe` 的代码中, 存在默认加载 `libjemalloc` 的行为, 所以对上述的配置而言, 只要系统安装了 jemalloc, 是否指定 `malloc-lib` 选项, 都不会有什么区别, 如下所示:
 
-```
+```bash
 /opt/percona-server-5.6.45-86.1-linux-x86_64/bin/mysqld_safe
 
 ...
@@ -80,7 +80,7 @@ fi
 Centos 7 中, 如果安装了 `jemalloc-3.6.0-1.el7.x86_64` 的 rpm 包, 默认会以 `/usr/lib64/libjemalloc.so.1` 文件设置 `LD_PRELOAD`, mysqld 进程启动的时候会预加载此文件, 以 jemalloc 来管理运行时需要的内存分配. 
 
 我们通过 [valgrind-mysql](https://www.percona.com/blog/2013/01/09/profiling-mysql-memory-usage-with-valgrind-massif/) 来分析是否预加载 `/usr/lib64/libjemalloc.so.1` 的行为, 不过遗憾的是, 两种方式并未看到异常, 整体的内存分布大致如下
-```
+```c
 99.87% (7,309,226,237B) (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
 ->73.33% (5,367,098,317B) 0xF7F9E8: os_malloc_aligned(unsigned long, unsigned long) (os_malloc.cc:222)
 | ->73.33% (5,367,098,317B) 0xF7F4AE: toku_xmalloc_aligned(unsigned long, unsigned long) (memory.cc:402)
