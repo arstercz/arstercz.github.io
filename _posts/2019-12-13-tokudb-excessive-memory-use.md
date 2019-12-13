@@ -29,7 +29,7 @@ my.cnf 配置:
 
 ## 分析处理
 
-最开始我们以为 jemalloc 存在 [bug-1128](https://github.com/jemalloc/jemalloc/issues/1128) 而引起此类问题, 所以将内置的 jemalloc 变更为以下版本, 在系统为安装 `jemalloc-3.6.0-1.el7.x86_64` 的情况下依旧出现内存高的问题, 如下所示:
+最开始我们以为 jemalloc 存在 [bug-1128](https://github.com/jemalloc/jemalloc/issues/1128) 而引起此类问题, 所以将内置的 jemalloc 变更为以下版本, 在系统未安装 `jemalloc-3.6.0-1.el7.x86_64` 的情况下依旧出现内存高的问题, 如下所示:
 ```
 jemalloc-3.6.0
 jemalloc-4.2.1
