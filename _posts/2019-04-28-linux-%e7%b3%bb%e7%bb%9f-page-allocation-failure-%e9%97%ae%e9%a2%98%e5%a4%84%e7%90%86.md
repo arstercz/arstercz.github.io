@@ -109,6 +109,11 @@ Node 1 Normal free:19976kB min:16260kB low:20324kB high:24388kB dirty:0kB shmem:
 
 这台主机的 `vm.min_free_kbytes` 为 `32496`, 对于 `vm.min_free_kbytes` 参数而言, linux 会根据此参数的值计算每颗 CPU 对应的每个内存区域的(low, high)水位值. 低于 low 的值时, kswapd 进程开始执行 reclaim 操作, 低于 min 的值时, 内核直接执行 reclaim 操作. kswapd 和内核执行 reclaim 操作的区别在于前者是在后台执行, 后者直接在前台执行, 所以在可用内存低于 min 值的时候, 系统可能出现卡顿的现象. 
 
+*备注:* 可以手动触发输出当前系统的内存使用信息到系统 message:
+```
+echo m > /proc/sysrq-trigger
+```
+
 另外 `vm.lowmem_reserve_ratio` 参数对各个内存区域提供了防卫作用, 主要可以防止高端区域在没有内存的情况下过度使用低端区域的内存资源. 所以下面的公式也决定了本内存区域是否同意分批内存给更高端的内存分配请求, 下面的等式成立则拒绝分配:
 ```
 # 内存区域
@@ -236,3 +241,4 @@ This is value ORed together of
 [redhat-641323](https://access.redhat.com/solutions/641323)  
 [redhat-2209921](https://access.redhat.com/solutions/2209921)  
 [kernel-vm](https://www.kernel.org/doc/Documentation/sysctl/vm.txt)  
+[what-are-page-allocation-failures](https://access.redhat.com/articles/1360023) 
