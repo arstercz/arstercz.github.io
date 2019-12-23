@@ -433,7 +433,6 @@ nav {
     font-weight: 400;
     font-size: 15.2px;
     font-family: $base-font;
-    a:visited{color: $oc-red-8}
     > a {
       color: $oc-gray-8;
       &:hover, &:active {
@@ -491,7 +490,6 @@ nav {
       margin: 3px 3px 3px 0;
       padding: .5px 4px;
       color: $tag-index-label-color;
-      background-color: $tag-index-label-background-color;
       border-radius: 3px;
       &:hover, &:focus {
         color: $pagination-over-color;
@@ -507,7 +505,6 @@ nav {
       margin: 3px 3px 3px 0;
       padding: .5px 4px;
       color: $tag-index-label-color;
-      background-color: $tag-index-label-background-color;
       border-radius: 3px;
       &:hover, &:focus {
         color: $pagination-over-color;
@@ -523,7 +520,6 @@ nav {
     font-size: 15px;
   }
 
-  a:visited{color: $oc-red-8}
   a:hover{color: $oc-blue-6}
   time {
     color: $base-lighten-color;
