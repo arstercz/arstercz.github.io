@@ -402,7 +402,7 @@ nav {
 }
 
 .posts > .post:last-child {
-  padding-bottom: 1em;
+  padding-bottom: 2px;
   border-bottom: none;
 }
 
@@ -467,7 +467,7 @@ nav {
 .pagination {
   font-weight: bold;
   font-size: 16px;
-  padding: 2em 0;
+  padding: 1em 0;
   width: 100%;
   display: inline-block;
   text-align: center;
@@ -490,10 +490,42 @@ nav {
   }
 
   > .page-number {
-    font-size: 15;
+    font-size: 15px;
+    font-weight: 500;
   }
 
   > .next {
+    a {
+      margin: 3px 3px 3px 0;
+      padding: .5px 4px;
+      color: $oc-blue-6;
+      border-radius: 3px;
+      &:hover, &:focus {
+        color: $pagination-over-color;
+	text-decoration: underline;
+      }
+    }
+  }
+
+  > .prevpost {
+    float: left;
+    width: 50%;
+    a {
+      margin: 3px 3px 3px 0;
+      padding: .5px 4px;
+      color: $oc-blue-6;
+      border-radius: 3px;
+      &:hover, &:focus {
+        color: $pagination-over-color;
+	text-decoration: underline;
+      }
+    }
+  }
+
+  > .nextpost {
+    float: right;
+    text-align: right;
+    width: 50%;
     a {
       margin: 3px 3px 3px 0;
       padding: .5px 4px;
@@ -571,7 +603,7 @@ nav {
 
 // Footer
 .wrapper-footer {
-  margin-top: 50px;
+  margin-top: 5px;
   border-top: 1px solid $footer-border-color;
   border-bottom: 1px solid $footer-border-color;
   background-color: $footer-background-color;
