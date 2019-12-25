@@ -140,7 +140,7 @@ pt-slave-delay 通过 SHOW  SLAVE  STATUS方式来实现复制延迟, 因为没�
 综上, `MySQL 5.6` 和 `pt-slave-delay` 工具的延迟功能都确保了 relay-log 能够以传统方式接受 master 的更新操作, 延迟的实现在 slave 端, 该特性确保了在延迟复制的过程中, `IO thread` 一直接收 master 的更新操作, 所以即便master 出现问题, 更新操作也不会丢失.
 
 参见:
-[delayed-replication-in-mysql-5-6-development-release](http://www.clusterdb.com/mysql-replication/delayed-replication-in-mysql-5-6-development-release)
-[pt-slave-delay](https://www.percona.com/doc/percona-toolkit/2.2/pt-slave-delay.html">https://www.percona.com/doc/percona-toolkit/2.2/pt-slave-delay.html)
-[introducing-mysql-slave-delay](http://www.xaprb.com/blog/2007/08/04/introducing-mysql-slave-delay/">http://www.xaprb.com/blog/2007/08/04/introducing-mysql-slave-delay/)
-[fast-forwarding-a-delayed-mysql-replica](http://mechanics.flite.com/blog/2014/02/12/fast-forwarding-a-delayed-mysql-replica/">http://mechanics.flite.com/blog/2014/02/12/fast-forwarding-a-delayed-mysql-replica/)
+[delayed-replication-in-mysql-5-6-development-release](http://www.clusterdb.com/mysql-replication/delayed-replication-in-mysql-5-6-development-release)  
+[pt-slave-delay](https://www.percona.com/doc/percona-toolkit/2.2/pt-slave-delay.html)  
+[introducing-mysql-slave-delay](http://www.xaprb.com/blog/2007/08/04/introducing-mysql-slave-delay/)  
+[fast-forwarding-a-delayed-mysql-replica](http://mechanics.flite.com/blog/2014/02/12/fast-forwarding-a-delayed-mysql-replica/)  

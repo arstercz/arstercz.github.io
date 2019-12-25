@@ -26,12 +26,16 @@ body {
 
 .container {
   margin: 0 auto;
-  max-width: 820px;
+  max-width: 900px;
   padding: 0 10px;
   width: 100%;
 }
 
 h1, h2, h3, h4, h5, h6 {
+  font-family: $helveticaNeue;
+  color: $darkerGray;
+  font-weight: bold;
+
   line-height: 1.7;
   margin: 1em 0 15px;
   padding: 0;
@@ -41,12 +45,8 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
-h1, h2, h3, h4 {
-  font-weight: 500;
-}
-
 h1 {
-  font-size: 18px;
+  font-size: 21px;
   a {
     color: inherit;
   }
@@ -54,17 +54,18 @@ h1 {
 }
 
 h2 {
-  font-size: 19px;
+  font-size: 22px;
 }
 
 h3 {
   font-family: $base-font;
-  font-size: 17px;
+  font-size: 20px;
+  font-weight: 500;
 }
 
 h4 {
-  font-size: 15px;
-  color: $base-lighten-color;
+  font-size: 18px;
+  font-weight: 500;
 }
 
 h6 {
@@ -73,7 +74,7 @@ h6 {
 
 p {
   color: $text-color;
-  margin: 13px 0;
+  margin: 16px 0;
 }
 
 a {
@@ -424,14 +425,14 @@ nav {
 
   .date {
     font-weight: 300;
-    font-size: 14px;
+    font-size: 16px;
     color: $base-lighten-color;
     margin-right: 4px;
   }
 
   .index-title {
     font-weight: 400;
-    font-size: 15.2px;
+    font-size: 16px;
     font-family: $base-font;
     > a {
       color: $oc-gray-8;
