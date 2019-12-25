@@ -8,15 +8,6 @@ layout: default
 
 <div class="posts">
   {% for post in paginator.posts %}
-   {% unless post.next %}
-       <h2>{{ post.date | date: '%Y' }}</h2>
-   {% else %}
-       {% capture year %}{{ post.date | date: '%Y' }}{% endcapture %}
-       {% capture nyear %}{{ post.next.date | date: '%Y' }}{% endcapture %}
-       {% if year != nyear %}
-          <h2>{{ post.date | date: '%Y' }}</h2>
-       {% endif %}
-   {% endunless %}
     <article class="post">
       <div clsss="meta">
         <span class="date">
@@ -41,21 +32,28 @@ layout: default
   {% endfor %}
 </div>
 
-<!--
 <div class="pagination">
   {% if paginator.previous_page %}
     <span class="prev">
       <a href="{{ site.baseurl }}{{ paginator.previous_page_path }}" class="prev">
-        Previous
+        &#x3C; Prev
       </a>
     </span>
+  {% else %}
+    <span class="prev">&#x3C; Prev</span>
   {% endif %}
+  <span class="page-number">
+       &nbsp;&nbsp;
+       {{ paginator.page }} of {{ paginator.total_pages }}
+       &nbsp;&nbsp;
+  </span>
   {% if paginator.next_page %}
     <span class="next">
       <a href="{{ site.baseurl}}{{ paginator.next_page_path }}" class="next">
-        Next
+        Next &#x3E;
       </a>
     </span>
+  {% else %}
+    <span class="next">Next &#x3E;</span>
   {% endif %}
 </div>
--->

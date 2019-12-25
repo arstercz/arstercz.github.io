@@ -320,7 +320,7 @@ img {
 }
 
 .masthead {
-  padding: 20px 0;
+  padding: 10px 0;
   border-bottom: 1px solid $lightGray;
 
   @include mobile {
@@ -362,24 +362,14 @@ img {
   color: $darkGray;
   cursor: pointer;
   font-family: $helveticaNeue;
-  font-weight: 350;
-  font-size: 30px;
+  font-weight: 500;
+  font-size: 23px;
   letter-spacing: 1px;
-}
-
-.site-description {
-  margin: -5px 0 0 0;
-  color: $gray;
-  font-size: 20px;
-
-  @include mobile {
-    margin: 3px 0;
-  }
 }
 
 nav {
   float: right;
-  margin-top: 23px; // @TODO: Vertically middle align
+  //margin-top: 23px; // @TODO: Vertically middle align
   font-family: $helveticaNeue;
   font-size: 18px;
 
@@ -475,18 +465,18 @@ nav {
 }
 
 .pagination {
-  font-weight: 400;
+  font-weight: bold;
+  font-size: 16px;
   padding: 2em 0;
   width: 100%;
   display: inline-block;
+  text-align: center;
 
   @include mobile {
     font-size: $small-font-size;
   }
 
   > .prev {
-    float: left;
-    width: 50%;
     a {
       margin: 3px 3px 3px 0;
       padding: .5px 4px;
@@ -494,14 +484,16 @@ nav {
       border-radius: 3px;
       &:hover, &:focus {
         color: $pagination-over-color;
+	text-decoration: underline;
       }
     }
   }
 
+  > .page-number {
+    font-size: 15;
+  }
+
   > .next {
-    float: right;
-    text-align: right;
-    width: 50%;
     a {
       margin: 3px 3px 3px 0;
       padding: .5px 4px;
@@ -509,6 +501,7 @@ nav {
       border-radius: 3px;
       &:hover, &:focus {
         color: $pagination-over-color;
+	text-decoration: underline;
       }
     }
   }
