@@ -83,6 +83,7 @@ a {
   cursor: pointer;
   &:hover, &:active {
     color: $link-color;
+    text-decoration: underline;
   }
 }
 
