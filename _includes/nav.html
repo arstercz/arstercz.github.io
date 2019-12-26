@@ -6,10 +6,11 @@
       {% endif %}
 
       <div class="site-info">
-        <h1 class="site-name"><a href="{{ site.baseurl }}/">{{ site.name }}</a></h1>
+        <h1 class="site-name">
+	  <a href="{{ site.baseurl }}/">{{ site.name }}</a>
+	</h1>
 	<!--<p class="site-description">{{ site.description }}</p>-->
       </div>
-
       <nav>
         {% for nav in site.navigation %}
         {% if nav.url contains 'http://' or nav.url contains 'https://' %}
