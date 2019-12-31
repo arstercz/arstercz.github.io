@@ -395,6 +395,16 @@ nav {
   }
 }
 
+.search-text {
+  input {
+    border-bottom: 1px solid $oc-gray-6;
+    border-top: 0px;
+    border-left: 0px;
+    border-right: 0px;
+    height: 25px;
+  }
+}
+
 // Posts
 .posts > .post {
   padding-bottom: 1em;
