@@ -79,6 +79,8 @@ Port name mapping (Optional)
 A load balancer sends traffic to an instance group through a named port. Create a named port to map the incoming traffic to a specific port number and then go to "HTTP load balancing" to create a load balancer using this instance group.
 ```
 
+另外, 在创建 `tcp lb` 的时候, 需要选择 `from internet -> multi regions` 模式才能够开启 proxy protocol 协议. 每个 lb 可以开启多个 backend, 不过每个 instance group 仅能被一个 backend 使用.
+
 ### 9. dnf-automatic 自动更新问题
 
 同问题 1, 在 Centos8 系统中, `/etc/dnf/automatic.conf` 配置文件指定了 dnf 的更新策略, 没有启用 `dnf-automatic` 服务, 就没有自动更新, 如果启用则做以下设置:
