@@ -5,6 +5,8 @@ tags: [haproxy, proxy]
 comments: false
 ---
 
+## 背景说明
+
 在 http/https 的协议中, 我们可以通过 [X-Forwarded-For](https://en.wikipedia.org/wiki/X-Forwarded-For) 从 Header 信息中获取到离服务端最近的 client 端的 IP 地址, 如果请求经过了多级代理且每级代理都开启此特性, 就可以获得真实有效的用户 IP. 不过这种特性是基于应用层实现, 并不适用于传输层. 在基于 tcp 层的转发场景中, 获取真实有效的用户 IP 显得更为重要. 
 
 Linux 内核从 2.2 版本开始支持透明代理([tproxy](https://www.kernel.org/doc/Documentation/networking/tproxy.txt)), 可以在传输层转发的情况下获取用户的 IP, 早期的版本需要在内核编译的时候开启此特性, 从 4.18 版本开始 tproxy 特性可以在 nf_tables 中直接使用. 不过遗憾的是在云环境中, 我们无法在使用了 `load balance` 的场景中使用此特性. 
@@ -102,7 +104,7 @@ Connection to 34.96.112.131 5222 port [tcp/xmpp-client] succeeded!
    +--------+         +----------+          +---------+       +------------+
 ```
 
-*备注*: 这里我们假定 `app server` 为非 `http/https` 服务. 
+**备注**: 这里我们假定 `app server` 为非 `http/https` 服务. 
 
 第一种为很常见的直连方式, 不需要依赖其它云服务, 但是在受到攻击(比如 ddos(https://www.cloudflare.com/learning/ddos/what-is-a-ddos-attack/)) 的时候, 可能就需要依赖云厂商的服务进行攻击防护. 
 
