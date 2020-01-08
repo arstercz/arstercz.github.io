@@ -76,7 +76,7 @@ PROXY TCP4 139.162.138.99 34.96.112.131 55372 5222\r\n
 ```
 # echo -en "PROXY TCP4 1.2.3.4 1.2.3.4 11 11\r\nHello World" | nc  -v 34.96.112.131 5222
 Connection to 34.96.112.131 5222 port [tcp/xmpp-client] succeeded!
--ERR unknown command 'PROXY'      # 这里的报错是因为受到假的数据且不支持处理
+-ERR unknown command 'PROXY'      # 这里的报错是因为收到假的数据且不支持处理
 ```
 
 `cloud lb` 支持 `proxy protocol` 协议, 在 haproxy 中抓包可以看到有两串类似的 `PROXY TCP4` 数据, 仅挨着三次握手后的第一条即为真实的信息(黄色圈), 后续的为伪造的信息(绿色圈):
@@ -106,7 +106,7 @@ Connection to 34.96.112.131 5222 port [tcp/xmpp-client] succeeded!
 
 **备注**: 这里我们假定 `app server` 为非 `http/https` 服务. 
 
-第一种为很常见的直连方式, 不需要依赖其它云服务, 但是在受到攻击(比如 ddos(https://www.cloudflare.com/learning/ddos/what-is-a-ddos-attack/)) 的时候, 可能就需要依赖云厂商的服务进行攻击防护. 
+第一种为很常见的直连方式, 不需要依赖其它云服务, 但是在受到攻击(比如 [ddos](https://www.cloudflare.com/learning/ddos/what-is-a-ddos-attack/)) 的时候, 可能就需要依赖云厂商的服务进行攻击防护. 
 
 使用了云服务后, 就可以通过 2, 3 两种方式, 这里我们以 `cloud LB` 为例说明, `app server` 想要获取到 client 的 IP, 就需要 `cloud LB` 支持 `proxy protocol` 特性, 在开启特性的情况下, `cloud LB` 就相当于 `proxy protocol` 的客户端负责发送真实的 `client ip`. 
 
@@ -128,7 +128,7 @@ global
 defaults
         mode       tcp
         log        global
-		log-format %T\ %ci:%cp\ %si:%sp\ %ST\ %b\ %f\ %bi:%bp
+        log-format %T\ %ci:%cp\ %si:%sp\ %ST\ %b\ %f\ %bi:%bp
         maxconn 51200
         retries 2
         timeout connect 8s
@@ -143,15 +143,15 @@ listen  tredis7379
         bind    *:7379 accept-proxy                  # 接受云厂商发来的 proxy protocol 数据, haproxy 会将数据里的 ip 作为用户 ip;
         server redis1 10.0.21.5:6379 # send-proxy    # 指定 send-proxy 或 send-proxy-v2 可以将收到的 proxy protocol 数据转给后端程序;
 		
-		# tcp 连接限制
+        # tcp 连接限制
         stick-table type ip size 200k expire 1m store conn_rate(3s),conn_cnt
         acl tcp_conn_above  src_conn_rate gt 5
         acl tcp_total_above src_conn_cnt ge 30
         tcp-request connection track-sc1 src
         tcp-request content accept if tcp_conn_above tcp_total_above
 		
-		# 创建封禁 ip 的规则, 192.168.0.1 可以是虚假的 ip, 可通过 api 接口操作 socket 动态增加需要封禁的 IP.
-		acl rejectrule src 192.168.0.1
+        # 创建封禁 ip 的规则, 192.168.0.1 可以是虚假的 ip, 可通过 api 接口操作 socket 动态增加需要封禁的 IP.
+        acl rejectrule src 192.168.0.1
         tcp-request content reject if rejectrule
 ```
 
@@ -167,6 +167,7 @@ listen  tredis7379
 1. 单个 ip 每 3 秒新建 tcp 连接数超过 5;
 2. 单个 ip 总的 tcp 连接数超过 30;
 ```
+
 在上述的配置中, `conn_rate(3s)` 取 3s 作为新建连接平均值的时间跨度, 对应 `src_conn_rate gt 5` 来看就是 3 秒内的新建连接数不能超过 5. 另外需要注意的是, haproxy 在进行策略限制的时候是先通过 `stick-table` 进行计数, 满足条件的时候直接应用规则进行拒绝, 而不是我们传统认为的先允许阈值之下的进行连接, 超过阈值之后再应用规则拒绝. 所以从这方面来看, 如果 3s 内的新建连接数超过 5, 那么这 3 秒内就不会有新的连接创建成功.
 
 更多策略规则可参考 [haproxy-configuration](https://www.haproxy.org/download/1.8/doc/configuration.txt) 的 `stick-table` 部分.
