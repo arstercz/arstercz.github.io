@@ -201,7 +201,7 @@ Connection closed by foreign host.
 
 在上述的连接限制和动态封禁的规则中, 我们都使用了 `tcp-request content reject ...` 规则, 为什么没有使用 `tcp-reques connection reject ...` 的原因在于我们使用的 `proxy protocol` 是基于应用层实现, haproxy 必须要解析应用层的数据才能够进行后续的处理. 所以这里的 `content` 是必须的条件, 如果使用了 `connection` 那么限制的就不是 `client ip`, 而是 `cloud LB` 的 ip 信息. 
 
-另外, 我们在进行动态封禁的时候, 最后忽略掉 `cloud LB` 的地址以免引起误封. 具体的 ip 列表可以参考各云厂商的手册文档.
+另外, 我们在进行动态封禁的时候, 最好忽略掉 `cloud LB` 的地址以免引起误封. 具体的 ip 列表可以参考各云厂商的手册文档.
 
 ## HAProxy 注意事项
 
@@ -313,7 +313,7 @@ panic: not enough memory to allocate coroutine stack Bad system call
 ```
 该错误由  mmproxy 依赖的 go 语言风格的协程并发库 [libmill](https://github.com/sustrik/libmill/search?q=not+enough+memory+to+allocate&unscoped_q=not+enough+memory+to+allocate) 抛出, 看 github 中的状态, 该工程已经很久未见更新, 此类问题可能不会修复.
 
-另外一个类型的工具为 [go-mmproxy](https://github.com/path-network/go-mmproxy), 和 `mmproxy` 的工作原理相同, 通过 go 语言实现, 从测试的效率来看性能要高很多, 不过使用的人较少, 优缺点通 `mmproxy`. 由于没有足够的使用案例, 如果需要使用需要做好充足的测试准备.
+另外一个类型的工具为 [go-mmproxy](https://github.com/path-network/go-mmproxy), 和 `mmproxy` 的工作原理相同, 通过 go 语言实现, 从测试的效率来看性能要高很多, 不过使用的人较少, 优缺点同 `mmproxy`. 由于没有足够的使用案例, 如果需要使用需要做好充足的测试准备.
 
 ## 参考
 
