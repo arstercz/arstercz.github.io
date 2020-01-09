@@ -248,23 +248,7 @@ cpu-map auto:1/1-4 0-3
 
 #### 参数设置
 
-haproxy 的手册不建议我们开启多进程(nbproc), 如下所示:
-```
-nbproc <number>
-  Creates <number> processes when going daemon. This requires the "daemon"
-  mode. By default, only one process is created, which is the recommended mode
-  of operation. For systems limited to small sets of file descriptors per
-  process, it may be needed to fork multiple daemons. USING MULTIPLE PROCESSES
-  IS HARDER TO DEBUG AND IS REALLY DISCOURAGED. See also "daemon" and
-  "nbthread".
-
-nbthread <number>
-  This setting is only available when support for threads was built in. It
-  creates <number> threads for each created processes. It means if HAProxy is
-  started in foreground, it only creates <number> threads for the first
-  process. See also "nbproc".
-``` 
-所以在使用单进程模式的时候, 需要将单个进程的资源设置的足够大, 如下参数设置仅供参考:
+在使用单进程模式的时候, 需要将单个进程的资源设置的足够大, 如下参数设置仅供参考:
 ```
 # 内核参数
 kernel.pid_max = 102400
