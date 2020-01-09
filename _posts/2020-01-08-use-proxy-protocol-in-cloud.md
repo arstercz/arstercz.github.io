@@ -118,6 +118,9 @@ Connection to 34.96.112.131 5222 port [tcp/xmpp-client] succeeded!
 global
         log     127.0.0.1:514 local2
         maxconn 64000
+        nbproc  1
+        nbthread 4
+        cpu-map auto:1/1-4 0-3
         chroot /var/empty
         stats socket /var/run/haproxy-admin.sock mode 660 level admin
         stats timeout 5s
@@ -202,6 +205,42 @@ Connection closed by foreign host.
 在上述的连接限制和动态封禁的规则中, 我们都使用了 `tcp-request content reject ...` 规则, 为什么没有使用 `tcp-reques connection reject ...` 的原因在于我们使用的 `proxy protocol` 是基于应用层实现, haproxy 必须要解析应用层的数据才能够进行后续的处理. 所以这里的 `content` 是必须的条件, 如果使用了 `connection` 那么限制的就不是 `client ip`, 而是 `cloud LB` 的 ip 信息. 
 
 另外, 我们在进行动态封禁的时候, 最好忽略掉 `cloud LB` 的地址以免引起误封. 具体的 ip 列表可以参考各云厂商的手册文档.
+
+#### 多进程和多线程
+
+`nbproc` 和 `nbthread` 是两种可以使用多核 cpu 的方式, nbproc 比较传统是以多进程的方式服务, 且调试起来比较麻烦. nbthread 为 `1.8` 版本新增的多线程功能, 在 `1.8.x` 的早期还只是实验性质, 在最新的 `1.8.23` 版本中, 多线程功能已经稳定可用, 如下所示:
+```
+nbproc <number>
+  Creates <number> processes when going daemon. This requires the "daemon"
+  mode. By default, only one process is created, which is the recommended mode
+  of operation. For systems limited to small sets of file descriptors per
+  process, it may be needed to fork multiple daemons. USING MULTIPLE PROCESSES
+  IS HARDER TO DEBUG AND IS REALLY DISCOURAGED. See also "daemon" and
+  "nbthread".
+
+nbthread <number>
+  This setting is only available when support for threads was built in. It
+  creates <number> threads for each created processes. It means if HAProxy is
+  started in foreground, it only creates <number> threads for the first
+  process. See also "nbproc".
+``` 
+
+不过两者也存在一些差别, 多进程方式的每个进程都相当于独立的个体, 一些策略和状态的应用则只是针对单个进程而非所有进程, 更详细的可以参考: [multi-process and multithreading](https://www.haproxy.com/blog/multithreading-in-haproxy/), 下面仅列出多进程的一些限制:
+```
+1. 不同进程之间需要同步 stick-table 等配置;
+2. 状态统计, 策略及限制等功能仅针对单进程, 并非全局;
+3. 每个进程都会进程监控检测;
+4. 任何需要执行运行时 API 的指令都需要发送到每个进程;
+```
+
+从实际的测试来, 如果启用 tcp 等限速策略, 上述的 `单个 ip 每 3 秒新建 tcp 连接数超过 5` 适用于单个进程, 如果有 3 个进程, 单个 ip 每 3 秒新建的连接数超过 15 才会满足条件. 多线程则没有此类问题, 单个进程中的线程共享状态统计, 策略限制等信息. 如果需要准确的执行策略限制建议开始多线程模式. 上述的配置中:
+```
+nbproc 1
+nbthread 4
+cpu-map auto:1/1-4 0-3
+```
+
+仅开启单个进程, 该进程开启 4 个线程, 每个线程对应使用 `cpu0 ~ cpu3`. 
 
 ## HAProxy 注意事项
 
@@ -324,4 +363,5 @@ panic: not enough memory to allocate coroutine stack Bad system call
 [cloudflare-preserving-client-ips-in-sectrum](https://blog.cloudflare.com/mmproxy-creative-way-of-preserving-client-ips-in-spectrum/)  
 [cloudflare-built-sectrum](https://blog.cloudflare.com/how-we-built-spectrum/)  
 [haproxy-runtime-api](https://www.haproxy.com/blog/dynamic-configuration-haproxy-runtime-api/)  
+[multi-process and multithreading](https://www.haproxy.com/blog/multithreading-in-haproxy/)  
 [haproxytool](https://github.com/unixsurfer/haproxytool)  
