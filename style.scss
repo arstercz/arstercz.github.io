@@ -26,7 +26,7 @@ body {
 
 .container {
   margin: 0 auto;
-  max-width: 900px;
+  max-width: 790px;
   padding: 0 10px;
   width: 100%;
 }
@@ -46,7 +46,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-  font-size: 22px;
+  font-size: 25px;
   a {
     color: inherit;
   }
@@ -54,18 +54,17 @@ h1 {
 }
 
 h2 {
-  font-size: 23px;
+  font-size: 24px;
   border-bottom: 1px #e1e4e8 solid;
 }
 
 h3 {
   font-family: $base-font;
-  font-size: 20px;
+  font-size: 21px;
 }
 
 h4 {
-  font-size: 18px;
-  font-weight: 500;
+  font-size: 16px;
 }
 
 h6 {
