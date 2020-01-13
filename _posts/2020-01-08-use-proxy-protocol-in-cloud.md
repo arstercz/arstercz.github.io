@@ -33,7 +33,7 @@ Linux 内核从 2.2 版本开始支持透明代理([tproxy](https://www.kernel.o
  +--------+         +----------+          +------------------+       +------------+
 ```
 
-就上图来看, 整个 `proxy protocol` 在第 `2` 步实现, 这里的 `cloud LB` 相当于客户端, `haproxy/nginx..` 等相当于服务端. 如果服务端软件支持发送 `proxy protocol` 功能, 也可以将真实的用户 IP 发送到第 3 步的 `app server` 中. 当然如果 `app server` 支持此方式, 可以直接去掉上述的 `haproxy/nginx...` 部分而直接与 `load balance` . 目前已知的支持 `proxy protocol` 特性的主要包含以下软件:
+就上图来看, 整个 `proxy protocol` 在第 `2` 步实现, 这里的 `cloud LB` 相当于客户端, `haproxy/nginx..` 等相当于服务端. 如果服务端软件支持发送 `proxy protocol` 功能, 也可以将真实的用户 IP 发送到第 3 步的 `app server` 中. 当然如果 `app server` 支持此方式, 可以直接去掉上述的 `haproxy/nginx...` 部分直接和 `load balance` 通信. 目前已知的支持 `proxy protocol` 特性的主要包含以下软件:
 ```
 Elastic Load Balancing(AWS's load-balancer)
 GCP LB(Google Cloud load-balancer)
@@ -255,7 +255,8 @@ kernel.pid_max = 102400
 kernel.threads-max = 409600
 vm.max_map_count = 102400
 net.ipv4.ip_local_port_range = 1024 65530
-net.ipv4.tcp_max_syn_backlog = 81920
+net.ipv4.tcp_max_syn_backlog = 10240
+net.core.somaxconn = 8192
 net.netfilter.nf_conntrack_max = 2621440
 net.core.netdev_max_backlog = 40960
 net.ipv4.tcp_tw_reuse = 0
