@@ -19,7 +19,7 @@ Linux 内核从 2.2 版本开始支持透明代理([tproxy](https://www.kernel.o
 
 #### 非标准的 TCP header
 
-这种方式基于修改 TCP 的包头实现, 在 TCP 的连接建立(SYN)阶段就将用户的 IP 加到 TCP 头部的可选字段中, 这种方式对数据报文的开销较大, IPV6 则更为明显. 即便最近几年有 [RFC 7974](https://tools.ietf.org/html/rfc7974) 协议的支持, 目前也没有什么软件支持此特性. 另外实现这种方式可能需要在系统调用的层面进行修改, 所以应用层很难支持实现此方式.
+这种方式基于修改 TCP 的包头实现, 在 TCP 的连接建立(SYN)阶段就将用户的 IP 加到 TCP 头部的可选字段中, 这种方式对数据报文的开销较大, IPV6 则更为明显. 即便最近几年有 [RFC 7974](https://tools.ietf.org/html/rfc7974) 协议的支持, 目前也没有多少软件支持此特性. 另外实现这种方式可能需要在系统调用的层面进行修改, 所以应用层很难支持实现此方式. 国内的几家云厂商提供的类似 [TOA](https://github.com/Huawei/TCP_option_address) 即是基于此机制以内核模块的方式获取用户 ip.
 
 #### 使用 PROXY protocol
 
