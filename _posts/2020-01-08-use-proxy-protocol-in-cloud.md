@@ -104,7 +104,7 @@ Connection to 34.96.112.131 5222 port [tcp/xmpp-client] succeeded!
    +--------+         +----------+          +---------+       +------------+
 ```
 
-**备注**: 这里我们假定 `app server` 为非 `http/https` 服务. 
+> **备注**: 这里我们假定 `app server` 为非 `http/https` 服务. 
 
 第一种为很常见的直连方式, 不需要依赖其它云服务, 但是在受到攻击(比如 [ddos](https://www.cloudflare.com/learning/ddos/what-is-a-ddos-attack/)) 的时候, 可能就需要依赖云厂商的服务进行攻击防护. 
 
@@ -337,7 +337,7 @@ panic: not enough memory to allocate coroutine stack Bad system call
 ```
 该错误由  mmproxy 依赖的 go 语言风格的协程并发库 [libmill](https://github.com/sustrik/libmill/search?q=not+enough+memory+to+allocate&unscoped_q=not+enough+memory+to+allocate) 抛出, 看 github 中的状态, 该工程已经很久未见更新, 此类问题可能不会修复.
 
-另外一个类型的工具为 [go-mmproxy](https://github.com/path-network/go-mmproxy), 和 `mmproxy` 的工作原理相同, 通过 go 语言实现, 从测试的效率来看性能要高很多, 不过使用的人较少, 优缺点同 `mmproxy`. 由于没有足够的使用案例, 如果需要使用需要做好充足的测试准备.
+另外一个类似的工具为 [go-mmproxy](https://github.com/path-network/go-mmproxy), 和 `mmproxy` 的工作原理相同, 通过 go 语言实现, 从测试的效率来看性能要高很多, 不过使用的人较少, 优缺点同 `mmproxy`. 由于没有足够的使用案例, 最好在使用前做好充足的测试.
 
 ## 参考
 

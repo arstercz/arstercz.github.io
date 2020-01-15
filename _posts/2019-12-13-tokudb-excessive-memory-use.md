@@ -25,7 +25,7 @@ my.cnf 配置:
 
 几台实例都出现此类情况, 总的内存接近 `innodb_buffer_size + 2 * tokudb_cache_size`, 正常的情况应该在 `innodb_buffer_size + tokudb_cache_size` 上下浮动. 
 
-*备注:* 几台实例均为 slave, 处于空闲状态. 并未做 `load data` 等批量更新之类的操作.
+> **备注:** 几台实例均为 slave, 处于空闲状态. 并未做 `load data` 等批量更新之类的操作.
 
 ## 分析处理
 
@@ -90,7 +90,7 @@ Centos 7 中, 如果安装了 `jemalloc-3.6.0-1.el7.x86_64` 的 rpm 包, 默认�
 | | ->04.60% (336,370,400B) 0xB5ABC2: init_instruments(PFS_global_param const*) (pfs_instr.cc:407)
 ```
 
-*备注:* 分析内存的时候, 需要使用 valgrind 启动 mysqld 的 debug 版本.
+> **备注:** 分析内存的时候, 需要使用 valgrind 启动 mysqld 的 debug 版本.
 
 #### 其它可能的问题
 
