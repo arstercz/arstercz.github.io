@@ -363,7 +363,7 @@ img {
   cursor: pointer;
   font-family: $helveticaNeue;
   font-weight: 500;
-  font-size: 23px;
+  font-size: 25px;
   letter-spacing: 1px;
 }
 
@@ -371,7 +371,7 @@ nav {
   float: right;
   //margin-top: 10px; // @TODO: Vertically middle align
   font-family: $helveticaNeue;
-  font-size: 18px;
+  font-size: 16px;
 
   @include mobile {
     float: none;
