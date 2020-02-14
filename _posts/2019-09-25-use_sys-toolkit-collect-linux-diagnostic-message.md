@@ -575,7 +575,7 @@ fio-status
 
 2. top 命令用来收集进程信息, 不过 top 计算需要至少两次采样数据才能进行计算, 官方的 `pt-summary` 还没有修复该问题, `sys-summary` 中取三次数据, 以最后一次的结果信息为准, 详见 [top report bug](https://bugzilla.redhat.com/show_bug.cgi?id=174619);
 
-3. MegaCli 或 MegaCli64 工具需要存在于标准的 PATH 路径中, 如果以 yum/rpm 等方式安装, 则包含 `/opt/MegaRAID/MegaCli/` 路径, MegaCli 收集的信息较多, 在搜集磁盘信息的时候为了获取一致的状态, MegaCli 可能会阻塞磁盘的正常读写, 这种情况下可能会引起有些应用的超时, 尤其是以机械盘提供服务数据库主机, DB 的响应时间可能远超预期, 应该避免在高峰期执行该命令. 另外如果是固态盘, 则 MegaCli 影响很轻微, 可以在需要的时候直接运行 sys-summary 工具. 如果系统没有 MegaCli 命令则忽略 RAID 和物理磁盘相关信息的收集;
+3. MegaCli 或 MegaCli64 工具需要存在于标准的 PATH 路径中, 如果以 yum/rpm 等方式安装, 则包含 `/opt/MegaRAID/MegaCli/` 路径, MegaCli 收集的信息较多, 在搜集磁盘信息的时候为了获取一致的状态, 低版本的 MegaCli(比如 4.00.xx 版本) 可能会阻塞磁盘的正常读写, 这种情况下可能会引起有些应用的超时, 尤其是以机械盘提供服务数据库主机, DB 的响应时间可能远超预期, 应该避免在高峰期执行该命令. 另外如果是固态盘, 则 MegaCli 影响很轻微, 高版本(比如 8.00.48)则没有此类问题, 对机械盘的影响也很轻微, 可以在需要的时候直接运行 sys-summary 工具. 如果系统没有 MegaCli 命令则忽略 RAID 和物理磁盘相关信息的收集;
 
 4. netstat 命令收集了所有的网络连接信息, 在连接数很大(比如10w+连接)的情况下, 该命令可能执行时间过长;
 
