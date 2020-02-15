@@ -46,7 +46,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-  font-size: 27px;
+  font-size: 25px;
   a {
     color: inherit;
   }
@@ -54,17 +54,17 @@ h1 {
 }
 
 h2 {
-  font-size: 25px;
+  font-size: 23px;
   border-bottom: 1px #e1e4e8 solid;
 }
 
 h3 {
   font-family: $base-font;
-  font-size: 23px;
+  font-size: 21px;
 }
 
 h4 {
-  font-size: 18px;
+  font-size: 16px;
 }
 
 h6 {
@@ -320,7 +320,7 @@ img {
 }
 
 .masthead {
-  padding: 13px 0;
+  padding: 12px 0;
   border-bottom: 1px solid $lightGray;
 
   @include mobile {
