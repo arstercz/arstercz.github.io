@@ -320,7 +320,7 @@ img {
 }
 
 .masthead {
-  padding: 10px 0;
+  padding: 13px 0;
   border-bottom: 1px solid $lightGray;
 
   @include mobile {
@@ -359,11 +359,11 @@ img {
 
 .site-name {
   margin: 0;
-  color: $darkGray;
+  color: $blue;
   cursor: pointer;
   font-family: $helveticaNeue;
   font-weight: 500;
-  font-size: 25px;
+  font-size: 22px;
   letter-spacing: 1px;
 }
 
@@ -382,7 +382,7 @@ nav {
 
   a {
     margin-left: 20px;
-    color: $darkGray;
+    color: $blue;
     text-align: right;
     font-weight: 300;
     letter-spacing: 1px;
@@ -420,19 +420,19 @@ nav {
   h1 {
     margin-bottom: .1em;
     font-family: $base-font;
-    font-size: 23px;
+    font-size: 25px;
   }
 
   .date {
     font-weight: 300;
-    font-size: 16px;
+    font-size: 14px;
     color: $base-lighten-color;
     margin-right: 4px;
   }
 
   .index-title {
     font-weight: 400;
-    font-size: 16px;
+    font-size: 15px;
     font-family: $base-font;
     > a {
       color: $oc-gray-8;
