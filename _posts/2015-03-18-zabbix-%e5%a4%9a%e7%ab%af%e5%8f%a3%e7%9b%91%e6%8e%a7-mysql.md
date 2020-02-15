@@ -22,7 +22,7 @@ tags:
 ### 介绍
 使用 zabbix 的 low-level 自动发现功能完成单主机多端口的监控, 详见[low_level_discovery](https://www.zabbix.com/documentation/2.2/manual/discovery/low_level_discovery), 整体上监控类似 percona 的 [zabbix](http://www.percona.com/doc/percona-monitoring-plugins/1.1/zabbix/index.html) 监控插件, 不过使用 `mymonitor.pl` 替换了脚本 `ss_get_mysql_stats.php`, 而且配置有点不同.
 
-具体代码及配置详见: [zabbix_mysql](https://github.com/chenzhe07/zabbix_mysql)
+具体代码及配置详见: [zabbix_mysql](https://github.com/arstercz/zabbix_mysql)
 
 
 ### 1. 结构说明:
@@ -53,7 +53,7 @@ mymonitor.pl 脚本默认以 `monitor/monitor` 用户及口令的方式连接 My
 ### 2. 安装说明
 在 agent 端操作：
 ```
-# git clone https://github.com/chenzhe07/zabbix_mysql.git /usr/local/zabbix_mysql
+# git clone https://github.com/arstercz/zabbix_mysql.git /usr/local/zabbix_mysql
 # bash /usr/local/zabbix_mysql/install.sh 192.168.1.2
 ```
 `192.168.1.2` 为内网 ip 地址, 这里考虑到可能存在多个内网ip, 所以没有自动获取, 需要用户手动添加.
