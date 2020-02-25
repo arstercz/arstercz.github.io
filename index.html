@@ -15,10 +15,7 @@ layout: default
   {% for post in paginator.posts %}
     <article class="post">
       <div clsss="meta">
-        <span class="date">
-	   {{ post.date | date: "%Y/%m/%d" }}
-        </span>
-	&raquo;
+	      <!--&raquo;-->
         <span class="index-title">
           <a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a>
 	</span>
@@ -32,6 +29,9 @@ layout: default
           </li>
           {% endfor %}
         </ul>
+        <span class="index-date">
+	   {{ post.date | date: "%Y/%m/%d" }}
+        </span>
       </div>
     </article>
   {% endfor %}
