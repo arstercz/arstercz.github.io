@@ -46,7 +46,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-  font-size: 25px;
+  font-size: 21px;
   a {
     color: inherit;
   }
@@ -54,17 +54,17 @@ h1 {
 }
 
 h2 {
-  font-size: 23px;
+  font-size: 19px;
   border-bottom: 1px #e1e4e8 solid;
 }
 
 h3 {
   font-family: $base-font;
-  font-size: 21px;
+  font-size: 17px;
 }
 
 h4 {
-  font-size: 16px;
+  font-size: 15px;
 }
 
 h6 {
@@ -316,7 +316,7 @@ img {
 //
 
 .wrapper-masthead {
-  margin-bottom: 30px;
+  margin-bottom: 15px;
 }
 
 .masthead {
@@ -490,7 +490,7 @@ nav {
 
 .pagination {
   font-weight: bold;
-  font-size: 16px;
+  font-size: 15px;
   padding: 1em 0;
   width: 100%;
   display: inline-block;

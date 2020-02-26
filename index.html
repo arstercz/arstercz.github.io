@@ -7,7 +7,7 @@ layout: default
 {% endif %}
 
 <p class="search-text">
-  <input type="text" size=30 maxlength=30 id="search-input" class="input-text" placeholder="Search posts..">
+  <input type="text" size=32 maxlength=30 id="search-input" class="input-text" placeholder="Search posts..">
 </p>
 <ul id="results-container"></ul>
 
@@ -44,8 +44,6 @@ layout: default
         &#x3C; Prev
       </a>
     </span>
-  {% else %}
-    <span class="prev">&#x3C; Prev</span>
   {% endif %}
   <span class="page-number">
        &nbsp;&nbsp;
@@ -58,7 +56,5 @@ layout: default
         Next &#x3E;
       </a>
     </span>
-  {% else %}
-    <span class="next">Next &#x3E;</span>
   {% endif %}
 </div>
