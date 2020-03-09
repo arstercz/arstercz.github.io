@@ -104,6 +104,6 @@ rmdir /data/db/.zfs/snapshot/db_20191025
 
 #### 避免人工或者监控访问镜像目录
 
-如果没有手动清理镜像目录, 我们影响尽量避免访问目录, 监控程序也最好避免访问镜像的目录, 比如可以将 zabbix 磁盘监控的自动发现属性 `Keep lost resources period (in days)
-` 设置为 0, 避免继续监控过期的挂载点.
+如果没有手动清理镜像目录, 我们应该尽量避免访问目录, 监控程序也最好避免访问镜像的目录, 比如可以将 zabbix 磁盘监控的自动发现属性 `Keep lost resources period (in days)
+` 设置为 0, 避免继续监控过期不用的挂载点.
 
