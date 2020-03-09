@@ -26,7 +26,7 @@ Mar  7 16:37:53 cz snoopy[91307]: [time_ms:636 login:(unknown) uid:0 pid:91307 f
 /sbin/mount.zfs datapool/db@db_20191025 /datapool/db/.zfs/snapshot/db_20191025 -n -o rw
 ```
 
-> `zfsonlinux 0.7.11 ~ 0.7.13` 版本目前默认挂载 300s, 如果没有操作则自动卸载. 其它版本未做测试. freebsd 系统的 zfs 则没有自动挂载的行为.
+> `zfsonlinux 0.7.11 ~ 0.7.13` 版本目前默认挂载 300s, 如果没有操作则自动卸载. 其它版本未做测试. `freebsd` 系统的 zfs 则没有自动挂载的行为.
 
 ## 如何销毁 zfs 镜像
  
@@ -49,15 +49,15 @@ zfs version:
 ```
 # zfs destroy datapool/db@db_20191025
 
-
+# less /var/log/messages
 Mar 09 09:23:57 cz snoopy[26557]: [uid:0 sid:0 tty:ERROR(ttyname_r->EBADF) cwd:/ filename:/sbin/mount.zfs]: /sbin/mount.zfs datapool/db@db_20191025 /data/
 Mar 09 09:23:57 cz kernel: WARNING: Unable to automount /data/db/.zfs/snapshot/db_20191025/datapool/db@db_20191025: 256
 Mar 09 09:23:58 cz snoopy[26561]: [uid:0 sid:0 tty:ERROR(ttyname_r->EBADF) cwd:/ filename:/sbin/mount.zfs]: /sbin/mount.zfs datapool/db@db_20191025 /data/
 Mar 09 09:23:58 cz kernel: WARNING: Unable to automount /data/db/.zfs/snapshot/db_20191025/datapool/db@db_20191025: 256
 
-# ls -al /data/db/.zfs/snapshot/  # 看不到镜像目录
+# ls -al /data/db/.zfs/snapshot/              # 看不到镜像目录
 
-# ls -al /data/db/.zfs/snapshot/db_20191025
+# ls -al /data/db/.zfs/snapshot/db_20191025   # 却可以访问
 ls: cannot access /data/db/.zfs/snapshot/db_20191025/.: Object is remote
 ls: cannot access /data/db/.zfs/snapshot/db_20191025/..: Object is remote
 total 0
@@ -65,9 +65,7 @@ d????????? ? ? ? ?            ? .
 d????????? ? ? ? ?            ? ..
 ```
 
-从上述的操作来看, 已经看不到镜像目录, 不过可以指定目录进行访问, 和 [issue-4068](https://github.com/openzfs/zfs/issues/4068) 描述的一致. 
-
-再从 [snoopy](https://blog.arstercz.com/how-does-snoopy-log-every-executed-command/) 的日志来看, 系统里有程序访问镜像目录, 进而导致 `mount.zfs` 操作.  不过系统日志中每隔一段时间便出现几次 `kernel` 消息, 我们在排除一些人为操作的情况下, 通过 [sysdig](https://github.com/draios/sysdig/wiki/Sysdig-Examples) 跟踪发现 `zabbix_agent` 监控访问了该目录进而引起 `kernel` 提示, 如下所示
+从上述的操作来看, 已经看不到镜像目录, 不过可以指定目录进行访问, 和 [issue-4068](https://github.com/openzfs/zfs/issues/4068) 描述的一致. 再从 [snoopy](https://blog.arstercz.com/how-does-snoopy-log-every-executed-command/) 的日志来看, 系统里有程序访问镜像目录, 进而导致 `mount.zfs` 操作.  不过系统日志中每隔一段时间便出现几次 `kernel` 消息, 我们在排除一些人为操作的情况下, 通过 [sysdig](https://github.com/draios/sysdig/wiki/Sysdig-Examples) 跟踪发现 `zabbix_agent` 监控访问了该目录进而引起 `kernel` 提示, 如下所示
 
 ```
 # sysdig | grep -A 4 db_20191025
@@ -88,7 +86,7 @@ d????????? ? ? ? ?            ? ..
 
 ## 如何处理
 
-从官方的 [issue-4068](https://github.com/openzfs/zfs/issues/4068), [issue-4672], [issue-4772](https://github.com/openzfs/zfs/issues/4772), [issue-8166](https://github.com/openzfs/zfs/issues/8166) 来看, 并未完全解决此问题, 只要访问已销毁的镜像目录就会出现自动挂载失败的情况. 从已测的信息来看, 以下版本均有上述的问题:
+从官方的 [issue-4068](https://github.com/openzfs/zfs/issues/4068), [issue-4672](https://github.com/openzfs/zfs/issues/4672), [issue-4772](https://github.com/openzfs/zfs/issues/4772), [issue-8166](https://github.com/openzfs/zfs/issues/8166) 来看, 并未完全解决此问题, 只要访问已销毁的镜像目录就会出现自动挂载失败的情况. 从已测的信息来看, 以下版本均有上述的问题:
 
 ```
 0.6.x
