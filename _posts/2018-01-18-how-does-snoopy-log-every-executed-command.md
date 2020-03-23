@@ -35,7 +35,7 @@ snoopy 即是通过 `preload` 的方式在程序进行 `execv()` 和 `execve()` 
 
 ### 系统调用
 
-`unix/linux` 提供了 7 中不同的 exec 函数来初始执行新的程序, 如下所示:
+`unix/linux` 提供了 7 种不同的 exec 函数来初始执行新的程序, 如下所示:
 
 ```c
 #include <unistd.h>
