@@ -98,7 +98,7 @@ mount -t debugfs /sys/kernel/debug
 
 #### strace
 
-strace 已经存在了很长时间, 其主要依靠 [ptrace](https://en.wikipedia.org/wiki/Ptrace) 来追踪用户空间的所有系统调用, 这种机制的问题在于应用程序每做一次系统调用都需要 ptrace 进行捕获, 获取到数据后再放行响应的系统调用. 如下所示:
+strace 已经存在了很长时间, 其主要依靠 [ptrace](https://en.wikipedia.org/wiki/Ptrace) 来追踪用户空间的所有系统调用, 这种机制的问题在于应用程序每做一次系统调用都需要 ptrace 进行捕获, 获取到数据后再放行相应的系统调用. 如下所示:
 
 ![linux-strace.png]({{ site.baseurl }}/images/articles/201910/linux-strace.png)
 
@@ -199,7 +199,7 @@ Tue Oct 29 19:52:52 2019 CST    996    996    994     redis-server  35307   6379
 [bpftrace](https://github.com/iovisor/bpftrace)  
 [bcc](https://github.com/iovisor/bcc)  
 
-`bcc` 则是在 `bpftrace` 的基础上实现的很多工具集, 从应用到内核, 不同层面的工具应用仅有. 最后再提醒下, eBPF 仅适用于 `Linux 4.1+` 的版本, 以 eBPF 开发的[进度](https://github.com/iovisor/bcc/blob/master/docs/kernel-versions.md)的来看, 
+`bcc` 则是在 `bpftrace` 的基础上实现的很多工具集, 从应用到内核, 不同层面的工具应有尽有. 最后再提醒下, eBPF 仅适用于 `Linux 4.1+` 的版本, 以 eBPF 开发的[进度](https://github.com/iovisor/bcc/blob/master/docs/kernel-versions.md)的来看, 
 `eBPF` 在 `kernel-4.10` 之后的支持才相对全面, 线上在使用的时候尽量选择较高内核版本的发行版, 比如以下示例:
 ```
 Redhat/Centos 8   -  4.18
