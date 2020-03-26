@@ -47,6 +47,8 @@ tags:
 
 通过实例组创建的云主机系统盘会被托管, 在关机的时候会重置系统盘, 重启的时候则不受影响. 另外需要绑定弹性 ip, 避免重启的时候 ip 变更. 可以在通过实例组创建的时候指定静态 ip.
 
+单个实例组下的多个虚拟机均为无状态模式, 假定每台虚机的服务相同, 在缩减数量的时候, gcp 通过随机方式缩减指定的虚机数量.
+
 ### 3. console 登录问题
 
 必须开启 sshd 服务才能使用 console 等方式连接云主机, 系统崩溃等问题可试着从 gcp 后台查看日志信息(后台 web 点击云主机后, 在 logs 选项查看对应的日志信息);
@@ -65,13 +67,13 @@ tags:
 
 ### 7. 磁盘修改问题
 
-google 云主机磁盘性能的限制随磁盘大小变化, 一定范围内, 磁盘越大性能越好;可以直接加大磁盘大小而不影响数据, 在后台 web 中 `resize` 数据盘大小, 保存后在云主机中执行 `xfs_growfs /dev/sdb` 即可, 其它文件系统可参考 growpart 命令, 更多见 <a href="https://cloud.google.com/compute/docs/disks/add-persistent-disk">gcp-disk</a>; 减小磁盘会影响已有数据, 可以附加新磁盘设备来替换数据.
+google 云主机磁盘性能的限制随磁盘大小变化, 一定范围内, 磁盘越大性能越好;可以直接加大磁盘大小而不影响数据, 在后台 web 中 `resize` 数据盘大小, 保存后在云主机中执行 `xfs_growfs /dev/sdb` 即可, 其它文件系统可参考 growpart 命令, 更多见 [add gcp disk](https://cloud.google.com/compute/docs/disks/add-persistent-disk), 减小磁盘会影响已有数据, 可以附加新磁盘设备来替换数据.
 
 另外 google 云主机磁盘(本地ssd,标准盘等)的性能都受磁盘大小的影响, 一定范围内磁盘越大, 随机 io 和吞吐量越大, 所以在准备缩减磁盘的时候需要考虑到磁盘的性能问题.
 
 ### 8. 负载均衡代理多端口问题
 
-`google load balancer` 的后端(backend) 在 tcp 模式中只能是实例组(`instane group`) 的方式提供服务, 如果存在不同的 lb 代理同样实例组的不通端口, 就需要在对应的实例组中创建多个端口名称映射(`Port name mapping`), 不然新建的 `load balance` 会覆盖以前的后端端口; 如下所示:
+`google load balancer` 的后端(backend) 在 tcp 模式中只能是实例组(`instane group`) 的方式提供服务, 如果存在不同的 lb 代理同样实例组的不同端口, 就需要在对应的实例组中创建多个端口名称映射(`Port name mapping`), 不然新建的 `load balance` 会覆盖以前的后端端口; 如下所示:
 
 ```
 Port name mapping (Optional)
@@ -79,7 +81,7 @@ Port name mapping (Optional)
 A load balancer sends traffic to an instance group through a named port. Create a named port to map the incoming traffic to a specific port number and then go to "HTTP load balancing" to create a load balancer using this instance group.
 ```
 
-另外, 在创建 `tcp lb` 的时候, 需要选择 `from internet -> multi regions` 模式才能够开启 proxy protocol 协议. 每个 lb 可以开启多个 backend, 不过每个 instance group 仅能被一个 backend 使用.
+另外, 在创建 `tcp lb` 的时候, 需要选择 `from internet -> multi regions` 模式才能够开启 proxy protocol 协议. 每个 lb 可以开启多个 backend, 每个 `backend` 可以指定多个实例组, 不过每个 instance group 仅能被一个 backend 使用.
 
 ### 9. dnf-automatic 自动更新问题
 
