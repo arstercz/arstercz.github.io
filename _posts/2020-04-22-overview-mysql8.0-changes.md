@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "MySQL 8.0 特性概览"
-tags: [MySQL, feature]
+tags: [mysql, feature]
 comments: false
 ---
 
@@ -20,8 +20,8 @@ MySQL `8.0` 版本比之 `5.7` 做了很大的变化, 比较明显的主要有�
 * [初始化与启动](#初始化与启动)
 * [监控](#监控)
 * [mysqldump 备份](#mysqldump-备份)
-* [innodb 变更](innodb-变更)
-* [主从复制](主从复制)
+* [innodb 变更](#innodb-变更)
+* [主从复制](#主从复制)
 
 
 ## 常用参数变更
@@ -67,11 +67,11 @@ have_query_cache  = no      # 永远为 NO
 #### information_schema 变更
 
 ```
-INNODB_LOCKS      =>  data_locks
+INNODB_LOCKS      => data_locks
 INNODB_LOCK_WAITS => data_lock_waits
 ```
 
-## X plugin
+## X-plugin
 
 `X plugin` 主要用于增强 `MySQL document` 的特性, 在 5.7 中为可选项, 需要单独安装插件, 在 8.0 中已经是默认开启, 可以设置 `xplugin=off` 禁用.
 
@@ -123,7 +123,7 @@ mysql > show global variables like '%auth%plugin%';
 | default_authentication_plugin | caching_sha2_password |
 +-------------------------------+-----------------------+
 
-mysql > alter user 'user'@'xxx' identified width mysql_native_password by 'pass';
+mysql > alter user 'user'@'xxx' identified with mysql_native_password by 'pass';
 ```
 
 如下所示, 默认低版本连接出现的错误:
@@ -162,7 +162,7 @@ default_authentication_plugin = mysql_native_password
 更多见:
 
   [8.0-ibd2sdi](https://dev.mysql.com/doc/refman/8.0/en/ibd2sdi.html)   
-  [mysql-8-frm-drop-how-to-recover-table-ddl]https://www.percona.com/blog/2018/12/07/mysql-8-frm-drop-how-to-recover-table-ddl/)   
+  [mysql-8-frm-drop-how-to-recover-table-ddl](https://www.percona.com/blog/2018/12/07/mysql-8-frm-drop-how-to-recover-table-ddl/)   
 
 
 #### 没有整形宽度
@@ -194,7 +194,7 @@ Create Table: CREATE TABLE `tests` (
 
 8.0 版本中, 初始化和启动的时候, 选项 `lower_case_table_names` 的值必须相同. 更多见 [sysvar_lower_case_table_names](https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_lower_case_table_names).  
 
-## SQL 语法变更
+## SQL-语法变更
 
 - 废弃了 `GROUP BY` 分组的排序 `ASC` 和 `DESC`, 存储过程中包含此语法的无法正常执行;
 - 关键字变更, 变更了部分关键字, 执行 SQL 的时候可能执行失败, 需要通过引号避免错误, 更多见 [8.0-keywords](https://docs.oracle.com/cd/E17952_01/mysql-8.0-en/keywords.html);
