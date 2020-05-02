@@ -1,15 +1,18 @@
 ---
-layout: page
-title: About
+layout: default
+title: "About"
+author: "arstercz"
 permalink: /about/
 ---
+
+### About
 
 Focus on `database`, `Linux` operating system and `performance` tuning.
 
 ### Contact me
 
-[arstercz@gmail.com](mailto:arstercz@gmail.com)  
-[github](https://github.com/arstercz)  
+[email](mailto:arstercz@gmail.com)  
+[eithub](https://github.com/arstercz)  
 
 ### Favorite websites
 

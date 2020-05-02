@@ -1,5 +1,5 @@
-{% include svg-icons.html %}
-
-{% if site.footer-text %}
-<p>{{ site.footer-text }}</p>
-{% endif %}
+<footer>
+  <span>
+   &copy; 2013 ~ <time datetime="{{ site.time }}">{{ site.time | date: '%Y' }}</time> {{ site.author.name }}.
+  </span>
+</footer>

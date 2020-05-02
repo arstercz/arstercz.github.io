@@ -1,6 +1,7 @@
 ---
-layout: page
-title: Tags
+layout: post
+author: "arstercz"
+title: "Tags"
 permalink: /tags/
 ---
 

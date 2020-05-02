@@ -2,47 +2,38 @@
 layout: default
 ---
 
-<article class="post">
-  <h1>{{ page.title }}</h1>
-
-  <div clsss="meta">
-    <span class="date">
-      {{ page.date | date_to_string }}
-    </span>
-
-    <ul class="tag">
-      {% for tag in page.tags %}
-      <li>
-        <a href="{{ site.url }}{{ site.baseurl }}/tags#{{ tag }}">
-          {{ tag }}
-        </a>
-      </li>
-      {% endfor %}
-    </ul>
-  </div>
-
-  <div class="entry">
-    {{ content }}
-    <br>
-    <!--<a href="{{ site.baseurl }}{{ post.url }}#">Back To TOP</a>-->
-  </div>
-
-  <div class="pagination">
-    {% if page.previous.url %}
-      <span class="prevpost" >
-          <a href="{{ site.url }}{{ site.baseurl }}{{ page.previous.url }}">
-            &#x3C; {{ page.previous.title }}
-          </a>
-      </span>
+<div class="post">
+  <div class="post-info">
+    <span>Written by</span>
+    {% if page.author %}
+        {{ page.author }}
+    {% else %}
+        {{ site.author.name }}
     {% endif %}
-    {% if page.next.url %}
-      <span class="nextpost" >
-          <a href="{{ site.url }}{{ site.baseurl }}{{ page.next.url }}">
-             {{ page.next.title }} &#x3E;
-          </a>
-      </span>
+
+    {% if page.date %}
+      <br>
+      <span>on&nbsp;</span><time datetime="{{ page.date }}">{{ page.date | date: "%B %d, %Y" }}</time>
     {% endif %}
   </div>
 
-  {% include disqus.html %}
-</article>
+  <h1 class="post-title">{{ page.title }}</h1>
+  <div class="post-line"></div>
+
+  {{ content }}
+</div>
+
+{% if page.comments %}
+  {% include disqus_comments.html %}
+{% endif %}
+
+<div class="pagination">
+  {% if page.next.url %}
+    <a href="{{ page.next.url | prepend: site.baseurl }}" class="left arrow">&#8592;</a>
+  {% endif %}
+  {% if page.previous.url %}
+    <a href="{{ page.previous.url | prepend: site.baseurl }}" class="right arrow">&#8594;</a>
+  {% endif %}
+
+  <a href="#" class="top">Top</a>
+</div>
