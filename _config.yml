@@ -27,8 +27,8 @@ plugins:
   # - jemoji #Uncomment this to allow emoji in your post
 
 # Permalinks
-permalink:      /:title
-paginate:       8
+permalink:      /:title/
+paginate:       10
 
 # Excludes
 exclude: [ Gemfile, Gemfile.lock, tale.gemspec ]
