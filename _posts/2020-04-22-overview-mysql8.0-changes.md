@@ -2,7 +2,7 @@
 layout: post
 title: "MySQL 8.0 特性概览"
 tags: [mysql, feature]
-comments: false
+comments: true
 ---
 
 MySQL `8.0` 版本比之 `5.7` 做了很大的变化, 比较明显的主要有去掉了查询缓存, 密码验证方式变更, 默认编码变更等方面, 部分特性随着 8.0 最新版的发布也会存在小幅度的改变, 更多变化可以参考 [what-is-new-in-mysql8.0](https://docs.oracle.com/cd/E17952_01/mysql-8.0-en/mysql-nutshell.html#mysql-nutshell-removals) 了解更多. 如果是从 `5.7` 升级到 `8.0` 可以参考 [upgrading-from-previous-series.html](https://docs.oracle.com/cd/E17952_01/mysql-8.0-en/upgrading-from-previous-series.html) 了解更多的不同. 下面则主要介绍 MySQL 常用特性的一些变化.

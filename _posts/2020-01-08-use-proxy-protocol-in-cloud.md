@@ -2,7 +2,7 @@
 layout: post
 title: "在云中使用 proxy protocol"
 tags: [haproxy, proxy]
-comments: false
+comments: true
 ---
 
 ## 背景说明
