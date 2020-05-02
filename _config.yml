@@ -36,3 +36,8 @@ exclude: [ Gemfile, Gemfile.lock, tale.gemspec ]
 # Disqus (Set to your disqus id)
 disqus: arstercz
 
+# gitment
+gitment_owner: arstercz
+gitment_repo: arstercz.github.io
+gitment_clientId: 3569ec9f24314efe982c
+gitment_clientSecret: e6dfba7d03bbbb502de2e822709c18f3f1d44c17

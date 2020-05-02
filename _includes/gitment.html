@@ -1,15 +1,17 @@
+{% if site.gitment_repo %}
 <div id="gitmentContainer"></div>
 <link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
 <script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
 <script>
     var gitment = new Gitment({
-        id: '{{ page.url }}',
-        owner: 'arstercz',
-        repo: 'arstercz.github.io',
-        oauth: {
-            client_id: '3569ec9f24314efe982c',
-            client_secret: 'e6dfba7d03bbbb502de2e822709c18f3f1d44c17',
-        },
+            id: '{{ page.url }}',
+            owner: '{{ site.gitment_owner }}',
+            repo: '{{ site.gitment_repo }}',
+            oauth: {
+                client_id: '{{ site.gitment_clientId }}',
+                client_secret: '{{ site.gitment_clientSecret }}',
+             },
     });
     gitment.render('gitmentContainer');
 </script>
+{% endif %}
