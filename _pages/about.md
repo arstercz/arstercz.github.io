@@ -12,7 +12,7 @@ Focus on `database`, `Linux` operating system and `performance` tuning.
 ### Contact me
 
 [email](mailto:arstercz@gmail.com)  
-[eithub](https://github.com/arstercz)  
+[github](https://github.com/arstercz)  
 
 ### Favorite websites
 
