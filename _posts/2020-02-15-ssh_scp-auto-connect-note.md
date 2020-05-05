@@ -2,7 +2,7 @@
 layout: post
 title: "ssh/scp 自动连接使用技巧"
 tags: [ssh, autologin]
-comments: false
+comments: true
 ---
 
 我们经常通过 `ssh/scp` 免密登录的方式来自动化的批量执行一些操作, 不过在实际的使用中可能经常碰到一些中断自动连接的问题. 下面则主要介绍如何避免这些问题并提供一些使用建议.

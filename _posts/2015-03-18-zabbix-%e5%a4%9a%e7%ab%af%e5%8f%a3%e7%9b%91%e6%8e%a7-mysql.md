@@ -18,6 +18,7 @@ categories:
 tags:
   - perl
   - zabbix
+comments: true
 ---
 ### 介绍
 使用 zabbix 的 low-level 自动发现功能完成单主机多端口的监控, 详见[low_level_discovery](https://www.zabbix.com/documentation/2.2/manual/discovery/low_level_discovery), 整体上监控类似 percona 的 [zabbix](http://www.percona.com/doc/percona-monitoring-plugins/1.1/zabbix/index.html) 监控插件, 不过使用 `mymonitor.pl` 替换了脚本 `ss_get_mysql_stats.php`, 而且配置有点不同.

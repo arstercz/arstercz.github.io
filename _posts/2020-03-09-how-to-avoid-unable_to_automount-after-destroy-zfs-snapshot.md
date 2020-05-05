@@ -2,7 +2,7 @@
 layout: post
 title: "如何避免销毁 zfs 镜像后出现 Unable to automount 错误提示"
 tags: [zfs]
-comments: false
+comments: true
 ---
 
 ## 简要说明

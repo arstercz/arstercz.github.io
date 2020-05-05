@@ -2,7 +2,7 @@
 layout: post
 title: "radon 工具使用及问题汇总"
 tags: [hash, mysql]
-comments: false
+comments: true
 ---
 
 [radon](https://github.com/radondb/radon) 工具作为 MySQL 的中间件对外提供服务, 其以 [jump consistent hash](https://arxiv.org/ftp/arxiv/papers/1406/1406.2294.pdf) 算法实现了扩展 MySQL 读写的目的. 业务所常用的 sql 语法都做了相应的支持, 比如 `DDL`, `SHOW`, `Full Text Search`, `JOIN` 以及聚合排序等, 详细 sql 支持见 [radon_sql_support](https://github.com/radondb/radon/blob/master/docs/radon_sql_support.md). 同时 radon 也提供了 [api](https://github.com/radondb/radon/blob/master/docs/api.md) 接口方便管理员进行配置状态的管理, 故障的诊断以及监控数据的收集.

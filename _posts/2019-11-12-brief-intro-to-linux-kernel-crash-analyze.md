@@ -2,7 +2,7 @@
 layout: post
 title: "Linux 系统内核崩溃分析处理简介"
 tags: [linux, crash, kernel]
-comments: false
+comments: true
 ---
 
 ## 背景说明

@@ -18,6 +18,7 @@ tags:
   - delay
   - MySQL
   - percona
+comments: true
 ---
 MySQL slave 延迟复制
 

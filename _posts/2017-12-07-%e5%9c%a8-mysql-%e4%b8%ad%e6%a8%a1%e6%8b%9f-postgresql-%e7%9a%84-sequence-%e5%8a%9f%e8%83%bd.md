@@ -12,6 +12,7 @@ categories:
 tags:
   - postgresql
   - sequence
+comments: true
 ---
 ## 介绍
 

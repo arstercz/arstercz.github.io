@@ -14,6 +14,7 @@ tags:
   - curl
   - dentry
   - slab
+comments: true
 ---
 ## 问题说明
 

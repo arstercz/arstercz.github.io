@@ -16,6 +16,7 @@ categories:
 tags:
   - iptables
   - port forward
+comments: true
 ---
 <h2>1. 介绍</h2>
 

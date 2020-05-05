@@ -2,7 +2,7 @@
 layout: post
 title: "Linux 系统动态追踪技术介绍"
 tags: [linux, trace]
-comments: false
+comments: true
 ---
 
 ## 目录

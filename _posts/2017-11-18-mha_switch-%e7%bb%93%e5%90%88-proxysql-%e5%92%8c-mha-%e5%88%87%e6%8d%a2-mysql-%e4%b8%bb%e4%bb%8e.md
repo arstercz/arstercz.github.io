@@ -13,6 +13,7 @@ tags:
   - MHA
   - MySQL
   - proxysql
+comments: true
 ---
 ## mha_switch: 结合 proxysql 和 MHA 切换 MySQL 主从
 

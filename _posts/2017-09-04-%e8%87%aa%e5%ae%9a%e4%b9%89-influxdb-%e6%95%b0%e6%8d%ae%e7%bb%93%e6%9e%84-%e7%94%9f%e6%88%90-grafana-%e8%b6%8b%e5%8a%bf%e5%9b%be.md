@@ -13,6 +13,7 @@ categories:
 tags:
   - grafana
   - influxdb
+comments: true
 ---
 ## 介绍
 

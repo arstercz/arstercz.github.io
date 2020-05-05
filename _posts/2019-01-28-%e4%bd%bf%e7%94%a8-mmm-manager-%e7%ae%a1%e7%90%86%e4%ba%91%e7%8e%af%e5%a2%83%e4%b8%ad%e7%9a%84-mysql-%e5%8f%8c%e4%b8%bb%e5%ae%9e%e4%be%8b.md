@@ -11,6 +11,7 @@ categories:
 tags:
   - mmm
   - MySQL
+comments: true
 ---
 ### 介绍说明
 

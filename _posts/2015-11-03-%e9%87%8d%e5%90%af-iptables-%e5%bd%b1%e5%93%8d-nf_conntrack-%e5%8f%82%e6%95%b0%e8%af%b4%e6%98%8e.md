@@ -17,6 +17,7 @@ categories:
   - system
 tags:
   - iptables
+comments: true
 ---
 重启 iptables 影响 nf_conntrack 参数说明
 

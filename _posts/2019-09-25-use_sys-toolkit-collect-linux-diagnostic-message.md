@@ -2,7 +2,7 @@
 layout: post
 title: "使用 sys-toolkit 收集 Linux 系统的诊断信息"
 tags: [linux, toolkit]
-comments: false
+comments: true
 ---
 
 在早期的一系列文章中, 我们提到了很多关于 [percona-toolkit](https://www.percona.com/software/database-tools/percona-toolkit) 工具的使用说明, 其中最常用的 [pt-stalk]({{ site.baseurl }}/top-10-percona-toolkit-tools-%e5%9b%9b), [pt-summary]({{ site.baseurl }}/top-10-percona-toolkit-tools-%e4%b8%89/) 等工具为 MySQL 的故障诊断和系统信息收集带来了很大的帮助. 不过其中的很多工具(比如 `pt-stalk`, `pt-sift` 等) 都和 MySQL 强关联, 实际上并不适用于通用的 Linux 系统. 鉴于此原因, 我们将常用的三个工具(`pt-stalk`, `pt-sift`, `pt-summary`) 修改为通用的系统搜集工具, 并额外增加了更多的特性以便在 Linux 系统出现问题的时候搜集尽可能多的诊断信息方便故障排错. 这三个工具均收录到 [sys-toolkit](https://github.com/arstercz/sys-toolkit) 工具集中. 下面则分别介绍这些工具:

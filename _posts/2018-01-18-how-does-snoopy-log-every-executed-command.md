@@ -10,6 +10,7 @@ categories:
   - system
 tags:
   - snoopy
+comments: true
 ---
 ## snoopy 介绍
 

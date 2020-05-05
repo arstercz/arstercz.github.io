@@ -13,6 +13,7 @@ categories:
 tags:
   - manage
   - MySQL
+comments: true
 ---
 ## 介绍
 
