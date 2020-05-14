@@ -7,7 +7,7 @@ permalink: /about/
 
 ### About
 
-Focus on `database`, `Linux` operating system and `performance` tuning.
+Focus on `database`, `Linux` operating system, `performance tuning` and `troubleshooting`.
 
 ### Contact me
 
