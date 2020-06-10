@@ -1,6 +1,6 @@
 ---
 id: 127
-title: MySQL 管理规范
+title: MySQL 安装配置规范
 date: 2014-05-27T17:56:56+08:00
 author: arstercz
 layout: post
