@@ -22,6 +22,7 @@ permalink: /archive/
     {% endunless %}
 
     <li>
+      <time>{{ post.date | date: "%m-%d" }}</time>
       {% if post.link %}
       <a href="{{ post.link }}">
       {% else %}
@@ -29,7 +30,6 @@ permalink: /archive/
       {% endif %}
         {{ post.title }}
       </a>
-      <time>{{ post.date | date: "%Y-%m-%d" }}</time>
     </li>
   {% endfor %}
 </ul>
