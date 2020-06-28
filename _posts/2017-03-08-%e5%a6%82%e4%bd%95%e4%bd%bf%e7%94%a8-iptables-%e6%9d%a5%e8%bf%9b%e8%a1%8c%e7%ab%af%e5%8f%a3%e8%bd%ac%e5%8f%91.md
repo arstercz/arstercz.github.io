@@ -18,13 +18,13 @@ tags:
   - port forward
 comments: true
 ---
-<h2>1. 介绍</h2>
+## 1. 介绍
 
 传统的端口转发工具<a href="https://github.com/arstercz/portproxy">portproxy</a> 、<a href="https://boutell.com/rinetd/">rinetd</a> 等， 这些应用工具都通过接收并转发 tcp 数据报文实现转发端口的目的, 但是都存在或多或少的缺陷, 比如不能 tcp/udp 同时支持, 难以修改数据报文的一些路由规则等. 庆幸的是我们可以通过 linux 的 iptables 的数据包过滤规则在 kernel 层面实现端口的转发.
 
 在 iptables 的层面, 端口转发也可以称为端口映射, 是通过NAT(地址转发)的方式来修改数据包目的地址或端口, 再将报文转发到最终的主机(通常在没有公网地址的私有网络中). 通过这种方式用户既可以访问到远端的私有网络的机器(比如运行着 http 服务的主机).
 
-<h2>2. 访问结构</h2>
+## 2. 访问结构
 
 我们以如下结构来讲解如何在 public A 主机中进行端口转发, 使得用户可以访问到后端的 private B 主机的 memcached 端口:
 
@@ -38,7 +38,7 @@ comments: true
 
 图中 public A 主机的 em2 网卡为公网地址, 最终 user 可以通过访问 1.1.1.1:20011 来访问 private B 的 11211 端口. user 用户的主机可能存在于私有网络中, 也可能有独立的公网地址, 后续会介绍两者的不同.
 
-<h2>3. iptables 中的数据报文流程</h2>
+## 3. iptables 中的数据报文流程
 
 linux 用户可以通过 iptables 及其一系列的规则来高度控制数据报文的传输. 而 iptables 中的表则是其构件块, 描述了功能的大类, iptables 一共有4个表, 分别如下:
 
@@ -93,23 +93,24 @@ Routing decision                                                  |
 
 本文要介绍的端口转发就是基于 nat 表的 PREROUTING 和 POSTROUTING 链, 所有的数据报文都要先经过 nat 的 PREROUTING 链进行处理, 再根据路由规则选择是进入 filter 的 INPUT 链还是 filter 的 FORWARD 链, 不管进入哪个链, 之后都会进去 nat 表的 POSTROUTING 链, 最后数据报文再转发出去.
 
-<h2>4. 设置端口转发</h2>
+## 4. 设置端口转发
 
 从上面的数据报文的流程来看, 要在 public A 主机中实现端口转发大致有两种方式, 第一种就是文中最开始介绍的 portproxy、rinetd 工具, 这些工具的数据报文在进入 nat 的 PREROUTING 后就进入了 filter 的 INPUT 链. 第二种则是本文要介绍的方法, 数据在进入 nat 的 PREROUTING 链后 直接进入 filter 的 FORWARD 链, 因此要进行以下操作:
 
-<h4>1) 开启内核 ip_forward 转发</h4>
+#### 1) 开启内核 ip_forward 转发
 
 redhat/centos 系列系统默认为 0, 或者在 /etc/sysctl.conf 文件进行更改以永久生效;
 
-<pre><code>sysctl -w net.ipv4.ip_forward=1
-</code></pre>
+```
+sysctl -w net.ipv4.ip_forward=1
+```
 
-<h4>2) 设置 PREROUTING 路由规则</h4>
+#### 2) 设置 PREROUTING 路由规则
 
-用户访问 1.1.1.1:20011 的时候, 通过 DNAT 的方式将数据报文中的目的 ip 信息改为后端的 private B 地址 10.0.21.7:11211.
+用户访问 `1.1.1.1:20011` 的时候, 通过 DNAT 的方式将数据报文中的目的 ip 信息改为后端的 private B 地址 `10.0.21.7:11211`.
 
 ```
-iptables -t nat -A PREROUTING -d 1.1.1.1/32 -p tcp -m tcp --dport 20011 -j DNAT --to-destination 10.0.21.7:11211
+iptables -t nat -A PREROUTING -d `1.1.1.1/32` -p tcp -m tcp --dport 20011 -j DNAT --to-destination `10.0.21.7:11211`
 ```
 
 如果 public A 主机的公网地址是固定的静态 ip, 则不用设置下面的参数:
@@ -118,29 +119,31 @@ iptables -t nat -A PREROUTING -d 1.1.1.1/32 -p tcp -m tcp --dport 20011 -j DNAT 
 iptables -t nat -A POSTROUTING -o em2 -j MASQUERADE 
 ```
 
-<h4>3) 增加 filter 表的 FORWARD 规则</h4>
+#### 3) 增加 filter 表的 FORWARD 规则
 
 该步骤不是必须的, 如果当前 FORWARD 链的默认规则为 REJECT 则需要添加, 如果是 ACCEPT 就不需要执行下面的操作.
 
-<pre><code>iptables -I FORWARD 1 -d 10.0.21.7/32 -j ACCEPT
-</code></pre>
+```
+iptables -I FORWARD 1 -d 10.0.21.7/32 -j ACCEPT
+```
 
-<h4>4) 设置 POSTROUTING 路由规则</h4>
+#### 4) 设置 POSTROUTING 路由规则
 
 该步骤也不是必须的, 主要视 public A 主机的路由规则而定, 默认情况下是不需要增加的, 因为 FORWARD 规则会通过 10.0.21.5 内网地址进行转发. 这里的 SNAT 则是将数据报文的源地址改为 10.0.21.5(即 public A 的内网地址), 再发送出去.
 
-<pre><code>iptables -t nat -I POSTROUTING 1 -d 10.0.21.7/32 -p tcp -m tcp --dport 11211 -j SNAT --to-source 10.0.21.5
-</code></pre>
+```
+iptables -t nat -I POSTROUTING 1 -d 10.0.21.7/32 -p tcp -m tcp --dport 11211 -j SNAT --to-source 10.0.21.5
+```
 
 设置完成后, 用户既可以通过 telnet 1.1.1.1 20011 验证端口转发的有效性.
 
-<h2>5. 访问出现的问题.</h2>
+## 5. 访问出现的问题
 
 在上述步骤设置完成后, 笔者也碰到了一个有趣的问题, 如果 user 的主机有独立的公网则可以 telnet 通过, 如果 user 的主机也是存在于私网中, 即也是通过 NAT 的方式访问 public A 主机的话, 就会出现 telnet 超时的问题.
 
 通过 tcpdump 抓包来看看数据报文的走向:
 
-<h4>1) user 在本地的私网环境中 telnet public A 主机:</h4>
+#### 1) user 在本地的私网环境中 telnet public A 主机:
 
 ```
 telnet 1.1.1.1 20011
@@ -152,42 +155,43 @@ user 本地端抓包:
 
 ```
 # tcpdump -S -s0 -nn -i any port 20011
-10:09:20.018174 IP 192.168.1.101.51782 &gt; 1.1.1.1.20011: Flags [S], seq 3245571896, win 14600, options [mss 1460,sackOK,TS val 57645414 ecr 0,nop,wscale 7], length 0
-10:09:21.017320 IP 192.168.1.101.51782 &gt; 1.1.1.1.20011: Flags [S], seq 3245571896, win 14600, options [mss 1460,sackOK,TS val 57646414 ecr 0,nop,wscale 7], length 0
+10:09:20.018174 IP 192.168.1.101.51782 > 1.1.1.1.20011: Flags [S], seq 3245571896, win 14600, options [mss 1460,sackOK,TS val 57645414 ecr 0,nop,wscale 7], length 0
+10:09:21.017320 IP 192.168.1.101.51782 > 1.1.1.1.20011: Flags [S], seq 3245571896, win 14600, options [mss 1460,sackOK,TS val 57646414 ecr 0,nop,wscale 7], length 0
 ```
 
 public A 主机抓包:
 
 ```
 # tcpdump -S -nn -i any port 11211 or port 20011
-10:09:22.777271 IP 2.2.2.2.57158 &gt; 1.1.1.1.20011: Flags [S], seq 3937785824, win 14600, options [mss 1380,sackOK,TS val 57645414 ecr 0,nop,wscale 7], length 0
-10:09:22.777335 IP 10.0.21.5.57158 &gt; 10.0.21.7.11211: Flags [S], seq 3937785824, win 14600, options [mss 1380,sackOK,TS val 57645414 ecr 0,nop,wscale 7], length 0
-10:09:23.776389 IP 2.2.2.2.57158 &gt; 1.1.1.1.20011: Flags [S], seq 3937785824, win 14600, options [mss 1380,sackOK,TS val 57646414 ecr 0,nop,wscale 7], length 0
-10:09:23.776420 IP 10.0.21.5.57158 &gt; 10.0.21.7.11211: Flags [S], seq 3937785824, win 14600, options [mss 1380,sackOK,TS val 57646414 ecr 0,nop,wscale 7], length 0
+10:09:22.777271 IP 2.2.2.2.57158 > 1.1.1.1.20011: Flags [S], seq 3937785824, win 14600, options [mss 1380,sackOK,TS val 57645414 ecr 0,nop,wscale 7], length 0
+10:09:22.777335 IP 10.0.21.5.57158 > 10.0.21.7.11211: Flags [S], seq 3937785824, win 14600, options [mss 1380,sackOK,TS val 57645414 ecr 0,nop,wscale 7], length 0
+10:09:23.776389 IP 2.2.2.2.57158 > 1.1.1.1.20011: Flags [S], seq 3937785824, win 14600, options [mss 1380,sackOK,TS val 57646414 ecr 0,nop,wscale 7], length 0
+10:09:23.776420 IP 10.0.21.5.57158 > 10.0.21.7.11211: Flags [S], seq 3937785824, win 14600, options [mss 1380,sackOK,TS val 57646414 ecr 0,nop,wscale 7], length 0
 ```
 
 private B 主机抓包:
 ```
 # tcpdump -S -nn -i any port 11211
-10:09:23.773626 IP 10.0.21.5.57158 &gt; 10.0.21.7.11211: Flags [S], seq 3937785824, win 14600, options [mss 1380,sackOK,TS val 57646414 ecr 0,nop,wscale 7], length 0
-10:09:25.773608 IP 10.0.21.5.57158 &gt; 10.0.21.7.11211: Flags [S], seq 3937785824, win 14600, options [mss 1380,sackOK,TS val 57648414 ecr 0,nop,wscale 7], length 0
+10:09:23.773626 IP 10.0.21.5.57158 > 10.0.21.7.11211: Flags [S], seq 3937785824, win 14600, options [mss 1380,sackOK,TS val 57646414 ecr 0,nop,wscale 7], length 0
+10:09:25.773608 IP 10.0.21.5.57158 > 10.0.21.7.11211: Flags [S], seq 3937785824, win 14600, options [mss 1380,sackOK,TS val 57648414 ecr 0,nop,wscale 7], length 0
 ```
 
 从两个 tcpdump 结果可以看出, 数据报文已经正常到了 private B 主机, 也就说已经通过了 public A 主机的 POSTROUTING 处理, 将包转发到了后端的 B 主机, 但是 B 主机没有响应, 正常的三次握手也没有建立完成, 也就是 B 主机直接丢弃了 A 发送过来的报文.
 
 但是如果 user 主机有独立的公网, 则正常验证通过. 这点很让人迷惑, tcpdump 的结果中唯一不同的就是数据报文开头的时间戳信息, 但是 tcp 选项里的 TS val 值是以 user 本地端为准的. 这让笔者想到了 TCP 时间戳的一个问题, 参见 <a href="http://stackoverflow.com/questions/8893888/dropping-of-connections-with-tcp-tw-recycle">dropping-of-connections-with-tcp-tw-recycle</a>, 而 B 主机上的 tcp_tw_recycle 的参数是开启的. tcp_tw_recycle 内核参数到底有什么用? 下面是内核文档的解释:
 
-<pre><code>kernel-doc-2.6.32/Documentation/networking/ip-sysctl.txt
+```
+kernel-doc-2.6.32/Documentation/networking/ip-sysctl.txt
 
 tcp_tw_recycle - BOOLEAN
         Enable fast recycling TIME-WAIT sockets. Default value is 0.
         It should not be changed without advice/request of technical
         experts.
-</code></pre>
+```
 
-linux 系统的 TIME_WAIT 状态用来保障连接的正常关系, 实际上并不会消耗过多的资源, 但是在高并发的环境中很多技术人员会将 tcp_tw_recycle 和 tcp_tw_reuse 参数打开用来快速回收和重用 TIME_WAIT 的 socket 连接, 这在一定程度上可以提升机器的性能, 不过也会带来一些难以预料的问题.
+linux 系统的 `TIME_WAIT` 状态用来保障连接的正常关系, 实际上并不会消耗过多的资源, 但是在高并发的环境中很多技术人员会将 `tcp_tw_recycle` 和 `tcp_tw_reuse` 参数打开用来快速回收和重用 `TIME_WAIT` 的 socket 连接, 这在一定程度上可以提升机器的性能, 不过也会带来一些难以预料的问题.
 
-当 tcp_tw_recycle 和 tcp_timestamps 参数同时开启的时候, 同一源 ip 的连接, 在 TIME_WAIT 状态下, 系统内核会追踪其最近的时间戳信息, 如果时间戳正常增长就允许重用(re-use)该连接的 socket, 如果时间戳异常变更, 该主机就会丢弃接收到 SYN 报文, 这就会引起上面令人迷惑的问题. 同样再来看看我们的环境, user 如果存在于 NAT 环境, 在连接 public server 的时候, 用户侧的 NAT 只会更改 IP 的源地址信息, 而不会改变时间戳(tcp 报文的时间戳基于系统启动的时间, tcp 报文的 timestamps 选项), <a href="https://www.ietf.org/rfc/rfc1323.txt">rfc</a>文档规定时间戳值必须为单调递增，否则接受到的包可能会被丢掉, 如下所示:
+当 `tcp_tw_recycle` 和 `tcp_timestamps` 参数同时开启的时候, 同一源 ip 的连接, 在 `TIME_WAIT` 状态下, 系统内核会追踪其最近的时间戳信息, 如果时间戳正常增长就允许重用(`re-use`)该连接的 socket, 如果时间戳异常变更, 该主机就会丢弃接收到 SYN 报文, 这就会引起上面令人迷惑的问题. 同样再来看看我们的环境, user 如果存在于 NAT 环境, 在连接 `public server` 的时候, 用户侧的 NAT 只会更改 IP 的源地址信息, 而不会改变时间戳(tcp 报文的时间戳基于系统启动的时间, tcp 报文的 `timestamps` 选项), <a href="https://www.ietf.org/rfc/rfc1323.txt">rfc</a>文档规定时间戳值必须为单调递增，否则接受到的包可能会被丢掉, 如下所示:
 
 ```
            An additional mechanism could be added to the TCP, a per-host
@@ -200,8 +204,8 @@ linux 系统的 TIME_WAIT 状态用来保障连接的正常关系, 实际上并�
            must be at least one tick of the sender's timestamp clock.
            Such an extension is not part of the proposal of this RFC.
 ```
-在 linux 内核源文件中 <code>linux/v2.6.39.4/source/net/ipv4/tcp_ipv4.c</code> 中的 <code>tcp_v4_conn_request</code> 函数中
-```
+在 linux 内核源文件中 `linux/v2.6.39.4/source/net/ipv4/tcp_ipv4.c` 中的 `tcp_v4_conn_request` 函数中
+```c
 		/* VJ's idea. We save last timestamp seen
 		 * from the destination in peer table, when entering
 		 * state TIME-WAIT, and check against it before
@@ -254,16 +258,16 @@ CONFIG_MACHZ_WDT=m
 我们来看看正常的 telnet 请求的情况:
 
 ```
-12:26:41.599122 IP 2.2.2.2.26597 &gt; 1.1.1.1.20011: Flags [S], seq 1403291286, win 14600, options [mss 1380,sackOK,TS val 65884228 ecr 0,nop,wscale 7], length 0
-12:26:41.599155 IP 10.0.21.5.26597 &gt; 10.0.21.7.11211: Flags [S], seq 1403291286, win 14600, options [mss 1380,sackOK,TS val 65884228 ecr 0,nop,wscale 7], length 0
-12:26:41.599219 IP 10.0.21.7.11211 &gt; 10.0.21.5.26597: Flags [S.], seq 159148930, ack 1403291287, win 14480, options [mss 1460,sackOK,TS val 1681744061 ecr 65884228,nop,wscale 7], length 0
-12:26:41.599226 IP 1.1.1.1.20011 &gt; 2.2.2.2.26597: Flags [S.], seq 159148930, ack 1403291287, win 14480, options [mss 1460,sackOK,TS val 1681744061 ecr 65884228,nop,wscale 7], length 0
-12:26:41.602296 IP 2.2.2.2.26597 &gt; 1.1.1.1.20011: Flags [.], ack 159148931, win 115, options [nop,nop,TS val 65884232 ecr 1681744061], length 0
-12:26:41.602321 IP 10.0.21.5.26597 &gt; 10.0.21.7.11211: Flags [.], ack 159148931, win 115, options [nop,nop,TS val 65884232 ecr 1681744061], length 0
+12:26:41.599122 IP 2.2.2.2.26597 > 1.1.1.1.20011: Flags [S], seq 1403291286, win 14600, options [mss 1380,sackOK,TS val 65884228 ecr 0,nop,wscale 7], length 0
+12:26:41.599155 IP 10.0.21.5.26597 > 10.0.21.7.11211: Flags [S], seq 1403291286, win 14600, options [mss 1380,sackOK,TS val 65884228 ecr 0,nop,wscale 7], length 0
+12:26:41.599219 IP 10.0.21.7.11211 > 10.0.21.5.26597: Flags [S.], seq 159148930, ack 1403291287, win 14480, options [mss 1460,sackOK,TS val 1681744061 ecr 65884228,nop,wscale 7], length 0
+12:26:41.599226 IP 1.1.1.1.20011 > 2.2.2.2.26597: Flags [S.], seq 159148930, ack 1403291287, win 14480, options [mss 1460,sackOK,TS val 1681744061 ecr 65884228,nop,wscale 7], length 0
+12:26:41.602296 IP 2.2.2.2.26597 > 1.1.1.1.20011: Flags [.], ack 159148931, win 115, options [nop,nop,TS val 65884232 ecr 1681744061], length 0
+12:26:41.602321 IP 10.0.21.5.26597 > 10.0.21.7.11211: Flags [.], ack 159148931, win 115, options [nop,nop,TS val 65884232 ecr 1681744061], length 0
 ...
 ...
-12:26:44.119060 IP 10.0.21.7.11211 &gt; 10.0.21.5.26597: Flags [.], ack 1403291294, win 114, options [nop,nop,TS val 1681746581 ecr 65886749], length 0
-12:26:44.119068 IP 1.1.1.1.20011 &gt; 2.2.2.2.26597: Flags [.], ack 1403291294, win 114, options [nop,nop,TS val 1681746581 ecr 65886749], length 0
+12:26:44.119060 IP 10.0.21.7.11211 > 10.0.21.5.26597: Flags [.], ack 1403291294, win 114, options [nop,nop,TS val 1681746581 ecr 65886749], length 0
+12:26:44.119068 IP 1.1.1.1.20011 > 2.2.2.2.26597: Flags [.], ack 1403291294, win 114, options [nop,nop,TS val 1681746581 ecr 65886749], length 0
 ```
 
 这是正常的三次握手的过程, 第三个包为 private B 主机的响应, 倒数第三个包的 TS val 为 65884232, 倒数第二个报的 ecr 为 65886749, 相减为 2.517个 HZ, 即经过了 2517 ms, 刚好对应每行的时间信息. 而最后一个包的 TS val 值 1681746581 会被 private B 主机保存为连接的最新时间戳(如果 tcp_tw_recycle 和 tcp_timestamps 同时开启的话).
