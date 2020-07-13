@@ -6,7 +6,7 @@ comments: true
 ---
 
 
-最近在使用新版本 Percona 分支的 MySQL 的时候, 发现启动巨慢, 且启动时间随 `innodb_buffer_pool_size` 的大小成正比, 配置的 `innodb_buffer_pool_size` 越大, 启动时间越长, 所耗时间约为 `T = innodb_buffer_pool_size(GB)`, 如下所示, 我们将 `innodb_buffer_pool_size` 配置的足够大, 就会发现实例启动耗时约 `440s`: 
+最近在使用新版本 [Percona MySQL](https://www.percona.com/software/mysql-database/percona-server) 的时候, 发现启动巨慢, 且启动时间随 `innodb_buffer_pool_size` 的大小成正比, 配置的 `innodb_buffer_pool_size` 值越大, 启动时间就越长, 所耗时间约为 `T = innodb_buffer_pool_size(GB)`, 如下所示, 我们将 `innodb_buffer_pool_size` 配置的足够大, 就会发现实例启动耗时约 `440s`: 
 
 ```
 Jul  7 12:00:44 mysqld-3301[95109]: InnoDB: Initializing buffer pool, total size = 432G, instances = 24, chunk size = 256M
@@ -46,7 +46,7 @@ node 1 free: 28378 MB
 
  ```
 
- 新版本的选项 `innodb_numa_interleave` 即可设置 MySQL 在启动的时候将 NUMA 内存策略从默认的 `MPOL_DEFAULT` 策略修改为 `MPOL_INTERLEAVE` 交互模式, 更多策略见 [numa_memory_policy](https://www.kernel.org/doc/html/latest/admin-guide/mm/numa_memory_policy.html#components-of-memory-policies). 通过 `INTERLEAVE` 策略完成内存分批后, MySQL 又会将策略修改回默认的 `DEFAULT` 策略, 如下官方说明:
+ 新版本的选项 `innodb_numa_interleave` 即可设置 MySQL 在启动的时候将 NUMA 内存策略从默认的 `MPOL_DEFAULT` 策略修改为 `MPOL_INTERLEAVE` 交互模式, 更多策略见 [numa_memory_policy](https://www.kernel.org/doc/html/latest/admin-guide/mm/numa_memory_policy.html#components-of-memory-policies). 通过 `INTERLEAVE` 策略完成内存分配后, MySQL 又会将策略修改回默认的 `DEFAULT` 策略, 如下官方说明:
 
  ```
  Enables the NUMA interleave memory policy for allocation of the InnoDB buffer pool. 
@@ -57,7 +57,7 @@ node 1 free: 28378 MB
 
 ## 为什么启动很慢?
 
-在 [percona-PS-3967](https://jira.percona.com/browse/PS-3967) 的问题中, 自动 Oracle 官方引入 `innodb_numa_interleave` 功能后, Percona 版本之前的 `NUMA` 策略并没有生效, 为了解决这个问题, Percona 版本从以下版本开始在启用 `NUMA INTERLEAVE` 策略的时候一并通过 `mmap` 的 `MAP_POPULATE` 标记预先分配 `innodb_buffer_pool_size` 指定的内存:
+在 [percona-PS-3967](https://jira.percona.com/browse/PS-3967) 的问题中, 自从 Oracle 官方引入 `innodb_numa_interleave` 功能后, Percona 版本之前的 `NUMA` 策略并没有生效, 为了解决这个问题, Percona 从以下版本开始在启用 `NUMA INTERLEAVE` 策略的时候一并通过 `mmap` 的 `MAP_POPULATE` 标记预先分配 `innodb_buffer_pool_size` 指定的内存:
 
 | 主版本 | 生效版本 |
 | :-: | :-: |
@@ -84,7 +84,7 @@ the buffer pool initialization time.
 
 #### 2. 关闭  innodb_numa_interleave
 
-如果实例使用的内存远小于单颗 cpu 对应的内存, 可以考虑关闭 numa 策略. 很多云主机实例仅一颗 CPU node, 无法开启 numa 的平衡策略(kernel.numa_balancing), 这种情况下就无需开启 `innodb_numa_interleave` 选项.
+如果实例使用的内存远小于单颗 cpu 对应的内存, 可以考虑关闭 numa 策略. 很多云主机实例仅一颗 `CPU node`, 无法开启 numa 的平衡策略(`kernel.numa_balancing`), 这种情况下就无需开启 `innodb_numa_interleave` 选项.
 
 #### 3. 保存 buffer pool
 
@@ -96,6 +96,8 @@ innodb_buffer_pool_dump_at_shutdown = 1
 innodb_buffer_pool_dump_pct = 60
 ```
 
+更多见: [Saving and Restoring the Buffer Pool State](https://dev.mysql.com/doc/refman/5.7/en/innodb-preload-buffer-pool.html)  
+
 #### 4. 使用低版本 MySQL
 
 如上所述的版本变更, 我们可以使用较低的版本, 不过可能出现 [PS-3967](https://jira.percona.com/browse/PS-3967) 不生效的问题. 从笔者的使用经验来看, 可以参考以下版本:
@@ -105,13 +107,12 @@ percona mysql 5.6.38
 percona mysql 5.7.19
 ```
 
-更多见: [Saving and Restoring the Buffer Pool State](https://dev.mysql.com/doc/refman/5.7/en/innodb-preload-buffer-pool.html)  
-
 ## 参考
 
-https://blog.jcole.us/2012/04/16/a-brief-update-on-numa-and-mysql/  
-https://www.percona.com/doc/percona-server/5.6/performance/innodb_numa_support.html  
-https://www.percona.com/doc/percona-server/5.7/performance/innodb_numa_support.html  
-https://jira.percona.com/browse/PS-3967  
-http://mysql.taobao.org/monthly/2015/07/06/  
-https://www.kernel.org/doc/html/latest/admin-guide/mm/numa_memory_policy.html#components-of-memory-policies  
+[a-brief-update-on-numa-and-mysql](https://blog.jcole.us/2012/04/16/a-brief-update-on-numa-and-mysql/)  
+[5.6-innodb_numa_support](https://www.percona.com/doc/percona-server/5.6/performance/innodb_numa_support.html)  
+[5.7-innodb_numa_support](https://www.percona.com/doc/percona-server/5.7/performance/innodb_numa_support.html)  
+[percona_PS-3967](https://jira.percona.com/browse/PS-3967)  
+[taobao-2015-07-05](http://mysql.taobao.org/monthly/2015/07/06/)  
+[numa_memory_policy](https://www.kernel.org/doc/html/latest/admin-guide/mm/numa_memory_policy.html#components-of-memory-policies)  
+
