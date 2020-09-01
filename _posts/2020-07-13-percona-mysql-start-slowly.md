@@ -107,6 +107,10 @@ percona mysql 5.6.38
 percona mysql 5.7.19
 ```
 
+#### 5. 开启 large-page
+
+可以考虑将共享缓存分配给 `innodb buffer pool`, MySQL 指定 `large page` 功能后, 就不需要通过 mmap 预分配指定的 `innodb_buffer_pool_size` 大小的缓存. 这种方式的启动时间和使用低版本的 MySQL 等同. 开启 `large-page` 的过程可参考: [configuring-huge-page-for-MySQL](https://www.linkedin.com/pulse/configuring-huge-pages-mysql-server-red-hat-linux-juan-soto/), [large-page-support](https://dev.mysql.com/doc/refman/5.7/en/large-page-support.html).  
+
 ## 参考
 
 [a-brief-update-on-numa-and-mysql](https://blog.jcole.us/2012/04/16/a-brief-update-on-numa-and-mysql/)  
