@@ -30,11 +30,11 @@ mysql > select name from t_web_column where column_id IN (946390, 946391, 946392
 ```sql
 CREATE TABLE `t_web_column` (
   `column_id` int(11) NOT NULL AUTO_INCREMENT,
-  `project` varchar(200) DEFAULT NULL,
+  `name` varchar(200) DEFAULT NULL,
   `column` varchar(200) DEFAULT NULL,
   PRIMARY KEY (`column_id`),
-  UNIQUE KEY `index` (`project`,`column`),
-  KEY `project` (`project`)
+  UNIQUE KEY `index` (`name`,`column`),
+  KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 
 mysql > explain distinct(name) from t_web_column where column_id IN (946390, 946391, 946392, 946393)\G
@@ -113,7 +113,7 @@ set global optimizer_switch='use_index_extensions=off';
 
 #### 升级版本
 
-参考 [mysql-bug-87207], 可以升级到下面或之上的版本彻底解决此类问题:
+参考 [mysql-bug-87207](https://bugs.mysql.com/bug.php?id=87207), 可以升级到下述或之上的版本彻底解决此类问题:
 ```
 Fixed in 
   5.6.39
