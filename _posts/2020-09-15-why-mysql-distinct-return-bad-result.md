@@ -83,6 +83,24 @@ no index extensions.
 2. 优化器使用稀疏索引, 并且错误的选择了唯一键;
 ```
 
+对应上述的表结构, 唯一键 `index(name, column)` 由于索引扩展包含了主键信息, 所以 `distinct` 查询中, 优化器会优先选择 `index` 索引. 如果关闭索引扩展, 优化器便会选择常规的主键查询:
+```sql
+mysql > set global optimizer_switch='use_index_extensions=off';
+
+mysql > explain distinct(name) from t_web_column where column_id IN (946390, 946391, 946392, 946393)\G
+*************************** 1. row ***************************
+           id: 1
+  select_type: SIMPLE
+        table: t_web_column
+         type: range
+possible_keys: PRIMARY,index
+          key: PRIMARY
+      key_len: 4
+          ref: NULL
+         rows: 17
+        Extra: Using where; Using temporary
+```
+
 解决该问题也很简单, 参考官方的提交 [git-commit-7352f13](https://github.com/mysql/mysql-server/commit/7352f13a4952691191f31ec2ad4b004d568734e4) 信息, 不再对唯一索引增加索引扩展:
 ```
 Solution:
