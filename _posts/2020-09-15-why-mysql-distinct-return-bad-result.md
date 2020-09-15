@@ -75,17 +75,25 @@ Using index for group-by
 Incorrect results could occur on a table with a unique index when the
 optimizer chose a loose index scan even though the unique index had
 no index extensions.
+
+Problem:
+--------
+This problem occurs under the following conditions:
+1) Table has a unique index.
+2) Query checks whether a loose index scan is applicable to
+this query. And mistakenly chooses it despite unique
+indexes having no index extensions.
 ```
 
 产生此类问题需要满足两个条件:
 ```
 1. 表中含有唯一键;
-2. 优化器使用稀疏索引, 并且错误的选择了唯一键;
+2. 优化器会检查是否可以使用松散索引扫描, 如果可以, 即便唯一索引没有索引扩展, 优化器也可能选择唯一索引;
 ```
 
-对应上述的表结构, 唯一键 `index(name, column)` 由于索引扩展包含了主键信息, 所以 `distinct` 查询中, 优化器会优先选择 `index` 索引. 如果关闭索引扩展, 优化器便会选择常规的主键查询:
+对应上述的表结构的唯一键 `index(name, column)`,  在 `distinct` 查询中, 优化器会优先选择 `index` 索引. 如果关闭索引扩展, 优化器便会选择常规的主键查询:
 ```sql
-mysql > set global optimizer_switch='use_index_extensions=off';
+mysql > set optimizer_switch='use_index_extensions=off';
 
 mysql > explain distinct(name) from t_web_column where column_id IN (946390, 946391, 946392, 946393)\G
 *************************** 1. row ***************************
@@ -101,7 +109,7 @@ possible_keys: PRIMARY,index
         Extra: Using where; Using temporary
 ```
 
-解决该问题也很简单, 参考官方的提交 [git-commit-7352f13](https://github.com/mysql/mysql-server/commit/7352f13a4952691191f31ec2ad4b004d568734e4) 信息, 不再对唯一索引增加索引扩展:
+解决该问题也很简单, 参考官方的提交 [git-commit-7352f13](https://github.com/mysql/mysql-server/commit/7352f13a4952691191f31ec2ad4b004d568734e4) 信息, 在进行稀疏索引扫描的时候, 索引扩展不再适用于唯一索引:
 ```
 Solution:
 ---------
