@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "发生 slab 内存泄漏该怎么办"
+title: "发生 SLAB 内存泄漏该怎么办"
 tags: [linux, slab]
 comments: true
 ---
@@ -12,9 +12,9 @@ comments: true
  | slob | 主要用于嵌入式系统, 代码量少, 算法简单 |
  | slub | 主要用于服务器等大型系统, 优化内存开销 |
 
-> 更多见: [slab/slob/slub](https://hammertux.github.io/slab-allocator)
+> **更多见**: [slab/slob/slub](https://hammertux.github.io/slab-allocator)
 
-通常的服务器系统都使用 `slub` 分配器, 内核, 模块或驱动用完内存后都需要释放掉内存, 如果一直占用着内存, 系统可能会频繁的 OOM 杀掉用户空间的进程, 更有可能耗尽系统内存引起内核崩溃. 在如下信息中, 系统已经没有多少内存可用, 其中 `SUnreclaim` 为 `slab` 的一部分, 占据了大量的内存:
+通常的服务器系统都使用 `slub` 分配器, 内核, 模块或驱动用完内存后都需要释放掉内存, 如果一直占用着内存, 系统可能会频繁的 `OOM(Out of Memory)` 杀掉用户空间的进程, 更有可能耗尽系统内存引起内核崩溃. 在如下信息中, 系统已经没有多少内存可用, 其中 `SUnreclaim` 为 `slab` 的一部分, 占据了大量的内存:
 ```
 # 系统环境
 
@@ -96,7 +96,7 @@ echo 0 > /sys/kernel/debug/tracing/events/kmem/kmalloc/enable
 ...
 ```
 
-跟踪的时间越长, 发现线索的概率就越大, 上述的信息中可以看到有不少用户空间的进程, 包括`systemd` 都进行了内存分配. 如果从上述信息中找到了可疑的信息, 可以关闭这些 `TASK` 对应的程序或内核模块, 如果找不到则可能是内核子系统, 驱动引起的原因. 上述信息中由于已经没有多少可用内存, 跟踪的时间也比较短, 所以没有发现可疑的线索. 同类问题可以参考 [redhat-1546313](https://access.redhat.com/solutions/1546313). 
+跟踪的时间越长, 发现线索的概率就越大, 上述的信息中可以看到有不少用户空间的进程, 包括`systemd` 都进行了内存分配. 如果从上述信息中找到了可疑的信息, 可以关闭这些 `TASK` 对应的程序或内核模块, 如果找不到则可能是内核子系统, 驱动引起的原因. 上述信息中由于已经没有多少可用内存, 跟踪的时间也比较短, 所以没有发现可疑的线索. 同类问题可以参考 [kmalloc-1024 slab caches take all resources](https://access.redhat.com/solutions/1546313). 
 
 ### 通过 slub 查找线索
 
@@ -142,7 +142,7 @@ Sep 16 16:27:26 cztest kernel: [<ffffffff99f25ae4>] int_signal+0x12/0x17
 
 ### 通过 kmemleak 查找线索
 
-[kmemleak](https://www.kernel.org/doc/html/v4.10/dev-tools/kmemleak.html) 通过追踪 `kmalloc(), kmem_cache_alloc(), vmalloc()` 等函数来判断内核是否存在内存泄漏. 目前大多数的发行版并没有开启编译选项 `CONFIG_DEBUG_KMEMLEAK `, 我们可以通过安装对应内核版本的 debug 版本来使用此特性.  这里我们不做具体的介绍, 详细示例可参考 [kmemleak 检测内核内存泄漏](http://linuxperf.com/?p=188) 和 [debug-kernel-space-memory-leak](https://www.bo-yang.net/2015/03/30/debug-kernel-space-memory-leak).
+[kmemleak](https://www.kernel.org/doc/html/v4.10/dev-tools/kmemleak.html) 通过追踪 `kmalloc(), kmem_cache_alloc(), vmalloc()` 等函数来判断内核是否存在内存泄漏. 目前大多数的发行版并没有开启编译选项 `CONFIG_DEBUG_KMEMLEAK `, 我们可以通过安装对应内核版本的 debug 版本来使用此特性.  这里不做具体的介绍, 详细示例可参考 [kmemleak 检测内核内存泄漏](http://linuxperf.com/?p=188) 和 [debug-kernel-space-memory-leak](https://www.bo-yang.net/2015/03/30/debug-kernel-space-memory-leak).
 
 ### 通过 perf 查找线索
 
@@ -184,7 +184,7 @@ WTOplog.lThread 99877 [000] 22544738.707289: probe:kmem_cache_alloc: (ffffffff99
 ......
 ``` 
 
-这种方式也有助于我们找到一些线索, 更多参考: [track-slab-using-perf](https://access.redhat.com/solutions/2850631).  
+更多参考: [track-slab-using-perf](https://access.redhat.com/solutions/2850631).  
 
 ### 通过 systemtap 查找线索
 
@@ -252,14 +252,15 @@ Exec: gpg-agent Name: kmalloc-1024  Count: 1
 
 ## 总结说明
 
-上述介绍的几种方式不一定能找出内存泄漏的根本原因, 不过会帮助我们获取一些有用的线索. 值得一提的是, 如果找到了相关的线索, 关闭对应的任务,内核模块或驱动后, 内核不一定会释放这些内存, 我们可能只能观察到 `kmalloc-1024` 不再增长, 这种情况下就只能靠重启系统释放内存.
+上述介绍的几种方式不一定能找出内存泄漏的根本原因, 不过会帮助我们获取一些有用的线索. 值得一提的是, 如果找到了相关的线索, 关闭对应的任务, 模块或驱动后, 内核不一定会释放这些内存, 可能只能观察到 `kmalloc-1024` 的数量不再增长, 这种情况下就只能靠重启系统释放内存.
 
 ## 参考
 
 [slab-allocator](https://hammertux.github.io/slab-allocator)  
-[redhat-1546313](https://access.redhat.com/solutions/1546313)  
-[redhat-358933](https://access.redhat.com/solutions/358933)  
-[redhat-2850631](https://access.redhat.com/solutions/2850631)  
+[kmalloc-1024 slab caches take all resources](https://access.redhat.com/solutions/1546313)  
+[keep track of slab leaks](https://access.redhat.com/solutions/358933)  
+[track slab allocations using perf](https://access.redhat.com/solutions/2850631)  
+[track slab allocations with systemtap](https://access.redhat.com/articles/2850581)  
 [debug-kernel-space-memory-leak](https://www.bo-yang.net/2015/03/30/debug-kernel-space-memory-leak)  
 [kmemleak 检测内核内存泄漏](http://linuxperf.com/?p=188)  
 [诊断 SLUB 问题](http://linuxperf.com/?p=184)  
