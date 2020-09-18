@@ -201,11 +201,20 @@ Tue Oct 29 19:52:52 2019 CST    996    996    994     redis-server  35307   6379
 
 `bcc` 则是在 `bpftrace` 的基础上实现的很多工具集, 从应用到内核, 不同层面的工具应有尽有. 最后再提醒下, eBPF 仅适用于 `Linux 4.1+` 的版本, 以 eBPF 开发的[进度](https://github.com/iovisor/bcc/blob/master/docs/kernel-versions.md)的来看, 
 `eBPF` 在 `kernel-4.10` 之后的支持才相对全面, 线上在使用的时候尽量选择较高内核版本的发行版, 比如以下示例:
+
 ```
+Redhat/Centos 7   -  3.10.0-940.el7.x86_64
 Redhat/Centos 8   -  4.18
 Ubuntu 18.04 LTS  -  4.15
 Debian 10(Buster) -  4.19  
 ```
+
+**备注**: Readhat/Centos 7 从 `7.6 (3.10.0-940.el7.x86_64)` 版本开始支持 `eBPF` 特性, 毕竟内核版本较低, 并没有支持所有的特性, 主要目的在于试用此技术:
+```
+The eBPF in Red Hat Enterprise Linux 7.6 is provided as Tech Preview and thus doesn't come with full support and is not suitable for deployment in production. 
+```
+我们**不应**将此特性大规模的部署到线上环境, 在此内核版本之后的 `Redhat/Centos 7` 都可以配合 `bcc-tools` 工具使用, 也可以自己编写相关的脚本. 更多见: [introduction-ebpf-red-hat-enterprise-linux-7](https://www.redhat.com/en/blog/introduction-ebpf-red-hat-enterprise-linux-7).  
+
 
 ## 线上实践指南
 
@@ -235,6 +244,8 @@ kernel-devel-3.10.0-957.27.2.el7.x86_64
 perf-3.10.0-957.27.2.el7.x86_64
 systemtap-runtime-4.0-9.el7.x86_64 (可选)
 ```
+
+> **备注**: 如果 `Redhat/Centos 7` 内核高于 `3.10.0-940.el7.x86_64`, 可以酌情使用基于 eBPF 的 `bcc-tools` 工具.  
 
 这里的版本需要和内核版本一致, `systemtap-runtime` 为可选项, 方便直接以 `staprun ...` 方式直接运行 `systemtap` 编译好的内核模块.
 
