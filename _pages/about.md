@@ -17,6 +17,7 @@ Focus on `database`, `Linux` operating system, `performance tuning` and `trouble
 ### Favorite websites
 
 [Blog for Cloudflare](https://blog.cloudflare.com/)  
+[Blog for Slack](https://slack.engineering/)  
 [Brendan D. Gregg's Homepage](http://www.brendangregg.com/)  
 [Yoshinori Matsunobu's Blog](http://yoshinorimatsunobu.blogspot.com/)  
 [Feedly](https://paper.seebug.org/)  
