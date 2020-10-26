@@ -122,8 +122,10 @@ message_format = "[uid:%{uid} sid:%{sid} pid:%{pid} tty:%{tty} cwd:%{cwd} filena
 `filter_chain` 为过滤规则, 可以只记录某个 uid 的所有操作, 也可以忽略记录某个 uid 的操作. 真实的环境中, 我们可能忽略一些监控用户的所有操作避免监控引起 snoopy 频繁的输出日志. 下面的配置则为忽略记录 uid 为 496 的用户的所有操作:
 
 ```bash
-filter_chain = exclude_uid:496
+filter_chain = exclude_uid:496;exclude_spanws_of:crond,daemon
 ```
+
+> 过滤规则在  `(filtering.c - snoopy_filtering_check_chain)` 函数实现, 由 `log.c - snoopy_log_syscall_exec` 函数调用, 过滤规则为事后行为, 即在打印日志的时候判断是否满足过滤规则, 并非事前行为. 
 
 #### output
 
