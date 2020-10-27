@@ -97,7 +97,7 @@ type=SYSCALL msg=audit(1603800704.305:5304075): arch=c000003e syscall=59 success
 l" key="command"
 type=EXECVE msg=audit(1603800704.305:5304075): argc=5 a0="/usr/bin/mysql" a1="-h" a2="127.0.0.1" a3="-P" a4="3301"
 ```
-更多说明见: [understanding-audit-log](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/security_guide/sec-understanding_audit_log_files)  
+> 更多说明见: [understanding-audit-log](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/security_guide/sec-understanding_audit_log_files)  
 
 auditd 整体上为分离的架构, `auditctl` 可以控制 `kauditd` 生成记录的策略, `kauditd` 生成的记录事件会发送到 `auditd` 守护程序, `audisp` 可以消费 `auditd` 的记录到其它地方. 其主要的几个工具包含如下:
 
@@ -121,17 +121,20 @@ auditd 整体上为分离的架构, `auditctl` 可以控制 `kauditd` 生成记�
 ....
 ```
 
+> `never` 和 `always` 所能支持的 `-F` 过滤字段不尽相同, 如果要按照 exe 忽略指定的工具路径, 只能通过 `never` 实现, exe 为执行工具的路径, 需要设置其绝对值, 这点没有 snoopy 的 exclude_comm 方便.
+
 更多规则设置见: [audit-define](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/security_guide/sec-defining_audit_rules_and_controls)  
 
-在实际的使用中, 我们不建议对常见的一些系统调用进行监控, 比如`connect`, `accept`, `execve` 等都是日志高产的行为, 应该在需要定位问题的时候开启. 当然如果过滤策略设置的足够详细, 比如忽略了指定用户, crond 进程等, 就可以很放心的监控这些系统调用. 
+在实际的使用中, 我们不建议对常见的一些系统调用进行监控, 比如`connect`, `accept`, `execve` 等都是日志高产的行为, 应该在需要定位问题的时候开启. 当然如果过滤策略设置的足够详细, 比如忽略了指定用户, crond 进程等, 就可以比较放心的监控这些系统调用. 
 
-另外也可以参考 `slack` 的官方文章, 了解更多 `audit` 相关的实践经验:
+一些安全工具(比如 [go-audit](https://github.com/slackhq/go-audit), [hids](https://github.com/ossec/ossec-hids))实现了与 `kauditd` 内核进程通信, 可以接收 `audit` 相关的日志, 这种方式替换了 `auditd` 服务, 灵活性很强, 可以做很多定制功能需求, 不过基本使用上还是建议避免收集过多的数据.
 
-[go-audit](https://github.com/slackhq/go-audit)  
+最后, 我们可以参考 `slack` 的官方文章, 了解更多 `audit` 相关的实践经验:
+
 [syscall-auditing-at-scale](https://slack.engineering/syscall-auditing-at-scale/)  
 [distributed-security-altering](https://slack.engineering/distributed-security-alerting/)  
 
 ## 总结
 
-从上述介绍可以看到, 审计系统的操作行为其实就是为了更方便的追溯和排查问题, 审计所产生的日志记录本身也可以作为取证的材料. 一些对安全敏感的企业可以通过 `auditd` 来实现不同级别的审计标准. 在实际的使用中, 我们建议通过 `snoopy` 或 `auditd` 来实现系统操作的审计需求, 另外也可以将审计的日志发送到 `ELK` 日志平台做一些策略方面的告警, 不过在具体的实践中, 我们需要做好细致的过滤规则避免产生大量重复且收效甚微的数据.
+从上述介绍可以看到, 审计系统的操作行为其实就是为了更方便的追溯和排查问题, 审计所产生的日志记录本身也可以作为取证的材料. 一些对安全敏感的企业可以通过 `auditd` 方式来实现不同级别的审计标准. 在实际的使用中, 我们建议通过 `snoopy` 或 `auditd` 来实现系统操作的审计需求, 另外也可以将审计的日志发送到 `ELK` 等日志平台做一些策略方面的告警, 不过在具体的实践中, 我们需要做好详细的过滤规则避免产生大量重复且收效甚微的数据.
 
