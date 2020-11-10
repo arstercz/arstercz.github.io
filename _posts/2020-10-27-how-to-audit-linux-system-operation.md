@@ -24,6 +24,7 @@ comments: true
 * [定制 bash 记录方式](#定制-bash-记录方式)
 * [snoopy 记录方式](#snoopy-记录方式)
 * [auditd 记录方式](#auditd-记录方式)
+* [eBPF 记录方式](#ebpf-记录方式)
 
 ### history 记录方式
 
@@ -48,7 +49,7 @@ comments: true
 
 ### snoopy 记录方式
 
-[snoopy 方式](https://github.com/a2o/snoopy) 相对新颖, 本质上是封装了 `execv, execve` 系统调用, 以系统预加载(`preload`)的方式实现记录所有的命令操作. 更多介绍可以参考以前的文章 [snoopy 如何记录系统执行过的命令](https://blog.arstercz.com/how-does-snoopy-log-every-executed-command/). 目前大部分系统执行命令时都通过 `execv, execve` 系统调用执行, 这点就和会话无关, 几乎所有的情况下, 只要通过这两个系统调用执行命令, 就会将操作行为记录下来, 从目前的最新版本(`2.4.8`)来看, snoopy 有几个优点:
+[snoopy 方式](https://github.com/a2o/snoopy) 相对新颖, 本质上是封装了 `execv, execve` 系统调用, 以系统预加载(`preload`)的方式实现记录所有的命令操作. 更多介绍可以参考以前的文章 [snoopy 如何记录系统执行过的命令]({{ site.baseurl }}/how-does-snoopy-log-every-executed-command/). 目前大部分系统执行命令时都通过 `execv, execve` 系统调用执行, 这点就和会话无关, 几乎所有的情况下, 只要通过这两个系统调用执行命令, 就会将操作行为记录下来, 从目前的最新版本(`2.4.8`)来看, snoopy 有几个优点:
 ```
 1. 难以绕过, 只要设置了 PRELOAD, 就肯定会记录;
 2. 无论是否存在 tty 会话, 都会记录 execv, execve 相关的命令行操作, 包含详细的进程上下文信息;
@@ -134,7 +135,21 @@ auditd 整体上为分离的架构, `auditctl` 可以控制 `kauditd` 生成记�
 [syscall-auditing-at-scale](https://slack.engineering/syscall-auditing-at-scale/)  
 [distributed-security-altering](https://slack.engineering/distributed-security-alerting/)  
 
+#### eBPF 记录方式
+
+[eBPF](https://ebpf.io/) 在较新版本的 Linux 内核中实现, 提供了动态追踪的机制, 可以阅读之前的文章 [Linux 系统动态追踪技术介绍]({{ site.baseurl }}/introduction_to_linux_dynamic_tracing/) 了解更多动态追踪相关的知识. [bpftrace](https://github.com/iovisor/bpftrace) 和 [bcc](https://github.com/iovisor/bcc) 是基于 `eBPF` 机制实现的工具, 方便大家对系统的调试和排错, bcc 提供了很多工具集, 从应用到内核, 不同层面的工具应有尽有, 比如 `execsnoop` 即可记录系统中所有的 `execv, execve` 相关的命令执行:
+```
+# ./execsnoop 
+PCOMM            PID    PPID   RET ARGS
+bash             32647  32302    0 /bin/bash
+id               32649  32648    0 /usr/bin/id -un
+hostname         32651  32650    0 /usr/bin/hostname
+uptime           410    32744    0 /bin/uptime
+```
+
+其它更细致的记录可以参考 [bcc](https://github.com/iovisor/bcc) 工具说明. 值得注意的是, `eBPF` 仅适用于 `Linux 4.1+` 的版本, 以 `eBPF` 开发的进度的来看, eBPF 在 `kernel-4.10` 之后的支持才相对全面, 线上在使用的时候尽量选择较高内核版本的发行版(比如 `Centos 8, Debian 10` 等). 另外 `Readhat/Centos 7` 从 `7.6 (3.10.0-940.el7.x86_64)` 版本开始支持 `eBPF` 特性, 不过内核版本较低, 并没有支持所有的特性, 其主要目的在于试用此技术:
+
 ## 总结
 
-从上述介绍可以看到, 审计系统的操作行为其实就是为了更方便的追溯和排查问题, 审计所产生的日志记录本身也可以作为取证的材料. 一些对安全敏感的企业可以通过 `auditd` 方式来实现不同级别的审计标准. 在实际的使用中, 我们建议通过 `snoopy` 或 `auditd` 来实现系统操作的审计需求, 另外也可以将审计的日志发送到 `ELK` 等日志平台做一些策略方面的告警, 不过在具体的实践中, 我们需要做好详细的过滤规则避免产生大量重复且收效甚微的数据.
+从上述介绍可以看到, 审计系统的操作行为其实就是为了更方便的追溯和排查问题, 审计所产生的日志记录本身也可以作为取证的材料. 一些对安全敏感的企业可以通过 `auditd` 方式来实现不同级别的审计标准. 在实际的使用中, 我们建议通过 `snoopy` 或 `auditd` 来实现系统操作的审计需求, 一些细致的记录追踪可以通过 `eBPF` 方式实现. 另外也可以将审计的日志发送到 `ELK` 等日志平台做一些策略方面的告警, 不过在具体的实践中, 我们需要做好详细的过滤规则避免产生大量重复且收效甚微的数据.
 
