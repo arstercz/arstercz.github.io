@@ -52,6 +52,7 @@ comments: false
 
 [Ansible](https://www.ansible.com/): A simple IT automation platform that makes your applications and systems easier to deploy and maintain.   
 [mpssh](https://github.com/ndenev/mpssh): Mass Parallel SSH.  
+[Supervisor](http://supervisord.org/): A Process Control System.
 
 ### Monitor
 
