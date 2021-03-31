@@ -18,8 +18,8 @@ $table-background-color: #fefefe;
 
 // Fonts
 // $serif-primary: 'monospace', 'PT Sans', 'Libre Baskerville', 'Times New Roman', Times, serif;
-$serif-primary: 'monospace', 'PT Sans', 'Helvetica', 'Spoqa Han Sans', 'Source Sans Pro', 'Apple SD Gothic Neo', 'Nanum Barun Gothic', 'Nanum Gothic', 'Verdana', 'Arial', 'Dotum', sans-serif;
-$serif-secondary: Palatino, 'Palatino LT STD', 'Palatino Linotype', 'Book Antiqua', 'Georgia', serif;
+$serif-primary: 'Libre Baskerville', 'Times New Roman', Times, serif !default;
+$serif-secondary: Palatino, 'Palatino LT STD', 'Palatino Linotype', 'Book Antiqua', 'Georgia', serif !default;
 $sans-serif: 'Helvetica Neue', 'Segoe UI', Helvetica, Arial, sans-serif;
 $monospaced: Menlo, Monaco, monospace;
 
