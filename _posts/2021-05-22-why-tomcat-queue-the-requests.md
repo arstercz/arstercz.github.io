@@ -15,17 +15,21 @@ comments: true
    tomcat-6.0.37
 ```
 
-在 tomcat 的配置中:
+tomcat 的 connector 配置:
 ```
-        <Connector port="8080" maxHttpHeaderSize="8192" protocol="org.apache.coyote.http11.Http11NioProtocol"
-                maxThreads="800" acceptCount="1000" minSpareThreads="50"
-                enableLookups="false" disableUploadTimeout="true"
-                maxKeepAliveRequests="1000" connectionTimeout="120000"/>
+# 开启 ssl
+<Connector port="443" maxHttpHeaderSize="8192" protocol="org.apache.coyote.http11.Http11NioProtocol"
+        maxThreads="800" acceptCount="1000" minSpareThreads="50"
+        enableLookups="false" disableUploadTimeout="true"
+        maxKeepAliveRequests="1000" connectionTimeout="120000"
+        SSLEnabled="true" scheme="https" secure="true"
+        clientAuth="true" sslProtocol="TLS" />
 ```
 
 配置中, 连接器使用了 `Http11NioProtocol` 非阻塞协议, Nio 协议默认最大连接数 10000, 同时运行线程数最大 800, 排队最大 1000，从配置来看, tomcat 应该是可以同时运行几百个请求的, 不过从 tcp 抓包来看, 却出现了排队的现象:
 
 ```
+// tshark 解析抓包的数据
     1 22:47:15.308511   10.11.1.10 → 10.11.1.13 TCP 74 54681 → 443 [SYN] Seq=0 Win=14600 Len=0 MSS=1460 SACK_PERM=1 TSval=1035175627 TSecr=0 WS=128
     2 22:47:15.336250 10.11.1.13 → 10.11.1.10   TCP 74 443 → 54681 [SYN, ACK] Seq=0 Ack=1 Win=28960 Len=0 MSS=1460 TSval=1051388483 TSecr=1035175627 WS=128
     3 22:47:15.336261   10.11.1.10 → 10.11.1.13 TCP 66 54681 → 443 [ACK] Seq=1 Ack=1 Win=14720 Len=0 TSval=1035175636 TSecr=1051388483
@@ -304,14 +308,14 @@ Any further simultaneous requests will receive "connection refused" errors, unti
 文档中描述的模式, 在大量请求同时来的时候, 我们容易理解成下面的流程:
 ```
    +------+     +------------------+    +-----------------------+    +------------------+     +----------+
-   | 请求 | ->  | 当前连接池的线程 | -> | 最大线程数 maxThreads | -> | 队列 acceptCount | - > | 拒绝处理 |
+   | 请求 | ->  |  当前连接池的线程   | -> |  最大线程数 maxThreads  | -> | 队列 acceptCount  | - > | 拒绝处理  |
    +------+     +------------------+    +-----------------------+    +------------------+     +----------+
 ```
 
 实际上应该是下面的流程:
 ```
    +------+     +-------------------+       +------------------+    +-----------------------+    +------------------+     +----------+
-   | 请求 | ->  | 请求队列(backlog) |   ->  | 当前连接池的线程 | -> | 最大线程数 maxThreads | -> | 队列 acceptCount | - > | 拒绝处理 |
+   | 请求 | ->  |  请求队列(backlog)  |   ->  | 当前连接池的线程    | -> |  最大线程数 maxThreads | -> |  队列 acceptCount | - > |  拒绝处理  |
    +------+     +-------------------+       +------------------+    +-----------------------+    +------------------+     +----------+
 ```
 
