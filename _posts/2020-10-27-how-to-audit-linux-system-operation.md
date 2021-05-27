@@ -23,6 +23,7 @@ comments: true
 * [history 记录方式](#history-记录方式)
 * [定制 bash 记录方式](#定制-bash-记录方式)
 * [snoopy 记录方式](#snoopy-记录方式)
+* [sysdig 记录方式](#sysdig-记录方式)
 * [auditd 记录方式](#auditd-记录方式)
 * [eBPF 记录方式](#ebpf-记录方式)
 
@@ -88,6 +89,36 @@ filter_chain = exclude_uid:992;exclude_comm:mysql,mongo,redis-cli
 ```
 `exclude_comm` 指定忽略以 `mysql, mongo 和 redis-cli` 工具执行的命令, 很多管理员或者脚本在使用这些工具的时候常常会加上用户密码信息, 这在明文环境中是很危险的行为, `exclude_comm` 规则简单的避免了常用工具泄漏敏感信息的隐患.
 
+#### sysdig 记录方式
+
+大部分情况下, 我们可以通过 [strace](https://man7.org/linux/man-pages/man1/strace.1.html) 工具来简单的追踪进程的行为, 比如 MySQL 为什么不能启动, php 为什么返回异常等等. 不过 strace 程序是基于 [ptrace](https://man7.org/linux/man-pages/man2/ptrace.2.html) 系统调用实现的, ptrace 为了能够获取到其他系统调用的详细信息, 需要做很多复杂的操作, 如果进程很繁忙, strace 就会对程序产生很大的影响. 这也是我们不建议对线上程序, 尤其是正在运行的游戏服, DB 等进程使用 strace 的原因. 
+
+[sysdig](https://github.com/draios/sysdig) 工具则以另一种创新的方式获取所有的系统调用, 可以很好的弥补 strace 的不足, 从下图来看:
+
+![linux-sysdig.png]({{ site.baseurl }}/images/articles/201910/linux-sysdig.png)
+
+sysdig 以内核模块的方式监控获取所有的系统调用, 其使用方式类似 `libpcap/tcpdump` 的用法, 可以将一段时间内系统调用的数据暂存起来供以后的跟踪分析. 因为对于 [系统调用](https://github.com/torvalds/linux/blob/master/arch/x86/entry/syscalls/syscall_64.tbl) 而言, 用户态层面的操作最终都会陷入到内核态, 由内核去完成对应的功能. 所以 sysdig 在内核态也就能很方便的获取到进程的上下文信息. 另外 sysdig 以非阻塞(non-blocking), 零拷贝(zero-copy) 的方式获取数据, 所以在实际使用中对在线的业务只有很轻微的影响. 我们线上繁忙程序的分析通常可以使用 sysdig 来跟踪排错.
+
+比如以下实例, 我们可以跟踪网络相关的调用找出哪个程序访问了另一台主机的端口(通常我们很难追踪到定期任务类程序的网络连接行为, 比如检测一个端口存活的工具, 连接操作是很快速的行为, 人工很难发现):
+```
+# sysdig fd.port=11211
+111107 21:57:30.101635885 2 telegraf (24077) < connect res=-115(EINPROGRESS) tuple=10.1.0.25:34700->10.1.0.25:11211 
+111125 21:57:30.101704276 3 memcached (19673) < accept fd=30(<4t>10.1.0.25:34700->10.1.0.25:11211) tuple=10.1.0.25:34700->10.1.0.25:11211 queuepct=0 queuelen=0 queuemax=128 
+111126 21:57:30.101707830 3 memcached (19673) > fcntl fd=30(<4t>10.1.0.25:34700->10.1.0.25:11211) cmd=4(F_GETFL) 
+```
+
+可以很方便的看到是 telegraf 监控程序访问了 11211 端口, 实际使用中, 我们更多的是暂存抓到的数据, 传到其他主机中查看, 如下所示:
+```
+# sysdig fd.port=11211 -w 11211.sysdig
+
+# sysdig -r 11211.sysdig 
+2799 22:00:04.397791648 1 memcached (19676) < sendmsg res=1046 data=STAT pid 19673..STAT uptime 1990036..STAT time 1621692003..STAT version 1.4.15.. 
+2800 22:00:04.397806812 1 telegraf (24072) > read fd=9 size=4096 
+2801 22:00:04.397810766 1 telegraf (24072) < read res=1046 data=STAT pid 19673..STAT uptime 1990036..STAT time 1621692003..STAT version 1.4.15.. 
+```
+
+更多 sysdig 示例可以参考: [Sysdig-Examples](https://github.com/draios/sysdig/wiki/Sysdig-Examples)
+
 #### auditd 记录方式
 
 [auditd 记录方式](https://people.redhat.com/sgrubb/audit/) 本身存在内核层面(kauditd 进程)的支持, 它实现了一个大而全的框架, 几乎能监控所有想监控的指标, 不管是按照访问模式, 系统调用还是事件类型触发, 都能满足监控需求. 因为其提供了内核层面的支持, 所以本质上比起 snoopy(仅封装 `execv, execve` 系统调用)要更加强大和健全.
@@ -151,5 +182,4 @@ uptime           410    32744    0 /bin/uptime
 
 ## 总结
 
-从上述介绍可以看到, 审计系统的操作行为其实就是为了更方便的追溯和排查问题, 审计所产生的日志记录本身也可以作为取证的材料. 一些对安全敏感的企业可以通过 `auditd` 方式来实现不同级别的审计标准. 在实际的使用中, 我们建议通过 `snoopy` 或 `auditd` 来实现系统操作的审计需求, 一些细致的记录追踪可以通过 `eBPF` 方式实现. 另外也可以将审计的日志发送到 `ELK` 等日志平台做一些策略方面的告警, 不过在具体的实践中, 我们需要做好详细的过滤规则避免产生大量重复且收效甚微的数据.
-
+从上述介绍可以看到, 跟踪系统的操作行为其实就是为了更方便的追溯和排查问题. 在实际的使用中, 我们建议通过 `snoopy` 或 `auditd` 来实现系统操作的跟踪, 如果系统内核较高, 一些细致的记录追踪可以通过 `eBPF` 方式实现. 当然我们可以记录的信息发送到 `ELK` 等日志平台做一些策略方面的告警. 不过在具体的实践中, 我们需要做好细致的过滤规则避免产生大量重复且收效甚微的数据.
