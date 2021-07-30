@@ -24,6 +24,7 @@ tags:
 7. 磁盘修改问题
 8. 负载均衡代理多端口问题
 9. dnf-automatic 自动更新问题
+10. 磁盘扩容问题
 ```
 
 ## 详细说明
@@ -90,3 +91,80 @@ A load balancer sends traffic to an instance group through a named port. Create 
 download_updates = no
 apply_updates = no
 ```
+
+### 10. 磁盘扩容问题
+
+> 备注: 大部分云厂商扩容方式类似, 详细见 [aliyun-resize_disk](https://help.aliyun.com/document_detail/113316.html?spm=a2c4g.11186623.6.931.37ca4eb7lDxmYi).
+
+如下所示, 分别对根分区和数据分区进行扩容:
+```
+# lsblk 
+NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+sda      8:0    0   30G  0 disk 
+└─sda1   8:1    0   15G  0 part /
+sdb      8:16   0  100G  0 disk /export
+```
+
+####  根分区扩容
+
+当前状态:
+```
+# df -hl /
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda1        15G   15G  615M  96% /
+```
+在 gcp 后台增加根分区大小到 `30G` 后, 查看信息如下:
+```
+# fdisk -l /dev/sda
+
+Disk /dev/sda: 32.2 GB, 32212254720 bytes, 62914560 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 4096 bytes
+I/O size (minimum/optimal): 4096 bytes / 4096 bytes
+Disk label type: dos
+Disk identifier: 0x000a261a
+
+   Device Boot      Start         End      Blocks   Id  System
+/dev/sda1   *        2048    31455327    15726640   83  Linux
+```
+
+可以通过 `growpart` 工具扩容根分区:
+```
+yum -y install cloud-utils-growpart.x86_64  # centos7 系统
+
+# growpart /dev/sda 1      # 1 为分区号, 对应上述 lsblk 中  sda1 的 MIN 信息
+CHANGED: partition=1 start=2048 old: size=31453280 end=31455328 new: size=62908492,end=62910540
+
+# reboot  # 需要重启
+```
+重启后查看根分区信息:
+```
+# df -hl /
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda1        30G   15G   16G  48% /
+```
+
+#### 数据分区扩容
+
+当前状态:
+```
+# df -hl /data
+/dev/sdb        100G   46G   55G  46% /data
+```
+
+分区为 xfs 时, 可以直接在线执行, 不需要 umount 分区:
+```
+# xfs_growfs /dev/sda1 
+```
+
+分区为 ext4 时, 可以直接执行, 不需要 umount 分区:
+```
+resize2fs /dev/sdb
+```
+
+查看扩容后的信息:
+```
+# df -hl /data
+/dev/sdb        150G   46G  105G  31% /data
+```
+
