@@ -14,7 +14,7 @@ permalink: /search/
 		font-size: normal;
 	    outline: none;
 	    padding: 1rem;
-		background: rgb(229, 229, 229);
+		background: rgb(246, 248, 250);
 	    width: 100%;
         height: 42px;
 		-webkit-appearance: none;
