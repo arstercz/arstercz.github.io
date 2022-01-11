@@ -11,7 +11,7 @@ tags: [macos]
 * [常用的效率工具](常用的效率工具)
 * [chrome 浏览器不能处理 https 页面](#chome-浏览器不能处理-https-页面)  
 * [锁屏后 ssh 连接中断](#锁屏后-ssh-连接中断)  
-* [wireshark 不能使用](#wireshark-不能使用)  
+* [wireshark ~~不能使用~~](#wireshark-不能使用)  
 
 ## 常用的效率工具
 
@@ -54,3 +54,6 @@ There's a secret passphrase built into the error page. Just make sure the page i
 截至目前(2021-10-18), wireshark 仅支持 macos 的 intel 架构, M1 架构还不支持. 如果要想分析抓包的文件, 只能借助支持 wireshark 的平台, 或者支持全平台的 [termshark](https://github.com/gcla/termshark) 工具以命令行的方式分析抓包文件.  不过 termshark 依赖的 tshark(wireshark 的组件) 不支持 macos. 所以如果手上有多余的 Linux 机器, 就直接用 termshark 来分析吧. 参考 [termshark-user-guide](https://github.com/gcla/termshark/blob/master/docs/UserGuide.md) 了解更多分析方法.
 
 另外, 网上提到的 [charles](https://www.charlesproxy.com/) 或 [proxyman](https://proxyman.io/ ) 工具本质上都是 web 代理调试的工具, 仅支持 `http/https` 的分析, 其他协议还不支持. 或许再等待一段时间后, 可能会出现 wireshark 的 M1 版本.
+
+
+*备注*: wireshark-3.6.1 版本已支持 mac m1 系统, 可下载 Arm 架构的安装包, 如 [macOS Arm 64-bit .dmg](https://1.as.dl.wireshark.org/osx/Wireshark%203.6.1%20Arm%2064.dmg).
