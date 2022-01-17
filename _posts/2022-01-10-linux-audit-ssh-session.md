@@ -118,6 +118,28 @@ $ ttytime 2022-01-10.02-23-52.068179.cz.ttyrec
 
 基于这些因素, ttyrec 建议开启 -Z 压缩减少对磁盘的占用.
 
+#### ttyplay 中断播放
+
+一些会话可能包含 `rz/sz` 的命令, 这些命令在通过 `ttyplay` 播放的时候会出现交互页面, 比如播放 rz 的时候, 如果你的终端(securecrt, iterm 等)支持 `Zmodem`, 则会弹出窗口让你选择文件列表. 这点像是 ttyplay 没有正确处理 Zmodem 协议. 如果终端禁止 Zmodem 协议, sz/rz 也会等待直到命令超时才会播放下一步骤.
+
+目前没有好的方法, 可以通过 ttyplay 的 `-n` 选项, 先导出 ttyrec 文件的内存, 再通过 less 等命令查看. 也可以找找开源的 web 端播放工具, 可能解决了此类问题.
+
+#### lshell 下如何使用
+
+lshell 类似特定的 shell, 如果用户的 shell 环境被修改为 `lshell`, 在一开始登录的时候就会进入 lshell 会话, 再去执行 ttyrec 之类的命令, 但是 ttyrec 命令本身需要在当前 shell 中继续加载 shell 会话, 如下所示, ttyrec 需要继续调用 lshell, 
+```
+ut1:~$ ttyrec
+/usr/bin/lshell: Permission denied
+
+ttyrec: aborting!
+```
+
+从 lshell 的实现来看, 底层的很多关联(比如 exec, bash) 等都是严格限制, 工具或者脚本依赖的一些命令或调用都不一定可以通过, 所以只能从 `先执行 ttyrec 启动新会话, 再执行 lshell 限制会话` 的方式来解决, 如下所示"
+```
+ttyrec -t 3600 -k 7200 -Z -d /export/tty_record -- sh -c 'lshell'
+```
+
+
 ## ttyrec 的缺点
 
 通过 ssh 的 ForceCommand 方式可以让使用者无感的登录跳板机. 不过 ttyrec 本质上还是在 ssh 登录后又起了一个子进程, 所以以下操作不会成功:
@@ -129,3 +151,7 @@ $ ttytime 2022-01-10.02-23-52.068179.cz.ttyrec
 如果一定要传文件, 需要提前做好上传文件的通路, 比如在跳板机启动 rsync 服务, 或者提供统一的上传下载服务.
 
 另外, ttyrec 目前仅适用于 Linux/Unix 系统, 如果需要连接 windows 等机器, 则无能为力, 只能借助其他工具, 比如 Apache 项目 [Guacamole](https://guacamole.apache.org/) 提供了通用的远程管理协议, 通过它可以统一管理基于 VNC, RDP(windows 系统等), 和 SSH 协议的会话. 如果需要统一所有系统的登录管理, 可以在 Guacamole 项目的基础上做更多的定制. 现成的项目可以参考 [next-terminal](https://github.com/dushixiang/next-terminal).
+
+## 其他替换工具
+
+另一个工具 [log-user-session](https://github.com/open-ch/log-user-session), 提供了和 `ttyrec` 类似的功能, 但不支持录屏, 仅以文本文件的方式存储会话内存, 等同 `ttyplay -n xxxx` 后的结果, 不过从易用性来看不如 ttyrec 方便, 而且不好和 lshell 结合, 但是该工具不会启动子会话, scp, rsync 等命令不受影响.
