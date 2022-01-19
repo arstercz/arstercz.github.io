@@ -154,4 +154,27 @@ ttyrec -t 3600 -k 7200 -Z -d /export/tty_record -- sh -c 'lshell'
 
 ## 其他替换工具
 
-另一个工具 [log-user-session](https://github.com/open-ch/log-user-session), 提供了和 `ttyrec` 类似的功能, 但不支持录屏, 仅以文本文件的方式存储会话内存, 等同 `ttyplay -n xxxx` 后的结果, 不过从易用性来看不如 ttyrec 方便, 而且不好和 lshell 结合, 但是该工具不会启动子会话, scp, rsync 等命令不受影响.
+另一个工具 [log-user-session](https://github.com/open-ch/log-user-session), 提供了和 `ttyrec` 类似的功能, 但不支持录屏, 仅以文本文件的方式存储会话内存, 等同 `ttyplay -n xxxx` 后的结果, 不过从易用性来看不如 ttyrec 方便, 而且不好和 lshell 结合, 但是该工具不会启动子会话, scp, rsync 等命令不受影响. 主要的几个配置选项说明如下:
+
+```
+LogFile = /export/user_session/%h-%u-%y%m%d-%H%M%S-%c-%p.log      # 格式见文档说明
+LogRemoteCommandData = 1                                          # remote command 对应 SSH_ORIGINAL_COMMAND 环境变量, 比如 'ssh host1 uptime', uptime 即为 SSH_ORIGINAL_COMMAND 的值
+LogNonInteractiveData = 1                                         # 是否记录非交互会话, 比如 'ssh host1 uptime' 即为非交互方式执行命令
+NonInteractiveCommandWhitelist = rsync,ps,uptime                  # 非交互会话命令白名单, 在名单里的只记录命令, 不记录输出结果
+```
+
+上述三个容易混淆的选项, 可以从源代码中详细区分, 只有返回 1 才会记录命令的输出:
+```
+ 544 int should_log_data(int interactive, const char *original_command) {
+ 545     if (!interactive && !opt_log_non_interactive_data) return 0;
+ 546     if (!interactive && *whitelist_size && is_command_whitelisted(original_command)) return 0;
+ 547     if (original_command && !opt_log_remote_command_data) return 0;
+ 548     return 1;
+ 549 }
+```
+
+更多说明见: [log-user-session_doc](https://github.com/open-ch/log-user-session/blob/develop/doc/log-user-session.pod).
+
+## 如何去除文本文件中的颜色和控制字符
+
+参见工具 [sys-rmcolor](https://github.com/arstercz/sys-toolkit#sys-rmcolor).
