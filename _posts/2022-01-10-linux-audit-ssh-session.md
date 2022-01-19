@@ -5,7 +5,7 @@ tags: [ssh]
 comments: true
 ---
 
-目前从命令行终端操作方面, 主要可以通过以下两种方式记录 ssh 会话的操作, 不过这些方式都存在固有的缺点, 难以达到审计的目的.
+目前从命令行终端操作方面, 主要可以通过以下两种方式记录 ssh 会话的操作, 不过这些方式都存在固有的缺点, 难以达到审计的目的. 如下所示:
 
 #### 1. 终端工具日志
 
@@ -18,6 +18,20 @@ comments: true
 基于上面的两个缺点, 我们可以在登录的跳板机中增加 [ovh-ttyrec](https://github.com/ovh/ovh-ttyrec) 工具, 记录个人所有的会话操作(包括多级联的 ssh 登录). 目前可以采用云厂商 ovh 发布的 ttyrec 分支版本, 其增加了会话管理功能, 因为有其它产品依赖该工具, 所以相对活跃, 存在一些问题的话, 也能相对好处理.
 
 不过上述的三种方式, 都可能多少记录了敏感信息(系统, db 密码等), 处理日志文件的时候一定要注意数据安全. 下面简单介绍如何使用 ovh-ttyrec 工具.
+
+* [如何部署](#如何部署)  
+* [如何使用及查看会话日志](#如何使用及查看会话日志)  
+    * [如何解锁](如何解锁)  
+    * [日志文件](日志文件)  
+    * [查看日志会话记录](#查看日志会话记录)  
+    * [如何导出日志](#如何导出日志)  
+    * [统计日志](#统计日志)  
+    * [日志文件的大小](#日志文件的大小)  
+    * [ttyplay 中断播放](#ttyplay-中断播放)  
+    * [lshell 下如何使用](#lshell-下如何使用)  
+* [ttyrec 的缺点](#ttyrec-的缺点)  
+* [其他替换工具](#其他替换工具)  
+* [如何去除文本中的颜色和控制字符](如何去除文本中的颜色和控制字符)  
 
 ## 如何部署
 
@@ -98,7 +112,7 @@ $ ls -hl /export/tty_record
 ttyplay -n -Z 2022-01-10.02-57-19.705167.cz.ttyrec.zst > /tmp/cz.session.log
 ```
 
-*备注*: ttyrec 文件中本身包含了时间信息, 文本高亮(如果 ssh 会话包含颜色显示), 导出的文件会包含一些特舒服和颜色字符. 不过通过 cat 等方式也可以正常显示. 一些命令的操作也可以通过 grep 进行处理.
+*备注*: ttyrec 文件中本身包含了时间信息, 文本高亮(如果 ssh 会话包含颜色显示), 导出的文件会包含一些特舒服和颜色字符. 不过通过 cat 等方式也可以正常显示. 一些命令的操作也可以通过 grep 进行处理. 另外也可以通过工具 [sys-rmcolor](https://github.com/arstercz/sys-toolkit#sys-rmcolor) 进行处理.
 
 #### 统计日志
 
@@ -114,6 +128,7 @@ $ ttytime 2022-01-10.02-23-52.068179.cz.ttyrec
 ```
 1. 会话输出多, 比如用户执行了查看文件的操作, 或者脚本 debug 打印了很多日志;
 2. 交互会话多, 比如长时间的 top, db, redis 等命令操作;
+3. 执行了 rz/sz 等操作, 文件越大, 对应的日志就越大;
 ```
 
 基于这些因素, ttyrec 建议开启 -Z 压缩减少对磁盘的占用.
@@ -134,7 +149,7 @@ ut1:~$ ttyrec
 ttyrec: aborting!
 ```
 
-从 lshell 的实现来看, 底层的很多关联(比如 exec, bash) 等都是严格限制, 工具或者脚本依赖的一些命令或调用都不一定可以通过, 所以只能从 `先执行 ttyrec 启动新会话, 再执行 lshell 限制会话` 的方式来解决, 如下所示"
+从 lshell 的实现来看, 底层的很多关联(比如 exec, bash) 等都是严格限制, 工具或者脚本依赖的一些命令或调用都不一定可以通过, 所以只能从 `先执行 ttyrec 启动新会话, 再执行 lshell 限制会话` 的方式来解决, 如下所示, 用户还是 `bash shell`, 在 `sshd_config` 中执行以下命令:
 ```
 ttyrec -t 3600 -k 7200 -Z -d /export/tty_record -- sh -c 'lshell'
 ```
@@ -164,7 +179,7 @@ NonInteractiveCommandWhitelist = rsync,ps,uptime                  # 非交互会
 ```
 
 上述三个容易混淆的选项, 可以从源代码中详细区分, 只有返回 1 才会记录命令的输出:
-```
+```c
  544 int should_log_data(int interactive, const char *original_command) {
  545     if (!interactive && !opt_log_non_interactive_data) return 0;
  546     if (!interactive && *whitelist_size && is_command_whitelisted(original_command)) return 0;
@@ -175,6 +190,6 @@ NonInteractiveCommandWhitelist = rsync,ps,uptime                  # 非交互会
 
 更多说明见: [log-user-session_doc](https://github.com/open-ch/log-user-session/blob/develop/doc/log-user-session.pod).
 
-## 如何去除文本文件中的颜色和控制字符
+## 如何去除文本中的颜色和控制字符
 
 参见工具 [sys-rmcolor](https://github.com/arstercz/sys-toolkit#sys-rmcolor).
