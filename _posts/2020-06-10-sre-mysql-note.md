@@ -172,7 +172,7 @@ max_allowed_packet = 1024M  # same to master
 
 更多见:
 
-[mha-switch](https://github.com/arstercz/mha_switch)  
+[mha4mysql-manager](https://github.com/arstercz/mha4mysql-manager)  
 [group-replication](https://dev.mysql.com/doc/refman/5.7/en/group-replication.html)  
 
 
