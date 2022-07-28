@@ -24,6 +24,7 @@ comments: true
 * [md5 校验错误](md5-校验错误)  
 * [一致性问题](#一致性问题)  
 * [目录显示问题](#目录显示问题)  
+* [windows 使用问题](#windows-使用问题)  
 
 ## 最佳实践
 
@@ -113,6 +114,27 @@ rclone 的挂载目录如果为目的端, 建议在本地使用 rsync 方式传�
 ## 目录显示问题
 
 对于 rclone 的 mount 方式而言, 期望的操作方式是本地挂载, 本地传输文件到远端, 这种方式新创建的目录或文件立即就可以生效显示. 如果是在远端传输文件, 本地挂载只为读取数据, 则会有一段时间的缓存, 新建的目录并不会立马显示, 该缓存时间受 `rclone mount` 选项 `--dir-cache-time` 控制, 超过指定时间再次访问的时候就会重新刷新目录列表, 对目录显示有短时间显示的需求, 可以将该值适当调小. 
+
+## windows 使用问题
+
+在 windows 系统中使用 rclone 的时候, 需要安装 windows 版的 fuse, 可以安装 [winfsp](https://github.com/winfsp/winfsp/) 以支持 fuse 功能. 在使用的时候也建议通过 windows 服务来启动 rclone, 如下所示, 可以通过windows 的 `sc` 命令以 cmd 方式来创建:
+
+```
+# 创建服务
+sc create rclone binpath= "D:\rclone-windows\rclone.exe mount --config D:\rclone-windows\rclone.conf --allow-non-empty --allow-other --vfs-cache-mode full --dir-cache-time 3m --poll-interval 1m --vfs-read-chunk-size-limit 128M --vfs-write-back 0s --log-level INFO --log-file D:\rclone-windows\log\rclone-sftp.log -o FileSecurity=\"O:WDG:WDD:NO_ACCESS_CONTROL\" --bwlimit 100M rclone_mount:/mnt/dl_tmp D:\rclone_mount" displayname= "Rclone Service" depend= Tcpip start= auto
+
+# 删除服务
+sc delete rclone
+```
+在 windows 中, 实际的文件权限由 winfsp 的 fuse 特性来实现控制, rclone 在通过 winfsp 挂载远端的时候需要执行文件的安全策略使得 windows 可以对挂载点进行完全的访问控制. 更多见:
+ 
+[rclone-windows-filesystem-permissions](https://rclone.org/commands/rclone_mount/#windows-filesystem-permissions) 
+[windwos-SDDL](https://docs.microsoft.com/en-us/windows/win32/secauthz/security-descriptor-string-format)  
+[winfsp-github-391](https://github.com/winfsp/winfsp/issues/391)  
+[rclone-github-4717](https://github.com/rclone/rclone/issues/4717)  
+[rclone-modtime-change](https://github.com/rclone/rclone/issues/3029)  
+
+> 备注: 如果提示`服务已标记删除 1072` 相关的错误, 需要关掉服务窗口, 再执行 `sc delete` 操作.
 
 ## systemd 管理挂载服务
 
