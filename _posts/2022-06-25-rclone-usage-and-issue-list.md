@@ -25,6 +25,7 @@ comments: true
 * [一致性问题](#一致性问题)  
 * [目录显示问题](#目录显示问题)  
 * [windows 使用问题](#windows-使用问题)  
+* [缓存目录过大问题](缓存目录过大问题)
 
 ## 最佳实践
 
@@ -135,6 +136,67 @@ sc delete rclone
 [rclone-modtime-change](https://github.com/rclone/rclone/issues/3029)  
 
 > 备注: 如果提示`服务已标记删除 1072` 相关的错误, 需要关掉服务窗口, 再执行 `sc delete` 操作.
+
+## 缓存目录过大问题
+
+使用 mount 模式的时候, 在开启 `--vfs-cache-mode full` 选项的情况下, rclone 为了提升性能, 通常会将文件写到本地, 再由后台功能异步的传输到远端. 如果短时间内传输大量文件, 就可能会使得默认的 vfs 缓存目录 `/tmp/rclone` 过大, 甚至吃满磁盘空间. 可以设置下面两个选项此类问题:
+ 
+```
+// rclone flags
+--cache-dir string                     Directory rclone will use for caching (default "/root/.cache/rclone")
+...
+--fs-cache-expire-duration duration    Cache remotes for this long (0 to disable caching) (default 5m0s)
+```
+ 
+由于 cache-dir 本身不够通用, 在 rpm 包中我们并未进行定制修改. `fs-cache-expire-duration` 则可以按需调整, 默认的 5m 也适合大多数场景. 线上传输较大的主机可以参考以下设置:
+```
+rclone --cache-dir /export/rclone/tmp  --fs-cache-expire-duration 2m mount ....
+```
+ 
+**备注**: 选项说明中的默认目录由实际的 `fs/config/config.go - makeCacheDir 函数决定`, linux 系统下默认为 `/tmp/rclone` 并非 `/root/.cache/rclone`, 如下所示:
+
+```go
+//fs/config/config.go 
+
+678 // Code borrowed from go stdlib until it is made public
+679 func makeCacheDir() (dir string) {
+680         // Compute default location.
+681         switch runtime.GOOS {
+682         case "windows":
+683                 dir = os.Getenv("LocalAppData")
+684
+685         case "darwin":
+686                 dir = os.Getenv("HOME")
+687                 if dir != "" {
+688                         dir += "/Library/Caches"
+689                 }
+690
+691         case "plan9":
+692                 dir = os.Getenv("home")
+693                 if dir != "" {
+694                         // Plan 9 has no established per-user cache directory,
+695                         // but $home/lib/xyz is the usual equivalent of $HOME/.xyz on Unix.
+696                         dir += "/lib/cache"
+697                 }
+698
+699         default: // Unix
+700                 // https://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html
+701                 dir = os.Getenv("XDG_CACHE_HOME")
+702                 if dir == "" {
+703                         dir = os.Getenv("HOME")
+704                         if dir != "" {
+705                                 dir += "/.cache"
+706                         }
+707                 }
+708         }
+709
+710         // if no dir found then use TempDir - we will have a cachedir!
+711         if dir == "" {
+712                 dir = os.TempDir()
+713         }
+714         return filepath.Join(dir, "rclone")
+715 }
+```
 
 ## systemd 管理挂载服务
 
