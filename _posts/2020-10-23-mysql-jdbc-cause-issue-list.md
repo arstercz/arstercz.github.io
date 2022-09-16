@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "MySQL 编码不一致可能引起的问题"
+title: "MySQL 及 jdbc 问题汇总"
 tags: [mysql, charset, procedure]
 comments: false
 ---
@@ -10,6 +10,9 @@ comments: false
 * [存储过程与编码](#存储过程与编码)
 * [jdbc 直接执行 sql](#jdbc-直连执行-sql)
 * [jdbc useSSL 参数变更](#jdbc-useSSL-参数变更)
+* [jdbc 通信异常](#jdbc-通信异常)  
+* [MySQL 命令无法输入中文问题处理](MySQL-命令无法输入中文问题处理)  
+* [MySQL 启动很慢](MySQL-启动很慢)  
 
 ### 存储过程与编码
 
@@ -47,3 +50,28 @@ SQL state [HY000]: error code [1267]: Illegal mix of collations (latin1_swedish_
 ```
 
 `MySQL 5.7.x` 及以上的版本, 默认会启用 `ssl`, 客户端连接的时候会自协商加密, 除非显示指定不加密. `mysql-connector-java` 从 `5.1.38` 开始默认开启 useSSL. 所以用低版本 jdbc 连接 `MySQL 5.7.x` 不会有加密的问题, 用高版本 jdbc 连接 5.7.6+ 以上会有加密问题, 需要显示指定 `useSSL=false`, 用高版本的 `jdbc` 连接 `MySQL 5.5, 5.6` 不会有加密问题.
+
+### jdbc 通信异常
+
+由于 mysql 连接 `wait_timeout` 等参数的设定, 实践中我们通常都不会将其设置的很大, 以避免吃满 db 的连接. 低版本的 `mysql-connector-j` 可能出现一下错误:
+```
+Caused by: com.mysql.jdbc.exceptions.jdbc4.CommunicationsException: The last packet successfully received from the server was 39,579,221 milliseconds ago.  The last packet sent successfully to the server was 39,579,221 milliseconds ago. is longer than the server configured value of 'wait_timeout'. You should consider either expiring and/or testing connection validity before use in your application, increasing the server configured values for client timeouts, or using the Connector/J connection property 'autoReconnect=true' to avoid this problem.
+```
+
+程序应该开启 `autoReconnect` 选项, 如果开启了还出现上述的错误, 需要升级 `mysql-connector-j` 至少到 `5.1.45` 版本, 低版本存在通信上的问题, 更多见 [bug-88242](https://bugs.mysql.com/bug.php?id=88242), 官方 changelog 中亦有提示:
+
+```
+Version 5.1.45
+.....
+  - Fix for Bug#88242 (27040063), autoReconnect and socketTimeout JDBC option makes wrong order of client packet.
+```
+
+### MySQL 命令无法输入中文问题处理
+
+见 [MySQL 命令无法输入中文问题处理]({{ site.baseurl }}/mysql-can-not-input-chinese/).
+
+### MySQL 启动很慢
+
+见 [为什么 Percona MySQL 开启 NUMA 选项后启动很慢]({{ site.baseurl }}/percona-mysql-start-slowly/).
+
+
