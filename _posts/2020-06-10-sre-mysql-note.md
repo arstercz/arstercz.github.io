@@ -99,11 +99,30 @@ pt-online-schema-change   # 在线修改表结构
 
 可参考设置:
 ```
+[mysql]
+prompt = 'mysql \u@[\h:\p \d] > '
+default-character-set = utf8
+[mysqladmin]
+default-character-set = utf8
+[mysqlcheck]
+default-character-set = utf8
+[mysqldump]
+default-character-set = utf8
+[mysqlimport]
+default-character-set = utf8
+[mysqlshow]
+default-character-set = utf8
+[client]
+port = 3396
+socket = /export/mysql/node3306/data/s3306
+
+[mysqld]
 # common InnoDB/XtraDB settings
 innodb_buffer_pool_size = 32G  # x 1.2 + 2GB for OS = 32GB node w/o MyISAM
 innodb_data_file_path = ibdata1:200M:autoextend
 innodb_log_file_size = 512M  # suitable for most environments
-innodb_log_buffer_size = 16M  # no bigger than max_allowed_packet
+innodb_log_files_in_group = 4
+innodb_log_buffer_size = 32M  # no bigger than max_allowed_packet
 innodb_flush_log_at_trx_commit = 2
 innodb_spin_wait_delay = 30
 innodb_sync_spin_loops = 100
@@ -148,6 +167,10 @@ query_cache_type = 1  # enable use of the query cache altogether
 query_cache_size = 0  # disable query cache
 
 tmpdir = /dev/shm
+skip-name-resolve
+skip-slave-start
+character-set-server = utf8  # default-character-set is deprecated in 5.0
+collation-server = utf8_general_ci
 log_output = FILE
 general_log = OFF
 slow_query_log = 1  # ON is not recognized in 5.1.46
