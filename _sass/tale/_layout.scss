@@ -83,13 +83,13 @@ footer,
 .archive {
   a {
     color: $default-color;
-    font-size: 15px;
+    font-size: 16px;
   }
 
   a:hover{color: $blue}
   time {
     color: $lighten-gray;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 300;
     margin-left: 3px;
   }
@@ -147,6 +147,6 @@ footer {
 
   span {
     color: $default-color;
-    font-size: .9rem;
+    font-size: .8rem;
   }
 }

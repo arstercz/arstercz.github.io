@@ -1,27 +1,25 @@
 // Colors
-$default-color: #24292e;
-$default-shade: #353535;
-$default-tint: #aaa;
-$grey-1: #979797;
-$grey-2: #e5e5e5;
-$grey-3: #f6f8fa;
-$lighten-gray: #868e96;
-$dark-gray: #3e3e40;
-$dark-pink: #87314e;
-$white: #fff;
-$blue: #0395e7;
-$shadow-color: rgba(0, 0, 0, .2);
-//$code-color: #bf616a;
-$code-color: #000000;
-$table-border-color: #e9ecef;
-$table-background-color: #fefefe;
+$default-color: #202020 !default;
+$default-shade: #353535 !default;
+$default-tint: #aaa !default;
+$grey-1: #979797 !default;
+$grey-2: #e5e5e5 !default;
+$grey-3: #f6f8fa !default;
+$lighten-gray: #868e96 !default;
+$dark-gray: #3e3e40 !default;
+$dark-pink: #87314e !default;
+$white: #fff !default;
+$blue: #4a9ae1 !default;
+$shadow-color: rgba(0, 0, 0, .2) !default;
+$code-color: #000000 !default;
+$table-border-color: #e9ecef !default;
+$table-background-color: #fefefe !default;
 
 // Fonts
-// $serif-primary: 'monospace', 'PT Sans', 'Libre Baskerville', 'Times New Roman', Times, serif;
 $serif-primary: 'Libre Baskerville', 'Times New Roman', Times, serif !default;
 $serif-secondary: Palatino, 'Palatino LT STD', 'Palatino Linotype', 'Book Antiqua', 'Georgia', serif !default;
-$sans-serif: 'Helvetica Neue', 'Segoe UI', Helvetica, Arial, sans-serif;
-$monospaced: Menlo, Monaco, monospace;
+$sans-serif: 'Helvetica Neue', 'Segoe UI', Helvetica, Arial, sans-serif !default;
+$monospaced: Menlo, Monaco, monospace !default;
 
 @mixin box-sizing($type: border-box) {
   -webkit-box-sizing: $type;
