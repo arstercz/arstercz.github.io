@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "ssh/scp 自动连接使用技巧"
-tags: [ssh, autologin]
+title: "ssh/scp/rsync 使用技巧"
+tags: [ssh, rsync, autologin]
 comments: true
 ---
 
@@ -12,6 +12,7 @@ comments: true
     * [指纹信息变更](#指纹信息变更)
     * [连接超时](#连接超时)
 * [公钥不匹配引起登录失败](#公钥不匹配引起登录失败)
+* [隐藏进程说明](#隐藏进程说明)
 * [使用建议](#使用建议)
 
 ### 引起中断的问题
@@ -42,7 +43,7 @@ Last login: Fri Feb 14 03:53:33 2020 from 10.0.1.10
 #### 指纹信息变更
 
 这种问题通常在重新初始化远程机器的时候, 比如重装机器, ssh 的指纹信息变更, 如下所示:
-```
+```bash
 $ ssh newhost
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
@@ -51,8 +52,10 @@ $ ssh newhost
 ......
 Host key verification failed.
 ```
+
 该问题同样可以通过 `StrictHostKeyChecking=no` 选项解决:
-```
+
+```bash
 $ ssh -o StrictHostKeyChecking=no newhost
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
@@ -117,7 +120,7 @@ debug1: Next authentication method: password
 ```
 
 从 sshd 源码 `sshconnect2.c` 来看, 有 `id_rsa.pub` 公钥的时候会进行 pubkey 检测, 不匹配就退出, 没有公钥文件则直接尝试私钥 `id_rsa` 连接. 如下所示:
-```
+```c
 1355 int
 1356 userauth_pubkey(Authctxt *authctxt)
 1357 {
@@ -156,6 +159,50 @@ debug1: Next authentication method: password
 ```
 
 所以在公钥不匹配的时候, 就会出现登录的问题, 可以简单的将 `id_rsa.pub` 换个文件名来跳过校验 pubkey, 以便正常登录.
+
+### 隐藏进程说明
+
+在日常使用 `scp/rsync/sftp` 的时候, 对端的机器一般都会产生一些隐含的进程, 具体如下:
+
+#### scp 文件
+
+如果在 A 主机执行 `scp file B:/tmp`, 那么 B 主机会产生下面的进程:
+```
+scp -t ...
+```
+
+如果在 A 主机执行 `scp B:/tmp/file /tmp`, 那么 B 主机会产生下面的进程:
+```
+scp -f ...
+```
+
+> 备注: `-t 和 -f` 选项不在手册选项中体现, 仅在源码中显现, 如下所示:
+```c
+// https://github.com/openssh/openssh-portable/blob/master/scp.c#L569
+		case 'f':	/* "from" */
+			iamremote = 1;
+			fflag = 1;
+			break;
+		case 't':	/* "to" */
+			iamremote = 1;
+			tflag = 1;
+```
+
+#### sftp 传输文件
+
+如果在 A 主机执行 `sftp B` 来传输文件, 那么 B 主机会产生下面的进程:
+```
+/usr/libexec/openssh/sftp-server
+```
+
+> 备注: 该进程受 B 主机 `/etc/ssh/sshd.conf` 配置 `Subsystem       sftp    /usr/libexec/openssh/sftp-server` 决定.
+
+#### rsync 传输文件
+
+如果在 A 主机执行 `rsync -av /tmp/file B:/tmp/` 或 `rsync -av B:/tmp/file /tmp/`, B 主机会产生下面的进程:
+```
+rsync --server ...
+```
 
 ### 使用建议
 
