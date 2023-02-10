@@ -12,6 +12,8 @@ tags: [macos]
 * [chrome 浏览器不能处理 https 页面](#chome-浏览器不能处理-https-页面)  
 * [锁屏后 ssh 连接中断](#锁屏后-ssh-连接中断)  
 * [wireshark ~~不能使用~~](#wireshark-不能使用)  
+* [ssh 到 macos 权限不足](#ssh-到-macos-权限不足)
+* [nfs mount 问题](#nfs-mount-问题)
 
 ## 常用的效率工具
 
@@ -24,7 +26,8 @@ tags: [macos]
 使用 chrome 打开一些自签证书的 https 站点时, 经常出现 `NET::ERR_CERT_INVALID` 的错误, 点击高级后也没有任何下一步的按钮提示.  不像 macos 下的 firefox 或者 windows 下的 chrome, 可以接受风险并继续打开站点. 这种情况可以参考 [no-proceed-anyway-option-on-neterr-cert-invalid](https://stackoverflow.com/questions/58802767/no-proceed-anyway-option-on-neterr-cert-invalid-in-chrome-on-macos):
 
 ```
-There's a secret passphrase built into the error page. Just make sure the page is selected (click anywhere on the screen), and just type thisisunsafe.
+There's a secret passphrase built into the error page. Just make sure the 
+page is selected (click anywhere on the screen), and just type thisisunsafe.
 ```
 
 鼠标点击到失效的 https 站点页面, 直接键盘输入 `thisisunsafe` 即可正常访问.
@@ -57,3 +60,38 @@ There's a secret passphrase built into the error page. Just make sure the page i
 
 
 *备注*: wireshark-3.6.1 版本已支持 mac m1 系统, 可下载 Arm 架构的安装包, 如 [macOS Arm 64-bit .dmg](https://1.as.dl.wireshark.org/osx/Wireshark%203.6.1%20Arm%2064.dmg).
+
+## ssh 到 macos 权限不足
+
+从 `windows/linux` ssh 连接登录 macos 后, 很多文件 io 的操作都会出现一下提示:
+```
+Operation not permitted
+```
+
+解决此问题需要在 macos 中开放 sshd 的 disk 操作权限, 如下所示:
+```
+Security & Privacy -> Privacy -> Full Disk Access -> [add sshd-keygen-wrapper]
+```
+
+## nfs mount 问题
+
+在 macos 中可以正常 mount `nfs server` 端的本地目录, 如果 `nfs server` 指定的目录也是挂载的别的主机的目录, 需要注意增加 `nolocks` 选项, 如下所示:
+```
+mount -t nfs  -o nfsvers=3,nolocks,noowners,timeo=15 10.1.1.2:/mnt/nfs_mount /opt/data/nfs_mount
+```
+
+同样的, 如果 nfs server 指定的目录如果是从别处挂载的, 需要增加 `fsid` 选项:
+```
+/mnt/nfs_mount1     10.1.1.0/24(insecure,rw,sync,all_squash,anongid=1001,anonuid=1001,fsid=10001)
+/mnt/nfs_mount2     10.1.1.0/24(insecure,rw,sync,all_squash,anongid=1001,anonuid=1001,fsid=10002)
+```
+
+`fsid` 说明见, 需要唯一, 不用和 uid 一样:
+```
+NFS needs to be able to identify each filesystem that it exports.  Normally it will use a UUID 
+for the filesystem (if the filesystem has such a thing) or the  device  number  of  the device 
+holding the filesystem (if the filesystem is stored on the device).
+
+As  not  all  filesystems are stored on devices, and not all filesystems have UUIDs, it is sometimes 
+necessary to explicitly tell NFS how to identify a filesystem.  This is done with the fsid= option.
+```
