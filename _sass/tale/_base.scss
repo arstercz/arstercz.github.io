@@ -12,7 +12,8 @@ body {
 
 html {
   font-family: $serif-primary;
-  font-size: 14px;
+  font-size: 15px;
+  line-height: 1.5;
   overflow-y: scroll;
 
   @media (min-width: 600px) {

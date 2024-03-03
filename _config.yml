@@ -33,11 +33,3 @@ paginate:       10
 # Excludes
 exclude: [ Gemfile, Gemfile.lock, tale.gemspec ]
 
-# Disqus (Set to your disqus id)
-disqus: 'https://arstercz.disqus.com/embed.js'
-
-# gitalk
-gitalk_owner: arstercz
-gitalk_repo: arstercz.github.io
-gitalk_clientId: 3569ec9f24314efe982c
-gitalk_clientSecret: e6dfba7d03bbbb502de2e822709c18f3f1d44c17
