@@ -50,7 +50,11 @@ comments: true
 
 ### snoopy 记录方式
 
-[snoopy 方式](https://github.com/a2o/snoopy) 相对新颖, 本质上是封装了 `execv, execve` 系统调用, 以系统预加载(`preload`)的方式实现记录所有的命令操作. 更多介绍可以参考以前的文章 [snoopy 如何记录系统执行过的命令]({{ site.baseurl }}/how-does-snoopy-log-every-executed-command/). 目前大部分系统执行命令时都通过 `execv, execve` 系统调用执行, 这点就和会话无关, 几乎所有的情况下, 只要通过这两个系统调用执行命令, 就会将操作行为记录下来, 从目前的最新版本(`2.4.8`)来看, snoopy 有几个优点:
+[snoopy 方式](https://github.com/a2o/snoopy) 相对新颖, 本质上是封装了 `execv, execve` 系统调用, 以系统预加载(`preload`)的方式实现记录所有的命令操作. 如下调用关系:
+
+<img src="{{ site.baseurl }}/images/articles/202010/snoopy-invoke.png" width="400" height="430" alt="snoopy-invoke.png"/>
+
+更多介绍可以参考以前的文章 [snoopy 如何记录系统执行过的命令]({{ site.baseurl }}/how-does-snoopy-log-every-executed-command/). 目前大部分系统执行命令时都通过 `execv, execve` 系统调用执行, 这点就和会话无关, 几乎所有的情况下, 只要通过这两个系统调用执行命令, 就会将操作行为记录下来, 从目前的最新版本(`2.4.8`)来看, snoopy 有几个优点:
 ```
 1. 难以绕过, 只要设置了 PRELOAD, 就肯定会记录;
 2. 无论是否存在 tty 会话, 都会记录 execv, execve 相关的命令行操作, 包含详细的进程上下文信息;

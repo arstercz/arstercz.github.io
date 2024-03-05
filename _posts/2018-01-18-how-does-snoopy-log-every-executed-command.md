@@ -160,6 +160,19 @@ syslog 选项在旧版中存在比较严重的 bug, 可能会引起系统挂死,
 
 同样的如果 snoopy 产生的日志过大, 可以在 `snoopy.ini` 中尽量配置需要忽略的选项, 配置完成后已经运行的程序不会立即生效, 需要重启程序以重新加载 `preload`.
 
+## 问题汇总
+
+| 版本 | 漏洞 | 描述 |
+| :-: | :- | :- |
+| < 2.4.6 | [issue-100](https://github.com/a2o/snoopy/issues/100) | keepalive 切换脚本执行过多的 execv 调用, 引起操作超时, 造成 keepalive 切换; |
+| < 2.4.6 | [issue-106](https://github.com/a2o/snoopy/issues/106) | Centos 7 中重启 NetworkManager 服务崩溃, 主要为 dhcp 和 ini 配置解析出错; |
+| < 2.4.8 | [issue-157](https://github.com/a2o/snoopy/issues/157) | cmdline 相关的指针和内存分配错误; |
+| < 2.4.14 | [issue-119](https://github.com/a2o/snoopy/issues/119) | 解析 .ini 配置解析引起的系统异常，造成 php 无法启动; |
+| < 2.4.14 | [issue-191](https://github.com/a2o/snoopy/issues/191) | 系统增加新用户时可能产生错误消息的异常; |
+| < 2.4.14 | [pull-198](https://github.com/a2o/snoopy/pull/198) | 命令行太长可能引起程序崩溃异常; |
+| < 2.4.14 | [pull-201](https://github.com/a2o/snoopy/pull/201) | 不太通用的空参数引起 execve 异常; |
+
+
 ## 总结
 
 整体上看, snoopy 通过封装系统调用来实现记录执行的命令, 这就存在一定的风险, 比如降低系统性能, 和其它软件相冲突, 以及 hang 住系统等严重的问题, 但也带来了其它方面的好处, 在安全审计和故障排错的场景中尤为有用. 当然我们也可以按需开启 snoopy, 比如在排错的场景中, 排错前开启, 完成后再关闭即可. 不过已经运行的程序不受 `preload` 机制的影响, 毕竟 上述介绍的 exec 相关的函数仅用来执行新的程序, 未使用上述的两个系统调用则不会被 snoopy 处理.
