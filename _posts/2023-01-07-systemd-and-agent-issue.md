@@ -93,4 +93,4 @@ systemd-run --unit sleep_test_50 --scope --slice=sleep_test nohup sleep 300 & >/
 
 ## 其它问题
 
-systemd 资源限制(`man systemd.resource-control`)目前(Centos 7 中)不支持 net 限速, 只能通过 `CPU, MEM, IO` 进行限制. 大多数情况下限制 CPU 也能等同打到限速 net 的目录(比如 [cpulimit](https://github.com/opsengine/cpulimit) 工具). systemd 限制资源示例见: [使用 systemd 限制系统资源](https://blog.arstercz.com/%e4%bd%bf%e7%94%a8-systemd-%e9%99%90%e5%88%b6%e7%b3%bb%e7%bb%9f%e8%b5%84%e6%ba%90%e7%9a%84%e4%bd%bf%e7%94%a8/).
+systemd 资源限制(`man systemd.resource-control`)目前(Centos 7 中)不支持 net 限速, 只能通过 `CPU, MEM, IO` 进行限制. 大多数情况下限制 CPU 也能等同打到限速 net 的目录(比如 [cpulimit](https://github.com/opsengine/cpulimit) 工具). systemd 限制资源示例见: [使用 systemd 限制系统资源]{{ site.baseurl }}/%e4%bd%bf%e7%94%a8-systemd-%e9%99%90%e5%88%b6%e7%b3%bb%e7%bb%9f%e8%b5%84%e6%ba%90%e7%9a%84%e4%bd%bf%e7%94%a8/).

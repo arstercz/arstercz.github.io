@@ -79,7 +79,7 @@ Total Memory | 64G
 
 ### 处理说明
 
-堆栈的打印过程类似于 [xfs 告警处理](https://blog.arstercz.com/centos-7-xfs_vm_releasepage-%e8%ad%a6%e5%91%8a%e9%97%ae%e9%a2%98%e5%a4%84%e7%90%86/) , 大致的过程为内核开启 `sack`, `fack` 功能后, 网络传输过程中需要的快速重传和选择性重传会通过 `tcp_input.c` 文件的 `tcp_mark_head_lost` 函数进行处理, 其主要标记传输过程中丢失的报文的数量, 如下所示, 系统报的 kernel 堆栈信息由 `tcp_mark_head_lost` 函数中的 `tcp_verify_left_out` 函数调用触发:
+堆栈的打印过程类似于 [xfs 告警处理]{{ site.baseurl }}/centos-7-xfs_vm_releasepage-%e8%ad%a6%e5%91%8a%e9%97%ae%e9%a2%98%e5%a4%84%e7%90%86/) , 大致的过程为内核开启 `sack`, `fack` 功能后, 网络传输过程中需要的快速重传和选择性重传会通过 `tcp_input.c` 文件的 `tcp_mark_head_lost` 函数进行处理, 其主要标记传输过程中丢失的报文的数量, 如下所示, 系统报的 kernel 堆栈信息由 `tcp_mark_head_lost` 函数中的 `tcp_verify_left_out` 函数调用触发:
 
 ```
 // source/include/net/tcp.h 

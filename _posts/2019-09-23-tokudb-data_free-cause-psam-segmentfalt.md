@@ -124,4 +124,4 @@ Missing separate debuginfos, use: debuginfo-install glibc-2.17-260.el7.x86_64 li
 
 ## 总结说明
 
-从上述的分析来看, 引起段错误的原因主要为 TokuDB 的特性, 造成 TokuDB 表 `DATA_FREE` 的属性特别大, 在实际的使用中, 我们应该忽略 TokuDB 表的 `DATA_FREE` 属性, 仅通过 `DATA_LENGTH + INDEX_LENGTH` 计算表的大小. `psam` 在后续的使用中会尽量遵循官方版本的行为, 在出现异常的时候仅输出相应的错误. 大家在使用 `psam` 碰到问题的时候可以提交问题到 [github-psam](https://github.com/arstercz/percona-server-auto-manager) 方便笔者及时更新. 更多的 TokuDB 问题可以参考文章 [TokuDB 使用问题汇总](https://blog.arstercz.com/tokudb-%e4%bd%bf%e7%94%a8%e9%97%ae%e9%a2%98%e6%b1%87%e6%80%bb/).
+从上述的分析来看, 引起段错误的原因主要为 TokuDB 的特性, 造成 TokuDB 表 `DATA_FREE` 的属性特别大, 在实际的使用中, 我们应该忽略 TokuDB 表的 `DATA_FREE` 属性, 仅通过 `DATA_LENGTH + INDEX_LENGTH` 计算表的大小. `psam` 在后续的使用中会尽量遵循官方版本的行为, 在出现异常的时候仅输出相应的错误. 大家在使用 `psam` 碰到问题的时候可以提交问题到 [github-psam](https://github.com/arstercz/percona-server-auto-manager) 方便笔者及时更新. 更多的 TokuDB 问题可以参考文章 [TokuDB 使用问题汇总]{{ site.baseurl }}/tokudb-%e4%bd%bf%e7%94%a8%e9%97%ae%e9%a2%98%e6%b1%87%e6%80%bb/).

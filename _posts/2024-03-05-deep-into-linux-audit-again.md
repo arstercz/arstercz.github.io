@@ -144,7 +144,7 @@ processors:
 
 > 数据可以存储到官方指定的 opensearch(兼容 es), 其在此基础上实现了很多看板和数据分析. 不过也可以存储到 es, 但需要单独安装 kibana 插件;
 
-<img src="{{ site.baseurl }}/images/articles/202403/wazuh-info.png" width="750" height="550" alt="wazuh-info.png"/>
+<img src="{{ site.baseurl }}/images/articles/202403/wazuh-info.png" width="750" height="520" alt="wazuh-info.png"/>
 
 在上面架构中, `agent` 直接和 `cluster` 通信, 将搜集的信息发给 cluster 节点, cluster 节点落盘到日志文件, 最后通过 filebeat 消费到 es 集群中.
 

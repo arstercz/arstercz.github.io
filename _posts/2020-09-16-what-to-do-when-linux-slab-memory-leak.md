@@ -188,7 +188,7 @@ WTOplog.lThread 99877 [000] 22544738.707289: probe:kmem_cache_alloc: (ffffffff99
 
 ### 通过 systemtap 查找线索
 
-在文章 [linux-dynamic-trace](https://blog.arstercz.com/introduction_to_linux_dynamic_tracing/) 中, 我们提到了 [systemtap](https://sourceware.org/systemtap/) 这个强悍的工具, 这里我们也可以使用 `systemtap` 来跟踪 `slab` 内存分配的堆栈情况. 如下所示增加脚本跟踪 `kmem_cache_alloc` 函数:
+在文章 [linux-dynamic-trace]{{ site.baseurl }}/introduction_to_linux_dynamic_tracing/) 中, 我们提到了 [systemtap](https://sourceware.org/systemtap/) 这个强悍的工具, 这里我们也可以使用 `systemtap` 来跟踪 `slab` 内存分配的堆栈情况. 如下所示增加脚本跟踪 `kmem_cache_alloc` 函数:
 ```c
 # cat kmem.stap
 # This script displays the number of given slab allocations and the backtraces leading up to it.

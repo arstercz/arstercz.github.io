@@ -21,7 +21,7 @@ datapool/db@db_20191025 zfs       346G   44G  302G  13% /datapool/db/.zfs/snapsh
 Mar  7 16:37:53 cz snoopy[91304]: [time_ms:614 login:root uid:0 pid:91304 filename:/usr/bin/ls username:root]: ls /export/mysql/.zfs/snapshot/mysql_20191025/
 Mar  7 16:37:53 cz snoopy[91307]: [time_ms:636 login:(unknown) uid:0 pid:91307 filename:/sbin/mount.zfs username:root]: /sbin/mount.zfs datapool/db@db_20191025 /datapool/db/.zfs/snapshot/db_20203007 -n -o rw
 ```
-从 [snoopy](https://blog.arstercz.com/how-does-snoopy-log-every-executed-command/) 的日志来看, 可以看到 `ls xxx` 访问操作触发了 mount 操作:
+从 [snoopy]{{ site.baseurl }}/how-does-snoopy-log-every-executed-command/) 的日志来看, 可以看到 `ls xxx` 访问操作触发了 mount 操作:
 ```
 /sbin/mount.zfs datapool/db@db_20191025 /datapool/db/.zfs/snapshot/db_20191025 -n -o rw
 ```
@@ -65,7 +65,7 @@ d????????? ? ? ? ?            ? .
 d????????? ? ? ? ?            ? ..
 ```
 
-从上述的操作来看, 已经看不到镜像目录, 不过可以指定目录进行访问, 和 [issue-4068](https://github.com/openzfs/zfs/issues/4068) 描述的一致. 再从 [snoopy](https://blog.arstercz.com/how-does-snoopy-log-every-executed-command/) 的日志来看, 系统里有程序访问镜像目录, 进而导致 `mount.zfs` 操作.  不过系统日志中每隔一段时间便出现几次 `kernel` 消息, 我们在排除一些人为操作的情况下, 通过 [sysdig](https://github.com/draios/sysdig/wiki/Sysdig-Examples) 跟踪发现 `zabbix_agent` 监控访问了该目录进而引起 `kernel` 提示, 如下所示
+从上述的操作来看, 已经看不到镜像目录, 不过可以指定目录进行访问, 和 [issue-4068](https://github.com/openzfs/zfs/issues/4068) 描述的一致. 再从 [snoopy]{{ site.baseurl }}/how-does-snoopy-log-every-executed-command/) 的日志来看, 系统里有程序访问镜像目录, 进而导致 `mount.zfs` 操作.  不过系统日志中每隔一段时间便出现几次 `kernel` 消息, 我们在排除一些人为操作的情况下, 通过 [sysdig](https://github.com/draios/sysdig/wiki/Sysdig-Examples) 跟踪发现 `zabbix_agent` 监控访问了该目录进而引起 `kernel` 提示, 如下所示
 
 ```
 # sysdig | grep -A 4 db_20191025
