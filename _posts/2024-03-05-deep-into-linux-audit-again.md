@@ -355,7 +355,7 @@ asmlinkage long sys_open(const char __user *filename,
                 int flags, umode_t mode);
 ```
 
-如果需要跟踪 `open` 调用, 可以在 `sys_open` 函数执行前后两个点来获取上下文信息, 不过为了尽量避免影响函数的执行, 通过都会选择执行完后, 即在 `sys_open` 函数 `exit` 的时候开始记录信息. 
+如果需要跟踪 `open` 调用, 可以在 `sys_open` 函数执行前后两个点来获取上下文信息, 不过为了尽量避免影响函数的执行, 通常都会选择执行完后, 即在 `sys_open` 函数 `exit` 的时候开始记录信息. 
 
 对应到 `auditctl` 规则, 可以表示如下:
 
