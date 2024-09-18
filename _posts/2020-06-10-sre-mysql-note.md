@@ -245,7 +245,7 @@ grafana + prometheus 或 influxdb  # 更细粒度, 更方便故障排错
 
 硬件方面主要是熟悉 RAID 卡对系统的影响, 带缓存与不带缓存, RAID 级别以及 `writethrough` 和 `writeback` 模式对 io 性能的影响.
 
-更多见:  [raid 控制器对系统的影响]{{ site.baseurl }}/raid-%e6%8e%a7%e5%88%b6%e5%99%a8%e5%af%b9%e7%b3%bb%e7%bb%9f%e6%80%a7%e8%83%bd%e7%9a%84%e5%bd%b1%e5%93%8d/)  
+更多见:  [raid 控制器对系统的影响]({{ site.baseurl }}/raid-%e6%8e%a7%e5%88%b6%e5%99%a8%e5%af%b9%e7%b3%bb%e7%bb%9f%e6%80%a7%e8%83%bd%e7%9a%84%e5%bd%b1%e5%93%8d/)  
 
 ### 系统调用及排错优化
 
@@ -253,7 +253,7 @@ grafana + prometheus 或 influxdb  # 更细粒度, 更方便故障排错
 
 更多见: 
 
-[Linux 动态追踪技术介绍]{{ site.baseurl }}/introduction_to_linux_dynamic_tracing/)  
+[Linux 动态追踪技术介绍]({{ site.baseurl }}/introduction_to_linux_dynamic_tracing/)  
 [perf-tool](https://github.com/brendangregg/perf-tools)  
 
 ### 跟踪系统命令执行
@@ -262,7 +262,7 @@ grafana + prometheus 或 influxdb  # 更细粒度, 更方便故障排错
 
 更多见:
 
-[how does snoopy work]{{ site.baseurl }}/how-does-snoopy-log-every-executed-command/)  
+[how does snoopy work]({{ site.baseurl }}/how-does-snoopy-log-every-executed-command/)  
 
 ## 性能相关
 
@@ -285,9 +285,9 @@ grafana + prometheus 或 influxdb  # 更细粒度, 更方便故障排错
 
 更多见:
 
-[MySQL 安装配置规范]{{ site.baseurl }}/percona-mysql%e5%8f%82%e6%95%b0%e9%85%8d%e7%bd%ae%e8%af%b4%e6%98%8e/)  
-[MySQL 管理事项规范]{{ site.baseurl }}/mysql%e7%ae%a1%e7%90%86%e4%ba%8b%e9%a1%b9%e8%a7%84%e8%8c%83/)  
-[MySQL 开发规范]{{ site.baseurl }}/mysql%e5%bc%80%e5%8f%91%e8%a7%84%e8%8c%83/)  
+[MySQL 安装配置规范]({{ site.baseurl }}/percona-mysql%e5%8f%82%e6%95%b0%e9%85%8d%e7%bd%ae%e8%af%b4%e6%98%8e/)  
+[MySQL 管理事项规范]({{ site.baseurl }}/mysql%e7%ae%a1%e7%90%86%e4%ba%8b%e9%a1%b9%e8%a7%84%e8%8c%83/)  
+[MySQL 开发规范]({{ site.baseurl }}/mysql%e5%bc%80%e5%8f%91%e8%a7%84%e8%8c%83/)  
 
 ## 其它
 
