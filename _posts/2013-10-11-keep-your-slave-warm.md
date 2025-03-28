@@ -29,10 +29,14 @@ pt-query-digest 2.2.x had removed this function.
 pt-query-digest 2.1.9
 
 workflow:
+```mermaid
+flowchart LR
+
+A[master] ---> |filter select sql| B[text file]
+B ---> |replay sql on slave| C[slave]
 ```
-              filter select sql                 replay sql on slave
-   | master |------------------->| text file |---------------------->| slave |
-```
+
+
 steps:
 1. capture select statement on master server, and save result into text file. 
 

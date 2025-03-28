@@ -27,10 +27,12 @@ Linux 内核从 2.2 版本开始支持透明代理([tproxy](https://www.kernel.o
 
 在云环境中, 大多数云厂商的 `load balance` 支持此方式, 如下所示:
 
-```
- +--------+    1    +----------+     2    +------------------+   3   +------------+
- | client |   --->  | cloud LB |    --->  | haproxy/nginx... |  ---> | app server |
- +--------+         +----------+          +------------------+       +------------+
+```mermaid
+flowchart LR
+
+A[client] ---> |1| B[cloud LB]
+B ---> |2| C[haproxy/nginx...]
+C ---> |3| D[app server]
 ```
 
 就上图来看, 整个 `proxy protocol` 在第 `2` 步实现, 这里的 `cloud LB` 相当于客户端, `haproxy/nginx..` 等相当于服务端. 如果服务端软件支持发送 `proxy protocol` 功能, 也可以将真实的用户 IP 发送到第 3 步的 `app server` 中. 当然如果 `app server` 支持此方式, 可以直接去掉上述的 `haproxy/nginx...` 部分直接和 `load balance` 通信. 目前已知的支持 `proxy protocol` 特性的主要包含以下软件:
@@ -88,20 +90,26 @@ Connection to 34.96.112.131 5222 port [tcp/xmpp-client] succeeded!
 
 从上述的说明来看, 在云环境中通过传输层获取 `client ip` 大概有以下几种方式:
 
+第一种:
+```mermaid
+flowchart LR
+
+A[client] ---> |1| B[app server]
 ```
-   +--------+    1    +------------+
- 1 | client |   --->  | app server |
-   +--------+         +------------+
+第二种:
+```mermaid
+flowchart LR
 
+A[client] ---> |1| B[cloud LB]
+B ---> |2| C[app server]
+```
+第三种:
+```mermaid
+flowchart LR
 
-   +--------+    1    +----------+     2    +------------+
- 2 | client |   --->  | cloud LB |    --->  | app server |
-   +--------+         +----------+          +------------+
-
-
-   +--------+    1    +----------+     2    +---------+   3   +------------+
- 3 | client |   --->  | cloud LB |    --->  | haproxy |  ---> | app server |
-   +--------+         +----------+          +---------+       +------------+
+A[client] ---> |1| B[cloud LB]
+B ---> |2| C[haproxy/nginx...]
+C ---> |3| D[app server]
 ```
 
 > **备注**: 这里我们假定 `app server` 为非 `http/https` 服务. 
