@@ -94,7 +94,7 @@ rollback;
 CREATE ROLE leo LOGIN PASSWORD 'password' SUPERUSER VALID UNTIL 'infinity'
 ```
 
-#### 用户及权限
+### 用户及权限
 
 ```sql
 CREATE ROLE user_percona LOGIN PASSWORD 'xxxxxx';
@@ -119,14 +119,14 @@ GRANT ALL ON SCHEMA db_percona TO user_percona;
 
 可以通过以下方式设置编码, 如果没有指定, 则继承上级的设置. postgresql 中 `UTF8` 编码支持 `1 - 4` 字节长度, 是真正的 `UTF8`, 不像 MySQL 仅支持 3 字节.
 
-#### 初始化时指定
+### 初始化时指定
 
 initdb 默认以 `UTF8` 编码初始化:
 ```sql
 initdb -E UTF8
 ```
 
-#### 创建库时指定
+### 创建库时指定
 
 ```sql
 # command line
@@ -137,7 +137,7 @@ CREATE DATABASE dbtest WITH ENCODING 'UTF8' LC_COLLATE='en_US.UTF-8' LC_CTYPE='e
 ```
 上述两种方式等同.
 
-#### 查看编码
+### 查看编码
 
 ```sql
 $ psql -l
@@ -153,7 +153,7 @@ $ psql -l
 (4 rows)
 ```
 
-#### 修改当前会话的编码
+### 修改当前会话的编码
 
 ```
 # 修改会话编码
@@ -248,7 +248,7 @@ There are some things that could be optimised, like ALTER TABLE ... ADD COLUMN .
 pg_dump -F p --column-inserts -b -v -f percona.insert.sql
 ```
 
-#### 备份时需要注意的问题
+### 备份时需要注意的问题
 
 pg_dump 备份时不会影响 DML 操作, 本身使用重复读隔离级别, 但是会阻塞 DDL 操作. 更多见 [pg_dump_and_DDL](https://blog.dbi-services.com/when-we-do-a-pg_dump-and-right-afterwards-truncate-a-table-which-is-in-the-dump-what-happens/).
 
