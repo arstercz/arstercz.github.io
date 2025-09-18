@@ -205,8 +205,9 @@ Create Table: CREATE TABLE `tests` (
 - 使用 `select xxx into outfile xx from xxx` 语法导出数据, `select xx from xxx into outfile ..` 语法可能废弃;
 - 使用 `set password for ... = ''` 修改用户密码, `password(..)` 语法已经废弃;
 - 不支持 `SELECT SQL_NO_CACHE ...` 语法;
--  sql_log_bin 仅支持会话级别的设置;
+- sql_log_bin 仅支持会话级别的设置;
 - 使用 `EXPLAIN` 时, 不支持于 `EXTENDED` 和 `PARTITIONS` 关键字一起使用;
+- 从 8.0.22 开始, unix_timestamp 的结果会根据参数中的表达式字面值来判断, 明显位字符串的返回预期的值, 否则将表达式结果当做 `DECIMAL` 类型处理, 最终返回包含 6 位小数的结果, 更多见: [bug-10847](https://bugs.mysql.com/bug.php?id=108407).
 
 ## 索引变更
 
