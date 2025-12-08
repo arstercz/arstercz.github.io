@@ -26,6 +26,7 @@ comments: true
 * [目录显示问题](#目录显示问题)  
 * [windows 使用问题](#windows-使用问题)  
 * [缓存目录过大问题](缓存目录过大问题)
+* [mount 上传文件大小限制](mount-上传文件大小限制)
 
 ## 最佳实践
 
@@ -197,6 +198,29 @@ rclone --cache-dir /export/rclone/tmp  --fs-cache-expire-duration 2m mount ....
 714         return filepath.Join(dir, "rclone")
 715 }
 ```
+
+## mount 上传文件大小限制
+
+通过 mount 方式挂载 gcp/s3 等存储时, 上传下载大文件可能出现以下的错误:
+```
+failed: failed to upload chunk 10001 with 5242880 bytes: InvalidArgument: The parameter partNumber is not valid
+```
+
+这主要因为对象存储针对大文件上传下载会进行分块传输. rclone 的 `--chunk-size` 用来控制此每块的大小, 默认 `5M`, 大部分云厂商都对分块数量进行了 10000 的限制. 这也是在启动 rclone mount 时, 一般会有以下日志提示的原因:
+```
+Streaming uploads using chunk size 5Mi will have maximum file size of 48.828Gi
+```
+
+所以如果要上传下载的文件很大, 可以按需调大 `--chunk-size` 选项, 比如在配置文件中增加:
+```
+chunk_size = 100Mi
+```
+再启动时会提示一下信息:
+```
+Streaming uploads using chunk size 100Mi will have maximum file size of 976.562Gi
+```
+
+> 备注: chunk_size 越大, 对大文件越好, 吞吐相比利用更好, 但是 rclone 会占用更多的本地内存. 另外公开的资料中 gcs 单个文件可以支持 5T, s3 可以 50T.
 
 ## systemd 管理挂载服务
 
