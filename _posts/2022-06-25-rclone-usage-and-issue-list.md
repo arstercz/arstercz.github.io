@@ -254,6 +254,25 @@ systemctl status rclone@bucketname   -->  查看服务状态
 
 启动后, 每个桶默认会挂载到 `/mnt/rclone_mount/bucketname` 目录. 对应的日志 `/var/log/rclone/rclone-bucketname.log`. 默认情况下 rclone 服务异常中断, 会定期重试启动, 重试信息会输出到对应的日志文件中.
 
+另外 rclone 也支持 http proxy 模式进行挂载, 如下所示:
+```
+
+[Unit]
+Description=rclone: Remote FUSE filesystem for cloud storage config %i
+Documentation=man:rclone(1)
+After=network-online.target
+Wants=network-online.target
+AssertPathIsDirectory=/mnt/rclone_mount/
+
+[Service]
+Type=notify
+Environment="http_proxy=http://10.1.1.10:8080"
+Environment="https_proxy=http://10.1.1.10:8080"
+ExecStartPre=/bin/mkdir -p /mnt/rclone_mount/%i
+......
+......
+```
+
 ## consul 特性支持
 
 [consul](https://github.com/arstercz/rclone/commit/dbfc1be7451351be92a096738c574078eab1fd24) 特性为笔者自定义特性, 初衷是为了隐藏各云存储的桶的 key 信息, 方便所有桶账号的统一管理, 避免人员混杂的时候 key 信息可能乱用的情况. 
