@@ -265,3 +265,16 @@ change master to master_ssl=1, get_master_public_key=1, master_public_key_path='
 ```
 
 更多选项见: [8.0-change-master-option](https://docs.oracle.com/cd/E17952_01/mysql-8.0-en/change-master-to.html).  
+
+## 自动重连
+
+从官方的 changelog 来看, mysql server 从 8.0.13 开启去掉了 reconnect 的支持, 在 8.0.34 之后又开始启用, 但是会给出 warning 提示, 如下所示:
+```
+Auto-reconnect is disabled by default. To enable it, call mysql_options() with the MYSQL_OPT_RECONNECT option (deprecated as of MySQL 8.0.13). 
+
+Beginning with MySQL 8.0.34, the automatic reconnection feature is deprecated. The related MYSQL_OPT_RECONNECT option is still available but 
+now returns a deprecation warning to the standard error output if your application calls the mysql_get_option() or mysql_options() function 
+with the option, even when setting it to false.
+```
+
+所以如果使用的是 `8.0.14 ~ 8.0.33` 的版本, client 端(比如 c++/java) 等可能出现 reconnection 无效的情况, 容易出现 `lost connection` 的错误. 这种情况下 client 端需要自行更换重试保活的逻辑(比如可以查询 `SELECT 1` 来保活).
