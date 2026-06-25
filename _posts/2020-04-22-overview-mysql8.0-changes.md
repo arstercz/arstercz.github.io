@@ -49,6 +49,10 @@ max_tmp_tables
 
 # status
 Qcache_xxx_xxxx      # 缓存相关的状态参数
+
+# mysql 8.0.30 开始弃用下面参数:
+innodb_log_file_size
+innodb_log_files_in_group
 ```
 
 **备注:** 8.0 版本废弃了 query cache 特性
@@ -62,6 +66,8 @@ tx_isolation      =>  transaction_isolation
 tx_read_only      =>  transaction_read_only
 innodb_undo_logs  =>  innodb_rollback_segments
 have_query_cache  = no      # 永远为 NO
+
+innodb_log_file_size, innodb_log_files_in_group => innodb_redo_log_capacity (可动态变更, 线上建议 2~4G 的大小增加, 不要一次增加很大值, 会引起 sql 卡顿)
 ```
 
 #### information_schema 变更
