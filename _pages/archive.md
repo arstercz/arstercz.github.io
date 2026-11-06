@@ -1,35 +1,30 @@
 ---
-layout: post
+layout: page
 author: "arstercz"
 title: "Archive"
 permalink: /archive/
 ---
 
 {% if site.posts.size == 0 %}
-  <h2>No post found</h2>
+  <p>No post found</p>
 {% endif %}
 
-<ul class="archive">
-  {% for post in site.posts %}
-    {% unless post.next %}
-      <h2>{{ post.date | date: '%Y' }}</h2>
+{% assign last_year = '' %}
+{% for post in site.posts %}
+  {% assign year = post.date | date: '%Y' %}
+  {% if year != last_year %}
+    {% unless forloop.first %}</ul>{% endunless %}
+    <h2 class="archive-year">{{ year }}</h2>
+    <ul class="archive">
+    {% assign last_year = year %}
+  {% endif %}
+  <li>
+    <time>{{ post.date | date: "%m-%d" }}</time>
+    {% if post.link %}
+      <a href="{{ post.link }}">{{ post.title }}</a>
     {% else %}
-      {% capture year %}{{ post.date | date: '%Y' }}{% endcapture %}
-      {% capture nyear %}{{ post.next.date | date: '%Y' }}{% endcapture %}
-      {% if year != nyear %}
-        <h2>{{ post.date | date: '%Y' }}</h2>
-      {% endif %}
-    {% endunless %}
-
-    <li>
-      {% if post.link %}
-      <a href="{{ post.link }}">
-      {% else %}
-      <a href="{{ site.baseurl }}{{ post.url }}">
-      {% endif %}
-        {{ post.title }}
-      </a>
-      <time>{{ post.date | date: "%m/%d/%Y" }}</time>
-    </li>
-  {% endfor %}
-</ul>
+      <a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a>
+    {% endif %}
+  </li>
+  {% if forloop.last %}</ul>{% endif %}
+{% endfor %}
