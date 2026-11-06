@@ -203,6 +203,20 @@ footer {
   }
 }
 
+// On phones the nav is centered; give the search box its own tidy line.
+@media (max-width: 599px) {
+  .nav .nav-search {
+    display: block;
+    padding: 0;
+    margin-top: .7rem;
+  }
+
+  .nav #nav-search-input,
+  .nav #nav-search-input:focus {
+    width: 220px;
+  }
+}
+
 // Search results rendered in the page content area
 .search-results {
   padding: 1rem 0 0;
