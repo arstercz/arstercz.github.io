@@ -13,12 +13,10 @@
   }
 
   &-title {
-    color: $gh-fg;
+    color: $default-shade;
     font-family: $sans-serif;
     font-size: 1.8rem;
     margin: 1rem 0;
-    padding-bottom: 0;
-    border-bottom: 0;
     text-align: center;
   }
 
@@ -31,31 +29,11 @@
 
   p {
     margin: 0 0 1rem;
-    text-align: left;
+    text-align: justify;
   }
 
-  ul,
-  ol {
-    margin: 0 0 1rem;
-    padding-left: 2rem;
-
-    li {
-      margin: .25rem 0;
-    }
-  }
-
-  // First heading right after the intro shouldn't carry a big top gap
-  > h2:first-of-type,
-  > h3:first-of-type {
-    margin-top: .5rem;
-  }
-
-  // Wide tables scroll horizontally instead of breaking the layout (mobile).
-  table {
-    display: block;
-    width: max-content;
-    max-width: 100%;
-    overflow: auto;
+  a:hover {
+    text-decoration: underline;
   }
 
   img {

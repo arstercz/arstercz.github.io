@@ -63,11 +63,6 @@ footer,
   a {
     color: $default-color;
     font-family: $sans-serif;
-
-    &:hover,
-    &:focus {
-      text-decoration: none;
-    }
   }
 }
 

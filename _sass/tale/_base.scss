@@ -1,19 +1,19 @@
 * {
   @include box-sizing;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 html,
 body {
-  color: $gh-fg;
+  color: $default-color;
   margin: 0;
   padding: 0;
 }
 
 html {
-  font-family: $sans-serif;
+  font-family: $serif-primary;
   font-size: 15px;
-  line-height: 1.6;
+  line-height: 1.5;
   overflow-y: scroll;
 
   @media (min-width: 600px) {
@@ -31,32 +31,13 @@ h3,
 h4,
 h5,
 h6 {
-  color: $gh-fg;
+  color: $default-shade;
   font-family: $sans-serif;
-  font-weight: 600;
-  line-height: 1.25;
-  margin: 1.5rem 0 1rem;
-}
-
-h1 {
-  font-size: 1.8rem;
-  padding-bottom: .3em;
-  border-bottom: 1px solid $gh-border;
+  line-height: normal;
 }
 
 h2 {
-  font-size: 1.4rem;
-  padding-bottom: .3em;
-  border-bottom: 1px solid $gh-border;
-}
-
-h3 { font-size: 1.2rem; }
-h4 { font-size: 1rem; }
-h5 { font-size: .9rem; }
-
-h6 {
-  font-size: .85rem;
-  color: $gh-muted;
+  border-bottom: 1px #e1e4e8 solid;
 }
 
 .nav-title {
@@ -65,31 +46,23 @@ h6 {
 }
 
 a {
-  color: $gh-link;
+  color: $blue;
   text-decoration: none;
-
-  &:hover,
-  &:focus {
-    text-decoration: underline;
-  }
 }
 
 blockquote {
-  border-left: .25rem solid $gh-border;
-  color: $gh-muted;
-  margin: 0 0 1rem;
-  padding: 0 1rem;
+  border-left: .25rem solid $grey-2;
+  color: $grey-1;
+  margin: .8rem 0;
+  padding: .5rem 1rem;
 
-  > :first-child { margin-top: 0; }
-  > :last-child { margin-bottom: 0; }
-}
+  p:last-child {
+    margin-bottom: 0;
+  }
 
-hr {
-  height: .25rem;
-  margin: 1.5rem 0;
-  padding: 0;
-  border: 0;
-  background: $gh-border;
+  @media (min-width: 600px) {
+    padding: 0 5rem 0 1.25rem;
+  }
 }
 
 img {
@@ -100,21 +73,17 @@ img {
 
 table {
   margin-bottom: 1rem;
-  border: 1px solid $gh-border;
+  width: 100%;
+  border: 1px solid $table-border-color;
   border-collapse: collapse;
-  border-spacing: 0;
 }
 
 td, th {
-  padding: 6px 13px;
-  border: 1px solid $gh-border;
+  padding: .25rem .5rem;
+  border: 1px solid $table-border-color;
 }
 
-th {
-  font-weight: 600;
-}
-
-tbody tr:nth-child(2n) td,
-tbody tr:nth-child(2n) th {
-  background-color: $gh-canvas;
+tbody tr:nth-child(odd) td, 
+tbody tr:nth-child(odd) th {
+  background-color: $table-background-color;
 }

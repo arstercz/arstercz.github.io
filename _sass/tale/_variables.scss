@@ -15,14 +15,6 @@ $code-color: #000000 !default;
 $table-border-color: #e9ecef !default;
 $table-background-color: #fefefe !default;
 
-// GitHub-style tokens (Primer)
-$gh-fg:        #1f2328 !default; // body text
-$gh-muted:     #656d76 !default; // secondary text
-$gh-border:    #d0d7de !default; // hairline borders
-$gh-link:      #0969da !default; // links
-$gh-canvas:    #f6f8fa !default; // subtle background (code, table stripes)
-$gh-code-bg:   rgba(175, 184, 193, .2) !default; // inline code background
-
 // Fonts
 $serif-primary: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
 $serif-secondary: Palatino, 'Palatino LT STD', 'Palatino Linotype', 'Book Antiqua', 'Georgia', serif !default;
