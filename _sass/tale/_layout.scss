@@ -209,49 +209,24 @@ footer {
 
   &-title {
     border-bottom: none;
-    color: $default-shade;
-    font-size: 1.2rem;
-    margin-bottom: 1.5rem;
+    color: $lighten-gray;
+    font-family: $sans-serif;
+    font-size: .95rem;
+    font-weight: 400;
+    margin: 0 0 1.2rem;
   }
 
-  ul {
+  .archive {
     list-style: none;
     margin: 0;
     padding: 0;
   }
 
-  .result-item {
-    padding: .9rem 0;
-    border-bottom: 1px solid $grey-2;
-
-    &:last-child {
-      border-bottom: 0;
-    }
+  .archive li {
+    margin-bottom: .6rem;
   }
 
-  .result-link {
-    color: $default-shade;
-    font-family: $sans-serif;
-    font-size: 1.1rem;
-    line-height: 1.4;
-
-    &:hover,
-    &:focus {
-      color: $blue;
-    }
-  }
-
-  .result-meta {
-    display: block;
-    margin-top: .4rem;
-    color: $lighten-gray;
-    font-family: $sans-serif;
-    font-size: .8rem;
-  }
-
-  .result-tags:not(:empty) {
-    margin-left: .85rem;
-    padding-left: .85rem;
-    border-left: 1px solid $grey-2;
+  .archive time {
+    margin-left: 8px;
   }
 }
