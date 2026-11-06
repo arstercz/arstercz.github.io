@@ -6,8 +6,70 @@
     <ul>
       <li><a href="{{ '' | prepend: site.baseurl }}/">Post</a></li>
       <li><a href="{{ '/archive' | prepend: site.baseurl }}/">Archive</a></li>
-      <li><a href="{{ '/search' | prepend: site.baseurl }}/">Search</a></li>
+      <li class="nav-search">
+        <div class="nav-search-box">
+          <svg class="nav-search-icon" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"></circle>
+            <line x1="16.5" y1="16.5" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
+          </svg>
+          <input type="text" id="nav-search-input" placeholder="Search..." autocomplete="off" aria-label="Search posts">
+        </div>
+        <ul id="nav-search-results"></ul>
+      </li>
       <li><a href="{{ '/about' | prepend: site.baseurl }}">About</a></li>
     </ul>
   </div>
 </nav>
+
+<script src="{{ '/search.js' | prepend: site.baseurl }}" type="text/javascript"></script>
+<script type="text/javascript">
+(function () {
+  var input = document.getElementById('nav-search-input');
+  var results = document.getElementById('nav-search-results');
+  if (!input || !results || typeof SimpleJekyllSearch === 'undefined') return;
+
+  var hasResults = false;
+
+  SimpleJekyllSearch({
+    searchInput: input,
+    resultsContainer: results,
+    json: '{{ "/search.json" | prepend: site.baseurl }}',
+    searchResultTemplate:
+      '<li><a href="{url}">' +
+        '<span class="result-title">{title}</span>' +
+        '<span class="result-meta">{tags}<span class="result-date">{date}</span></span>' +
+      '</a></li>',
+    noResultsText: '<li class="result-empty">No results found</li>',
+    limit: 10,
+    fuzzy: false,
+    exclude: ['Welcome']
+  });
+
+  // Show/hide the dropdown based on whether the input has a value.
+  function refresh() {
+    hasResults = input.value.trim().length > 0 && results.children.length > 0;
+    results.classList.toggle('is-open', hasResults);
+  }
+  input.addEventListener('keyup', refresh);
+  input.addEventListener('focus', refresh);
+
+  // Close on Escape.
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' || e.keyCode === 27) {
+      input.value = '';
+      results.innerHTML = '';
+      results.classList.remove('is-open');
+      input.blur();
+    }
+  });
+
+  // Close when clicking outside the search box.
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('.nav-search')) {
+      results.classList.remove('is-open');
+    } else if (input.value.trim().length > 0 && results.children.length > 0) {
+      results.classList.add('is-open');
+    }
+  });
+})();
+</script>
