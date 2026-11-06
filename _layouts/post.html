@@ -2,6 +2,36 @@
 layout: default
 ---
 
+{% capture toc %}{% include toc.html html=content sanitize=true class="toc-list" h_min=2 h_max=3 %}{% endcapture %}
+
+{% if toc contains '</a>' %}
+  <aside id="toc-sidebar" class="toc-sidebar">
+    <div class="toc-heading">Contents</div>
+    <nav class="toc-nav">{{ toc }}</nav>
+  </aside>
+
+  <button id="toc-toggle" class="toc-toggle" type="button" aria-label="Table of contents" title="Contents">
+    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+      <line x1="8" y1="6" x2="20" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
+      <line x1="8" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
+      <line x1="8" y1="18" x2="20" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
+      <circle cx="4" cy="6" r="1.3" fill="currentColor"></circle>
+      <circle cx="4" cy="12" r="1.3" fill="currentColor"></circle>
+      <circle cx="4" cy="18" r="1.3" fill="currentColor"></circle>
+    </svg>
+  </button>
+
+  <div id="toc-modal" class="toc-modal" hidden>
+    <div class="toc-modal-panel">
+      <div class="toc-modal-header">
+        <span>Contents</span>
+        <button id="toc-close" class="toc-close" type="button" aria-label="Close">&times;</button>
+      </div>
+      <nav class="toc-nav">{{ toc }}</nav>
+    </div>
+  </div>
+{% endif %}
+
 <div class="post">
   <div class="post-info">
     <span>Written by</span>
@@ -55,3 +85,84 @@ layout: default
 
   <a href="#" class="top">Top</a>
 </div>
+
+<script type="text/javascript">
+(function () {
+  var modal = document.getElementById('toc-modal');
+  var toggle = document.getElementById('toc-toggle');
+  var allLinks = [].slice.call(document.querySelectorAll('.toc-nav a'));
+  if (!allLinks.length) return;
+
+  function closeModal() {
+    if (modal) modal.hidden = true;
+    document.body.classList.remove('toc-modal-open');
+  }
+
+  // Smooth scroll on click; close the mobile modal afterwards.
+  allLinks.forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      var href = a.getAttribute('href') || '';
+      if (href.charAt(0) === '#') {
+        var target = document.getElementById(decodeURIComponent(href.slice(1)));
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          if (history.replaceState) history.replaceState(null, '', href);
+        }
+      }
+      closeModal();
+    });
+  });
+
+  // Mobile toggle button + modal open/close.
+  if (toggle && modal) {
+    toggle.addEventListener('click', function () {
+      var willOpen = modal.hidden;
+      modal.hidden = !willOpen;
+      document.body.classList.toggle('toc-modal-open', willOpen);
+    });
+    modal.addEventListener('click', function (e) {
+      if (e.target === modal || e.target.id === 'toc-close') closeModal();
+    });
+    document.addEventListener('keydown', function (e) {
+      if ((e.key === 'Escape' || e.keyCode === 27) && !modal.hidden) closeModal();
+    });
+  }
+
+  // Scroll-spy: highlight the current section in the desktop sidebar.
+  var spyLinks = [].slice.call(document.querySelectorAll('#toc-sidebar .toc-nav a'));
+  var map = {};
+  var ids = [];
+  spyLinks.forEach(function (a) {
+    var href = a.getAttribute('href') || '';
+    if (href.charAt(0) === '#') {
+      var id = decodeURIComponent(href.slice(1));
+      if (document.getElementById(id)) { map[id] = a; ids.push(id); }
+    }
+  });
+
+  if (ids.length && 'IntersectionObserver' in window) {
+    var visible = {};
+    function highlight() {
+      var current = null;
+      for (var i = 0; i < ids.length; i++) {
+        if (visible[ids[i]]) { current = ids[i]; break; }
+      }
+      if (!current) {
+        // Nothing in the trigger zone: fall back to the last heading above it.
+        for (var j = 0; j < ids.length; j++) {
+          if (document.getElementById(ids[j]).getBoundingClientRect().top < 120) current = ids[j];
+        }
+      }
+      spyLinks.forEach(function (a) { a.classList.remove('active'); });
+      if (current && map[current]) map[current].classList.add('active');
+    }
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { visible[en.target.id] = en.isIntersecting; });
+      highlight();
+    }, { rootMargin: '-80px 0px -70% 0px', threshold: 0 });
+    ids.forEach(function (id) { obs.observe(document.getElementById(id)); });
+    highlight();
+  }
+})();
+</script>
