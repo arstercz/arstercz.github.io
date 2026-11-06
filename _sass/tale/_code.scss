@@ -4,11 +4,10 @@ code {
 }
 
 code {
-  background-color: $grey-3;
-  border-radius: 3px;
-  //color: $code-color;
+  background-color: $gh-code-bg;
+  border-radius: 6px;
   font-size: 85%;
-  padding: .25em .5em;
+  padding: .2em .4em;
 }
 
 pre {
@@ -18,16 +17,19 @@ pre {
 pre code {
   background-color: transparent;
   color: inherit;
-  font-size: 85%;
+  font-size: 100%;
   padding: 0;
+  white-space: pre;
+  word-break: normal;
 }
 
 .highlight {
-  background-color: $grey-3;
-  border-radius: 3px;
-  line-height: 1.4;
+  background-color: $gh-canvas;
+  border-radius: 6px;
+  line-height: 1.45;
   margin: 0 0 1rem;
   padding: 1rem;
+  font-size: 85%;
 
   pre {
     margin-bottom: 0;
