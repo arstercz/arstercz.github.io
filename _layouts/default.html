@@ -14,7 +14,7 @@
 
       <div id="search-results" class="search-results" hidden>
         <h2 class="search-results-title"></h2>
-        <ul id="search-results-list" class="archive"></ul>
+        <ul id="search-results-list"></ul>
       </div>
     </main>
 
@@ -36,10 +36,12 @@
         resultsContainer: list,
         json: '{{ "/search.json" | prepend: site.baseurl }}',
         searchResultTemplate:
-          '<li>' +
-            '<a href="{url}">{title}</a>' +
-            '<time>{date}</time>' +
-            '<span class="result-tags">{tags}</span>' +
+          '<li class="result-item">' +
+            '<a class="result-link" href="{url}">{title}</a>' +
+            '<span class="result-meta">' +
+              '<span class="result-date">{date}</span>' +
+              '<span class="result-tags">{tags}</span>' +
+            '</span>' +
           '</li>',
         noResultsText: '',
         limit: 50,

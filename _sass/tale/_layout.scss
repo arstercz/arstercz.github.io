@@ -211,27 +211,47 @@ footer {
     border-bottom: none;
     color: $default-shade;
     font-size: 1.2rem;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
   }
 
-  .archive {
+  ul {
     list-style: none;
     margin: 0;
     padding: 0;
   }
 
-  .archive li {
-    margin-bottom: .6rem;
+  .result-item {
+    padding: .9rem 0;
+    border-bottom: 1px solid $grey-2;
+
+    &:last-child {
+      border-bottom: 0;
+    }
   }
 
-  .archive time {
-    margin-left: 8px;
+  .result-link {
+    color: $default-shade;
+    font-family: $sans-serif;
+    font-size: 1.1rem;
+    line-height: 1.4;
+
+    &:hover,
+    &:focus {
+      color: $blue;
+    }
   }
 
-  .result-tags {
+  .result-meta {
     display: block;
+    margin-top: .4rem;
     color: $lighten-gray;
-    font-size: 12px;
-    margin-top: 2px;
+    font-family: $sans-serif;
+    font-size: .8rem;
+  }
+
+  .result-tags:not(:empty) {
+    margin-left: .85rem;
+    padding-left: .85rem;
+    border-left: 1px solid $grey-2;
   }
 }
