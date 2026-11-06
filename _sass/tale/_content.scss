@@ -126,51 +126,55 @@
   }
 }
 
-// Code block header: language label + copy button (added by JS)
+// Code block: floating copy icon in the top-right corner (GitHub style)
 .post .code-block {
   position: relative;
   margin: 0 0 1rem;
-  border-radius: 6px;
-  background: $grey-3;
-  overflow: hidden;
 
   .highlight {
     margin: 0;
-    border-radius: 0;
+  }
+
+  &:hover .code-copy {
+    opacity: 1;
   }
 }
 
-.post .code-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: .3rem .85rem;
-  background: #eceef2;
-  border-bottom: 1px solid $grey-2;
-  font-family: $sans-serif;
-}
-
-.post .code-lang {
-  color: $lighten-gray;
-  font-size: .72rem;
-  letter-spacing: .5px;
-  text-transform: uppercase;
-}
-
 .post .code-copy {
-  border: 0;
-  background: none;
+  position: absolute;
+  top: .5rem;
+  right: .5rem;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid $grey-2;
+  border-radius: 6px;
+  background: $white;
   color: $lighten-gray;
   cursor: pointer;
-  font-family: $sans-serif;
-  font-size: .72rem;
-  padding: .12rem .45rem;
-  border-radius: 4px;
+  opacity: .6;
   @include transition(all .15s ease-out);
 
   &:hover {
     color: $default-shade;
-    background: rgba(0, 0, 0, .06);
+    border-color: $grey-1;
+  }
+
+  &.copied {
+    color: #1a7f37;
+    border-color: #1a7f37;
+    opacity: 1;
+  }
+
+  svg {
+    display: block;
+    width: 15px;
+    height: 15px;
+    fill: currentColor;
   }
 }
 
