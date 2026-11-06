@@ -5,7 +5,8 @@ tags: [proxy,system]
 comments: true
 ---
 
-{: .prompt-tip } 本文由 AI 汇总生成
+> 本文由 AI 汇总生成
+{: .prompt-tip } 
 
 最近在看 [ProxyBridge](https://github.com/InterceptSuite/ProxyBridge) 这个工具。它的定位是"按进程把流量分流到 SOCKS5/HTTP 代理"的透明代理——应用自己完全无感知、不用改任何代理配置,由系统在内核层把目标进程的连接悄悄劫持过去。
 
@@ -92,7 +93,8 @@ macOS 版基于 Apple 的 **Network Extension** 框架,以一个 **System Extens
 
 Linux 版是完整的原生实现:CLI + GTK3 GUI + systemd service。
 
-> {: .prompt-warning } 注意:GitHub **主页** README 把 Linux 写成 "Netfilter NFQUEUE + iptables",这段**已经过时**。真正的实现是 **eBPF 方案**——看代码 `Linux/src/bpf/proxybridge.bpf.c` 和 `Linux/README.md` 就清楚了。
+> 注意:GitHub **主页** README 把 Linux 写成 "Netfilter NFQUEUE + iptables",这段**已经过时**。真正的实现是 **eBPF 方案**——看代码 `Linux/src/bpf/proxybridge.bpf.c` 和 `Linux/README.md` 就清楚了。
+{: .prompt-warning }
 
 ### 机制
 
@@ -140,7 +142,8 @@ curl -Lo deploy.sh https://raw.githubusercontent.com/InterceptSuite/ProxyBridge/
 - **三平台都不支持真正的正则**。Windows / Linux 用的是 glob 通配(看 Linux 源码 `pb_rules.c` 里的 `pb_glob_match`,只实现了 `*` 和 `?`),没有 `[...]` 字符类、`(a|b)` 分组、`.*`/`+`/`{n}` 量词、`^`/`$` 锚点;
 - **macOS 甚至不是按进程名**,只能按 Bundle ID,连 `*chrome*` 这种都做不到(只能精确包标识)。
 
-{: .prompt-info } Linux / Windows 的 glob 合法写法示例:
+> Linux / Windows 的 glob 合法写法示例:
+{: .prompt-info }
 
 ```
 curl
@@ -156,7 +159,8 @@ firefox;chrome
 
 ## 六、CentOS 7 跑得起来吗?——基本不行
 
-{: .prompt-danger } 既然 Linux 版是 eBPF 方案,老系统就卡在硬门槛上了。拿 CentOS 7 对一下:
+> 既然 Linux 版是 eBPF 方案,老系统就卡在硬门槛上了。拿 CentOS 7 对一下:
+{: .prompt-danger } 
 
 | 要求 | CentOS 7 实际情况 |
 |---|---|
