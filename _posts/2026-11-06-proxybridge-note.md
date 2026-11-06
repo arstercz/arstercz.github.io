@@ -5,7 +5,7 @@ tags: [proxy,system]
 comments: true
 ---
 
-> 本文由 AI 汇总生成
+{: .prompt-tip } 本文由 AI 汇总生成
 
 最近在看 [ProxyBridge](https://github.com/InterceptSuite/ProxyBridge) 这个工具。它的定位是"按进程把流量分流到 SOCKS5/HTTP 代理"的透明代理——应用自己完全无感知、不用改任何代理配置,由系统在内核层把目标进程的连接悄悄劫持过去。
 
@@ -15,8 +15,6 @@ comments: true
 2. Windows / macOS / Linux 三个平台各自的**机制、系统要求、使用限制**;
 3. 三平台"进程匹配"能力对比(以及它到底能不能当正则用);
 4. 为什么在 CentOS 7 这种老系统上跑不起来,以及替代方案。
-
----
 
 ## 一、核心思路:内核拦截连接,转交本地 relay
 
@@ -33,8 +31,6 @@ comments: true
 | Linux | eBPF | cgroup v2 的 `connect4` / `connect6` / `sendmsg` hook |
 
 下面逐个展开。
-
----
 
 ## 二、Windows:WinDivert 驱动
 
@@ -65,7 +61,6 @@ GUI / CLI 用原生 C + Win32 API 写,启动快、体积小。
 - 最多 **32** 个代理配置同时生效,规则可各自指定走哪个代理;
 - **域名规则依赖明文 DNS**:域名是从应用自己的 DNS 查询里学到的,所以浏览器开了 DoH / "安全 DNS" 时域名匹配会失效。
 
----
 
 ## 三、macOS:Network Extension
 
@@ -93,13 +88,11 @@ macOS 版基于 Apple 的 **Network Extension** 框架,以一个 **System Extens
 - **部分系统进程绕过扩展**:为系统稳定,关键 macOS 服务不被拦截;
 - TCP 支持完整(可按目标 IP / 域名 / 端口 / 协议匹配),UDP 仅限 Bundle ID。
 
----
-
 ## 四、Linux:eBPF(cgroup connect hook)
 
 Linux 版是完整的原生实现:CLI + GTK3 GUI + systemd service。
 
-> ⚠️ 注意:GitHub **主页** README 把 Linux 写成 "Netfilter NFQUEUE + iptables",这段**已经过时**。真正的实现是 **eBPF 方案**——看代码 `Linux/src/bpf/proxybridge.bpf.c` 和 `Linux/README.md` 就清楚了。
+> {: .prompt-warning } 注意:GitHub **主页** README 把 Linux 写成 "Netfilter NFQUEUE + iptables",这段**已经过时**。真正的实现是 **eBPF 方案**——看代码 `Linux/src/bpf/proxybridge.bpf.c` 和 `Linux/README.md` 就清楚了。
 
 ### 机制
 
@@ -132,8 +125,6 @@ curl -Lo deploy.sh https://raw.githubusercontent.com/InterceptSuite/ProxyBridge/
 - 进程名**区分大小写**;解释型程序(python/node/java)按解释器二进制识别(如 `python3.12`);
 - 规则按顺序匹配、首次命中生效;本地代理工具(Burp / mitmproxy / Tor / `ssh -D`)会被自动豁免以防回环。
 
----
-
 ## 五、三平台"进程匹配"对比:都不是正则
 
 很多人关心能不能"按进程名正则分流",这里专门对比一下:
@@ -149,7 +140,7 @@ curl -Lo deploy.sh https://raw.githubusercontent.com/InterceptSuite/ProxyBridge/
 - **三平台都不支持真正的正则**。Windows / Linux 用的是 glob 通配(看 Linux 源码 `pb_rules.c` 里的 `pb_glob_match`,只实现了 `*` 和 `?`),没有 `[...]` 字符类、`(a|b)` 分组、`.*`/`+`/`{n}` 量词、`^`/`$` 锚点;
 - **macOS 甚至不是按进程名**,只能按 Bundle ID,连 `*chrome*` 这种都做不到(只能精确包标识)。
 
-Linux / Windows 的 glob 合法写法示例:
+{: .prompt-info } Linux / Windows 的 glob 合法写法示例:
 
 ```
 curl
@@ -163,11 +154,9 @@ firefox;chrome
 
 在 **Linux** 版上相对好办:进程名匹配发生在**用户态规则引擎**——eBPF 只负责提供触发点和 pid/cgroup,真正把"进程 → 规则"对应起来是在用户态写进 map 的。所以加正则**只需改用户态**(把 `pb_glob_match` / 规则解析换成 `regexec` 或 PCRE),**不用动 eBPF**,改动量不大、风险可控。
 
----
-
 ## 六、CentOS 7 跑得起来吗?——基本不行
 
-既然 Linux 版是 eBPF 方案,老系统就卡在硬门槛上了。拿 CentOS 7 对一下:
+{: .prompt-danger } 既然 Linux 版是 eBPF 方案,老系统就卡在硬门槛上了。拿 CentOS 7 对一下:
 
 | 要求 | CentOS 7 实际情况 |
 |---|---|
@@ -180,8 +169,6 @@ firefox;chrome
 - CentOS 7 已在 **2024 年 6 月 EOL**;
 - 官方安装脚本的发行版列表里也没有 CentOS 7(列的是较新的 RHEL/Rocky/Alma 等);
 - 就算用 ELRepo 的 `kernel-ml` 强升到 5.11+ 内核、再开 cgroup v2,也很折腾且脱离作者测试环境,生产不建议。
-
----
 
 ## 七、CentOS 7 上实现"按进程分流走代理"的替代方案
 
@@ -196,7 +183,7 @@ firefox;chrome
 
 ### 方案 2:`proxychains-ng`
 
-LD_PRELOAD 劫持,只对你用它启动的那个进程生效。
+`LD_PRELOAD` 劫持,只对你用它启动的那个进程生效。
 
 - 优点:最简单;
 - 局限:只对动态链接、且你能控制启动命令的程序有效(静态链接、setuid 的不行)。
@@ -209,8 +196,6 @@ LD_PRELOAD 劫持,只对你用它启动的那个进程生效。
 4. redsocks 转到你的代理。
 
 这是 CentOS 7 上最贴近 ProxyBridge 效果、且能支持**真正的正则进程匹配**的做法。
-
----
 
 ## 小结
 
