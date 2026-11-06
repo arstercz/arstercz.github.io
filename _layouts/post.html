@@ -5,11 +5,6 @@ layout: default
 {% capture toc %}{% include toc.html html=content sanitize=true class="toc-list" h_min=2 h_max=3 %}{% endcapture %}
 
 {% if toc contains '</a>' %}
-  <aside id="toc-sidebar" class="toc-sidebar">
-    <div class="toc-heading">Contents</div>
-    <nav class="toc-nav">{{ toc }}</nav>
-  </aside>
-
   <button id="toc-toggle" class="toc-toggle" type="button" aria-label="Table of contents" title="Contents">
     <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
       <line x1="8" y1="6" x2="20" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
@@ -129,8 +124,8 @@ layout: default
     });
   }
 
-  // Scroll-spy: highlight the current section in the desktop sidebar.
-  var spyLinks = [].slice.call(document.querySelectorAll('#toc-sidebar .toc-nav a'));
+  // Scroll-spy: highlight the current section (shown when the popup opens).
+  var spyLinks = [].slice.call(document.querySelectorAll('#toc-modal .toc-nav a'));
   var map = {};
   var ids = [];
   spyLinks.forEach(function (a) {
