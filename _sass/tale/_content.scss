@@ -101,4 +101,126 @@
     border: 0;
     background: $grey-2;
   }
+
+  // Heading anchor (appended by JS), shown on hover
+  .heading-anchor {
+    margin-left: .4rem;
+    color: $lighten-gray;
+    font-weight: 400;
+    text-decoration: none;
+    opacity: 0;
+    @include transition(opacity .15s ease-out);
+
+    &:hover {
+      color: $blue;
+      text-decoration: none;
+    }
+  }
+
+  h1:hover .heading-anchor,
+  h2:hover .heading-anchor,
+  h3:hover .heading-anchor,
+  h4:hover .heading-anchor,
+  .heading-anchor:focus {
+    opacity: 1;
+  }
+}
+
+// Code block header: language label + copy button (added by JS)
+.post .code-block {
+  position: relative;
+  margin: 0 0 1rem;
+  border-radius: 6px;
+  background: $grey-3;
+  overflow: hidden;
+
+  .highlight {
+    margin: 0;
+    border-radius: 0;
+  }
+}
+
+.post .code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .3rem .85rem;
+  background: #eceef2;
+  border-bottom: 1px solid $grey-2;
+  font-family: $sans-serif;
+}
+
+.post .code-lang {
+  color: $lighten-gray;
+  font-size: .72rem;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+}
+
+.post .code-copy {
+  border: 0;
+  background: none;
+  color: $lighten-gray;
+  cursor: pointer;
+  font-family: $sans-serif;
+  font-size: .72rem;
+  padding: .12rem .45rem;
+  border-radius: 4px;
+  @include transition(all .15s ease-out);
+
+  &:hover {
+    color: $default-shade;
+    background: rgba(0, 0, 0, .06);
+  }
+}
+
+// Callout / prompt boxes (use blockquote with {: .prompt-xxx })
+.post {
+  .prompt-tip,
+  .prompt-info,
+  .prompt-warning,
+  .prompt-danger {
+    position: relative;
+    margin: 0 0 1.15rem;
+    padding: .7rem 1rem .7rem 2.7rem;
+    color: $default-color;
+    border-left: .22rem solid;
+    border-radius: 0 6px 6px 0;
+
+    > :last-child {
+      margin-bottom: 0;
+    }
+
+    &::before {
+      position: absolute;
+      left: .85rem;
+      top: .65rem;
+      font-size: 1rem;
+      line-height: 1.4;
+    }
+  }
+
+  .prompt-tip {
+    border-color: #1a7f37;
+    background: rgba(26, 127, 55, .07);
+    &::before { content: "\1F4A1"; } // 💡
+  }
+
+  .prompt-info {
+    border-color: #0969da;
+    background: rgba(9, 105, 218, .07);
+    &::before { content: "\2139\FE0F"; } // ℹ️
+  }
+
+  .prompt-warning {
+    border-color: #bf8700;
+    background: rgba(191, 135, 0, .1);
+    &::before { content: "\26A0\FE0F"; } // ⚠️
+  }
+
+  .prompt-danger {
+    border-color: #cf222e;
+    background: rgba(207, 34, 46, .07);
+    &::before { content: "\26D4"; } // ⛔
+  }
 }

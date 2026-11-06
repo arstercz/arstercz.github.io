@@ -161,3 +161,81 @@ layout: default
   }
 })();
 </script>
+
+<script type="text/javascript">
+(function () {
+  var post = document.querySelector('.post');
+  if (!post) return;
+
+  // 1. Hover anchor links on content headings.
+  var heads = [].slice.call(post.querySelectorAll('h1[id], h2[id], h3[id], h4[id]'));
+  heads.forEach(function (h) {
+    var a = document.createElement('a');
+    a.className = 'heading-anchor';
+    a.href = '#' + h.id;
+    a.setAttribute('aria-label', 'Link to this section');
+    a.textContent = '#';
+    a.addEventListener('click', function (e) {
+      e.preventDefault();
+      var url = location.origin + location.pathname + '#' + h.id;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url);
+      }
+      if (history.replaceState) history.replaceState(null, '', '#' + h.id);
+      h.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    h.appendChild(a);
+  });
+
+  // 2. Code blocks: language label + copy button.
+  var blocks = [].slice.call(post.querySelectorAll('div.highlighter-rouge'));
+  blocks.forEach(function (box) {
+    var hl = box.querySelector('.highlight');
+    if (!hl) return; // skip anything without a real code block (e.g. inline code)
+    box.classList.add('code-block');
+
+    var m = box.className.match(/language-([\w+-]+)/);
+    var lang = m ? m[1] : '';
+    if (lang === 'plaintext' || lang === '') lang = 'text';
+
+    var header = document.createElement('div');
+    header.className = 'code-header';
+
+    var label = document.createElement('span');
+    label.className = 'code-lang';
+    label.textContent = lang;
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'code-copy';
+    btn.textContent = 'Copy';
+    btn.addEventListener('click', function () {
+      var code = box.querySelector('code');
+      var text = code ? code.innerText : '';
+      function done(ok) {
+        btn.textContent = ok ? 'Copied!' : 'Failed';
+        setTimeout(function () { btn.textContent = 'Copy'; }, 2000);
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { done(true); }, function () { done(false); });
+      } else {
+        try {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.position = 'fixed';
+          ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+          done(true);
+        } catch (err) { done(false); }
+      }
+    });
+
+    header.appendChild(label);
+    header.appendChild(btn);
+    box.insertBefore(header, box.firstChild);
+  });
+})();
+</script>
