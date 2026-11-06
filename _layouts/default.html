@@ -8,9 +8,80 @@
     {% include navigation.html %}
 
     <main>
-      {{ content }}
+      <div id="page-content">
+        {{ content }}
+      </div>
+
+      <div id="search-results" class="search-results" hidden>
+        <h2 class="search-results-title"></h2>
+        <ul id="search-results-list" class="archive"></ul>
+      </div>
     </main>
 
     {% include footer.html %}
+
+    <!-- Site search (Simple-Jekyll-Search) -->
+    <script src="{{ '/search.js' | prepend: site.baseurl }}" type="text/javascript"></script>
+    <script type="text/javascript">
+    (function () {
+      var input = document.getElementById('nav-search-input');
+      var pageContent = document.getElementById('page-content');
+      var panel = document.getElementById('search-results');
+      var list = document.getElementById('search-results-list');
+      var title = panel ? panel.querySelector('.search-results-title') : null;
+      if (!input || !pageContent || !panel || !list || typeof SimpleJekyllSearch === 'undefined') return;
+
+      SimpleJekyllSearch({
+        searchInput: input,
+        resultsContainer: list,
+        json: '{{ "/search.json" | prepend: site.baseurl }}',
+        searchResultTemplate:
+          '<li>' +
+            '<a href="{url}">{title}</a>' +
+            '<time>{date}</time>' +
+            '<span class="result-tags">{tags}</span>' +
+          '</li>',
+        noResultsText: '',
+        limit: 50,
+        fuzzy: false,
+        exclude: ['Welcome']
+      });
+
+      function showResults() {
+        if (title) {
+          var n = list.children.length;
+          title.textContent = n > 0
+            ? 'Search results for "' + input.value.trim() + '" (' + n + ')'
+            : 'No results for "' + input.value.trim() + '"';
+        }
+        pageContent.hidden = true;
+        panel.hidden = false;
+      }
+
+      function restore() {
+        panel.hidden = true;
+        pageContent.hidden = false;
+      }
+
+      function update() {
+        if (input.value.trim().length > 0) {
+          showResults();
+        } else {
+          restore();
+        }
+      }
+
+      input.addEventListener('keyup', update);
+
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' || e.keyCode === 27) {
+          input.value = '';
+          list.innerHTML = '';
+          restore();
+          input.blur();
+        }
+      });
+    })();
+    </script>
   </body>
 </html>
